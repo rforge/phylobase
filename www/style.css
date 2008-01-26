@@ -1,0 +1,50 @@
+
+/*CSS assembled by Peter Cowan 17 January 2007 
+    Components were borrowed and modified from:
+    http://www.nypl.org/styleguide/
+    http://schwilk.org/
+*/
+/* General stuff*/
+body {
+    margin: 0; padding: 0; 
+    font-family: verdana, trebuchet, tahoma, sans-serif; color: #000; 
+    font-size: 1.1em;
+    background: #E6E6E6; 
+} 
+
+dt {
+    font-weight: bold; 
+} 
+
+ol, li, dl, dt, dd {
+    line-height: 1.5em;
+}
+
+/* main section */
+.content {
+    position: absolute; top: 25px; left: 20px; 
+    padding: 0px 20px; margin: 0px 20px; 
+    border: 1px dotted #000; 
+/*    width: 540px; */
+    }
+
+/* General headline and link styling */
+p {margin-top: 0; padding-top: 0; line-height: 1.5em; margin-bottom: 1em;}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 1.25em 0 0 0; font-family: arial, helvetica, sans-serif;
+}
+
+img { border: 0 }
+
+a { text-decoration: none; font-weight: bold; }
+a:link { color: #D21200;}
+a:visited { color: #B20F01;}
+a:active { color: #FF5110;}
+a:hover { color: #FF1502; text-decoration: underline; }
+
+/* Footer */
+#footer, .marginalia { 
+    font: 10px verdana, arial, helvetica, sans-serif; 
+    margin-top: 10px; padding-top: 10px; border-top: 1px dotted #333333; 
+}

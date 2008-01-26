@@ -37,7 +37,7 @@ The phylobase package seeks to provide a set of S4 classes and methods for repre
 
 <!-- end of project description -->
 
-<p> The package can be install, on a good day, using the following commands at the R prompt: </p>
+<p> The package can be installed, on a good day, using the following commands at the R prompt: </p>
 
 <p>For windows users: install.packages("phylobase",repos="http://r-forge.r-project.org")</p>
 
@@ -45,7 +45,9 @@ The phylobase package seeks to provide a set of S4 classes and methods for repre
 
 <p>For everyone else: install.packages("phylobase", repos="http://r-forge.r-project.org", type = 'source')</p>
 
-<p> The <strong>project summary page</strong> you can find <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
+<p> The <strong>project summary page</strong> can found <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
+
+<p> The recent TODO list can be found  <a href= "todo.html" title = "TODO"><strong>here</strong></a>. </p>
 
 </body>
 </html>
