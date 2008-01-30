@@ -1,8 +1,8 @@
 # Init file for package RcppTemplate
 .First.lib <- function(lib, pkg) {
-	require(phylo4)
+##	require(phylo4)
 	require(ape)
-  library.dynam("RcppTemplate", pkg, lib )
+       library.dynam("phylobase", pkg, lib )
 }
 
 # Runs RcppTemplate demos interactively.
