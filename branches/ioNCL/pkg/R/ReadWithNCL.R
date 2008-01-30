@@ -99,7 +99,7 @@ NexusToPhylo4 <- function(fileToRead,multi=FALSE) {
 	
 # Finally ready to make the call...
     intreesstring <- .Call("ReadTreesWithNCL", params,
-						   PACKAGE="ReadWithNCL")
+						   PACKAGE="phylobase")
 	
 	intreesphylolist <- read.nexustreestring(intreesstring);
 	if (length(intreesphylolist)>1 || multi) {
@@ -128,7 +128,7 @@ NexusToDataFrame <- function(fileToRead,allchar=FALSE, polymorphictomissing=TRUE
 	}
 	
 	incharsstring <- .Call("ReadCharsWithNCL",params,
-						   PACKAGE="ReadWithNCL")
+						   PACKAGE="phylobase")
 	print(incharsstring)
 	tipdata<-eval(parse(text=incharsstring))
 	tipdata
