@@ -12,7 +12,7 @@
    }
  }
  \usage{
-\NexusToPhylo4D(fileToRead, multi=FALSE, allchar=FALSE, polymorphictomissing=TRUE, levelsall=TRUE)
+NexusToPhylo4D(fileToRead, multi=FALSE, allchar=FALSE, polymorphictomissing=TRUE, levelsall=TRUE)
 }
 \arguments{
   \item{fileToRead}{a Nexus file}

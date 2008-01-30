@@ -12,7 +12,7 @@
    }
  }
  \usage{
-\NexusToDataFrame(fileToRead,allchar=FALSE, polymorphictomissing=TRUE, levelsall=TRUE)
+NexusToDataFrame(fileToRead,allchar=FALSE, polymorphictomissing=TRUE, levelsall=TRUE)
 }
 \arguments{
   \item{fileToRead}{a Nexus file}
