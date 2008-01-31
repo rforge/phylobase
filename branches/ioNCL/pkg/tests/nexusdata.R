@@ -1,14 +1,11 @@
 ## try to read NEXUS files
+library(phylobase)
+fn <- system.file("nexusfiles/treepluscharV01.nex",package="phylobase")
+td<-NexusToPhylo4D(fn)
+summary(td)
+## would try plotting, but typically don't have enough room
+## to plot data
+## Error in .local(x, ...) : 
+##    No room left to plot data; please try reducing ratio.tree or cex.label.
+plot(as(td,"phylo4"))
 
-##  _0.2.1 extension is only necessary because I have two different
-##   versions installed 
-##
-##
-if (FALSE) {
-    library(phylobase,version="0.2.1")
-    fn <- system.file("nexusfiles/treepluscharV01.nex",package="phylobase_0.2.1")
-    td<-NexusToPhylo4D(fn)
-    file.copy(fn,"temp.nex")
-    td<-NexusToPhylo4D("temp.nex")
-    plot(td,ratio.tree=0.001)
-}
