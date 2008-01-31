@@ -46,8 +46,10 @@ RcppExport SEXP ReadWithNCL(SEXP params) {
 
 		// Get parameters in params - only 1 is gotten now
 		RcppParams rparam(params);
-		string filename = rparam.getStringValue("filename");
-	
+		string filename = "'";
+		filename+=rparam.getStringValue("filename");
+		filename+="'";
+		
 		BASICCMDLINE reader;
 		
 		//this is where the reader would be passed the filename to read
@@ -121,7 +123,9 @@ RcppExport SEXP ReadTreesWithNCL(SEXP params) {
 		
 		// Get parameters in params - only 1 is gotten now
 		RcppParams rparam(params);
-		string filename = rparam.getStringValue("filename");
+		string filename = "'";
+		filename+=rparam.getStringValue("filename");
+		filename+="'";
 		
 		BASICCMDLINE reader;
 		
@@ -167,7 +171,10 @@ RcppExport SEXP ReadCharsWithNCL(SEXP params) {
 		
 		// Get parameters in params - only 1 is gotten now
 		RcppParams rparam(params);
-		string filename = rparam.getStringValue("filename");
+		string filename = "'";
+		filename+=rparam.getStringValue("filename");
+		filename+="'";
+		
 		bool allchar = rparam.getBoolValue("allchar");
 		bool levelsall=rparam.getBoolValue("levelsall");
 		bool polymorphictomissing=rparam.getBoolValue("polymorphictomissing");
