@@ -22405,7 +22405,8 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-ac_config_files="$ac_config_files Makefile example/Makefile example/ncltest/Makefile example/nclsimplest/Makefile example/basiccmdline/Makefile example/normalizer/Makefile ncl/Makefile test/Makefile"
+#ac_config_files="$ac_config_files Makefile example/Makefile example/ncltest/Makefile example/nclsimplest/Makefile example/basiccmdline/Makefile example/normalizer/Makefile ncl/Makefile test/Makefile"
+ac_config_files="$ac_config_files Makefile ncl/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure

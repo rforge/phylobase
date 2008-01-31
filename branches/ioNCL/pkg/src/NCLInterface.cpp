@@ -842,11 +842,11 @@ NxsString BASICCMDLINE::ReturnDataForR(bool allchar, bool polymorphictomissing, 
 				int statenumber=characters->GetInternalRepresentation(taxon,character,0);
 				
 				if(characters->IsMissingState(taxon,character)) {
-					outputforR+='<NA>';
+					outputforR+="<NA>";
 				}
 				else if (characters->GetNumStates(taxon,character)>1) {
 					if(polymorphictomissing) {
-						outputforR+='<NA>';
+						outputforR+="<NA>";
 					}
 					else {
 						outputforR+='{';
