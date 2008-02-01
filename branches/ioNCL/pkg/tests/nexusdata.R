@@ -9,3 +9,9 @@ summary(td)
 ##    No room left to plot data; please try reducing ratio.tree or cex.label.
 plot(as(td,"phylo4"))
 
+## try to read a nexus file where the newick string describing the tree is split
+## across several lines
+multiLine <- system.file("nexusfiles/MultiLineTrees.nex",package="phylobase")
+multiLineTrees <-NexusToPhylo4(multiLine)
+summary(multiLineTrees)
+

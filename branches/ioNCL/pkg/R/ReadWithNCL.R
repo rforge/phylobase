@@ -114,7 +114,8 @@ read.nexustreestring <- function(X)
         TRANS <- matrix(x, ncol = 2, byrow = TRUE)
         TRANS[, 2] <- gsub("['\"]", "", TRANS[, 2])
     }
-    start <- if (translation)  semico[semico > i2][1] + 1 else semico[semico > i1][1]
+    ## find the first element in the vector of tree strings which starts with "TREE " or "tree " 
+    start <- grep("^\\W?[Tt][Rr][Ee][Ee]\\W", X)[1]
     end <- endblock[endblock > i1][1] - 1
 #	print(X)
 #	print(mode(X))
