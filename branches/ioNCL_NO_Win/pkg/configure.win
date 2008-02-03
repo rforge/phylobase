@@ -1,0 +1,15 @@
+echo "NOT building anything -- stub until Windows building is fixed!"
+##echo "Building libRcpp.a in RcppSrc..."
+##cd src/RcppSrc
+echo "RHOME=${R_HOME}"
+##make RHOME=${R_HOME}
+##cd ../..
+##echo "Building libncl.a in ncl..."
+##cd src/ncl
+##./configure.win
+##make
+##cd ../..
+##if test \! -d inst
+##then
+##    mkdir inst
+##fi
