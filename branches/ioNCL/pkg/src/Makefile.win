@@ -7,7 +7,7 @@
 
 OBJ = NCLInterface.o ReadWithNCL.o
 LINKOBJ  = NCLInterface.o ReadWithNCL.o $(RES)
-DLLLIBS = -s -L RcppSrc -lRcpp -L"$(RHOME)/bin" -lR --no-export-all-symbols --add-stdcall-alias
+DLLLIBS = -s -L RcppSrc -lRcpp -L"$(RHOME)/bin" -lR -L ncl/ncl -lncl --no-export-all-symbols --add-stdcall-alias
 BIN  = phylobase.dll
 CXXFLAGS = -I RcppSrc -I ncl/ncl -I"$(RHOME)/include" -I"$(RHOME)/src/include" -Wall -O2 -DBUILDING_DLL=1
 RM = rm -f
