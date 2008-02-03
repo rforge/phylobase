@@ -5,16 +5,16 @@
 #This include causes many warnings and other issues, and doesn't seem to be needed!
 #include $(RHOME)/src/gnuwin32/MkRules
 
-OBJ = RcppExample.o
-LINKOBJ  = RcppExample.o $(RES)
-DLLLIBS = -s -L../RcppSrc -lRcpp -L"$(RHOME)/bin" -lR --no-export-all-symbols --add-stdcall-alias
-BIN  = RcppTemplate.dll
-CXXFLAGS = -I../RcppSrc -I"$(RHOME)/include" -Wall -O2 -DBUILDING_DLL=1
+OBJ = NCLInterface.o ReadWithNCL.o
+LINKOBJ  = NCLInterface.o ReadWithNCL.o $(RES)
+DLLLIBS = -s -L RcppSrc -lRcpp -L"$(RHOME)/bin" -lR --no-export-all-symbols --add-stdcall-alias
+BIN  = phylobase.dll
+CXXFLAGS = -I RcppSrc -I ncl/ncl -I"$(RHOME)/include" -I"$(RHOME)/src/include" -Wall -O2 -DBUILDING_DLL=1
 RM = rm -f
 
 .PHONY: all clean
 
-all: RcppTemplate.dll
+all: phylobase.dll
 
 clean:
 	${RM} $(LINKOBJ) $(BIN)
@@ -22,5 +22,8 @@ clean:
 $(BIN): $(LINKOBJ)
 	$(CXX) -shared $(LINKOBJ) $(DLLLIBS) -o $(BIN)
 
-RcppExample.o: RcppExample.cpp
-	$(CXX) -c RcppExample.cpp -o RcppExample.o $(CXXFLAGS)
+NCLInterface.o: NCLInterface.cpp
+	$(CXX) -c NCLInterface.cpp -o NCLInterface.o $(CXXFLAGS)
+    
+ReadWithNCL.o: ReadWithNCL.cpp
+	$(CXX) -c ReadWithNCL.cpp -o ReadWithNCL.o $(CXXFLAGS)
