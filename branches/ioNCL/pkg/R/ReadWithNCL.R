@@ -1,6 +1,5 @@
 
 NexusToPhylo4 <- function(fileToRead,multi=FALSE) {
-    if (.Platform$OS.type=="windows") stop("windows stub")
 #This returns a single phylo4 object if the nexus file has one tree; 
 #it returns a list of phylo4 objects if the nexus file has more than one or multi==TRUE
 #Note that a list of phylo4 objects is not the same as a multiphylo4d object
@@ -31,29 +30,27 @@ NexusToPhylo4 <- function(fileToRead,multi=FALSE) {
 }
 
 NexusToDataFrame <- function(fileToRead,allchar=FALSE, polymorphictomissing=TRUE, levelsall=TRUE) {
-    if (.Platform$OS.type=="windows") stop("windows stub")
-    ##This returns a single phylo4D object if the nexus file has one tree; 
-    ##it returns a list of phylo4D objects if the nexus file has more than one or multi==TRUE
-    ##Note that a list of phylo4D objects is not the same as a multiphylo4d object
-    output<-c("Failure")
-    filename<-fileToRead
-    params <- list(filename=fileToRead, allchar=allchar, polymorphictomissing=polymorphictomissing, levelsall=levelsall)
+#This returns a single phylo4D object if the nexus file has one tree; 
+#it returns a list of phylo4D objects if the nexus file has more than one or multi==TRUE
+#Note that a list of phylo4D objects is not the same as a multiphylo4d object
+	output<-c("Failure")
+	filename<-fileToRead
+	params <- list(filename=fileToRead, allchar=allchar, polymorphictomissing=polymorphictomissing, levelsall=levelsall)
 	
-    ## Check that params is properly formatted.
-    if(!is.list(params) || length(params) == 0) {
-        stop("The params parameter must be a non-empty list")
-    }
-    
-    incharsstring <- .Call("ReadCharsWithNCL",params,
-                           PACKAGE="phylobase")
-    print(incharsstring)
-    tipdata<-eval(parse(text=incharsstring))
-    tipdata
+# Check that params is properly formatted.
+	if(!is.list(params) || length(params) == 0) {
+		stop("The params parameter must be a non-empty list")
+	}
+	
+	incharsstring <- .Call("ReadCharsWithNCL",params,
+						   PACKAGE="phylobase")
+	print(incharsstring)
+	tipdata<-eval(parse(text=incharsstring))
+	tipdata
 }
 
 
 NexusToPhylo4D <- function(fileToRead,multi=FALSE,allchar=FALSE, polymorphictomissing=TRUE, levelsall=TRUE) {
-        if (.Platform$OS.type=="windows") stop("windows stub")
 #This returns a single phylo4D object if the nexus file has one tree; 
 #it returns a list of phylo4D objects if the nexus file has more than one or multi==TRUE
 #Note that a list of phylo4D objects is not the same as a multiphylo4d object
