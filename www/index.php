@@ -1,6 +1,4 @@
 
-<!-- This is the project specific website template -->
-<!-- It can be changed as liked or replaced by other content -->
 
 <?php
 
@@ -37,17 +35,32 @@ The phylobase package seeks to provide a set of S4 classes and methods for repre
 
 <!-- end of project description -->
 
-<p> The package can be installed, on a good day, using the following commands at the R prompt: </p>
-
-<p>For windows users: install.packages("phylobase",repos="http://r-forge.r-project.org")</p>
-
-<p></p>
-
-<p>For everyone else: install.packages("phylobase", repos="http://r-forge.r-project.org", type = 'source')</p>
-
-<p> The <strong>project summary page</strong> can found <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
-
-<p> The recent TODO list can be found  <a href= "todo.html" title = "TODO"><strong>here</strong></a>. </p>
+<h2>Package resources</h2>
+<ul>
+<li>To install the current release version (0.3, rev. 104): download one of
+the following and install as appropriate for your platform.
+(<strong>phylobase does not currently build on 64-bit *nix.
+We are working to fix this.  Please contact us if you need
+phylobase for this platform, as it may encourage us to work harder.</strong>)
+<ul>
+<li><a href="misc/phylobase_0.3.tar.gz">Source</a> (for Linux, Unix, or MacOS/Windows with development
+tools installed)</a></li>
+<li><a href="misc/phylobase_0.3.zip">Windows binary</a></li>
+<li><strong>add MacOS binary here</strong>
+</ul></li>
+<li>To install the current nightly snapshot (on a good day):
+<ul>
+<li>Windows or *n*x users: <tt>install.packages("phylobase",repos="http://r-forge.r-project.org")</tt></li>
+<li>MacOS users: <tt>install.packages("phylobase", repos="http://r-forge.r-project.org", type = 'source')</tt> (because R-forge does not build MacOS binaries: 
+this will also work for Linux/Unix, where <tt>type='source'</tt> is the
+default)</li>
+</ul>
+</li>
+<li>A current copy (0.3r104) of the package
+<a href="misc/phylobase.pdf">vignette</a></li>
+<li>The <strong>project summary page</strong> can found <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </li>
+<li>The recent TODO list can be found  <a href= "todo.html" title = "TODO"><strong>here</strong></a>. </li>
+</ul>
 
 </body>
 </html>
