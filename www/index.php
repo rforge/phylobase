@@ -42,6 +42,10 @@ the following and install as appropriate for your platform.
 (<strong>phylobase does not currently build on 64-bit *nix.
 We are working to fix this.  Please contact us if you need
 phylobase for this platform, as it may encourage us to work harder.</strong>)
+(The current version requires ape version 2.1: MacOS users will
+need to specify <tt>install.packages("ape",type="source")</tt>,
+and have development tools installed,
+to get the right version.)
 <ul>
 <li><a href="misc/phylobase_0.3.tar.gz">Source</a> (for Linux, Unix, or MacOS/Windows with development
 tools installed)</a></li>
