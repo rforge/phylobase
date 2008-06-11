@@ -1,0 +1,328 @@
+## Peter Cowan 2008-06-11 Heavily modified from Emmanuel Paradis plot.phylo
+## original copyright below
+
+## plot.phylo.R (2008-05-08)
+
+##   Plot Phylogenies
+
+## Copyright 2002-2008 Emmanuel Paradis
+
+## This file is part of the R-package `ape'.
+## See the file ../COPYING for licensing issues.
+
+myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
+                       node.pos = NULL, show.tip.label = TRUE,
+                       show.node.label = FALSE, edge.color = "black",
+                       edge.width = 1, font = 3, cex = par("cex"),
+                       adj = NULL, srt = 0, no.margin = FALSE,
+                       root.edge = FALSE, label.offset = 0, underscore = FALSE,
+                       x.lim = NULL, y.lim = NULL, direction = "rightwards",
+                       lab4ut = "horizontal", tip.color = "black", ...)
+{
+    require(grid)
+    require(ape)
+    Ntip <- length(x$tip.label)
+    if (Ntip == 1) stop("found only one tip in the tree!")
+    Nedge <- dim(x$edge)[1]
+    if (any(tabulate(x$edge[, 1]) == 1))
+      stop("there are single (non-splitting) nodes in your tree; you may need to use collapse.singles().")
+    Nnode <- x$Nnode
+    ROOT <- Ntip + 1
+    type <- match.arg(type, c("phylogram"))
+    direction <- match.arg(direction, c("rightwards", "leftwards",
+                                        "upwards", "downwards"))
+    if (is.null(x$edge.length)) use.edge.length <- FALSE
+    if (type == "unrooted" || !use.edge.length) root.edge <- FALSE
+    phyloORclado <- type %in% c("phylogram", "cladogram")
+    horizontal <- direction %in% c("rightwards", "leftwards")
+    if (phyloORclado) {
+        ## we first compute the y-coordinates of the tips.
+        ## Fix from Klaus Schliep (2007-06-16):
+        if (!is.null(attr(x, "order")))
+          if (attr(x, "order") == "pruningwise")
+            x <- reorder(x)
+        ## End of fix
+        yy <- numeric(Ntip + Nnode)
+        TIPS <- x$edge[x$edge[, 2] <= Ntip, 2]
+        yy[TIPS] <- 1:Ntip
+    }
+    edge.color <- rep(edge.color, length.out = Nedge)
+    edge.width <- rep(edge.width, length.out = Nedge)
+    ## fix from Li-San Wang (2007-01-23):
+    xe <- x$edge
+    x <- reorder(x, order = "pruningwise")
+    ereorder <- match(x$edge[, 2], xe[, 2])
+    edge.color <- edge.color[ereorder]
+    edge.width <- edge.width[ereorder]
+    ## End of fix
+    
+    grid.newpage()
+    if(show.tip.label) {
+        treelayout <- grid.layout(1, 2, widths = unit(c(1, 1), c('null', 'strwidth'), list(NULL, 'seven')))
+    } else {treelayout = NULL}
+    pushViewport(viewport(0.5, 0.5, 0.8, 0.8, layout = treelayout, name = 'treelayout'))
+    grid.edit('treelayout', rot = 90)
+    if (phyloORclado) {
+        if (is.null(node.pos)) {
+            node.pos <- 1
+        }
+        if (node.pos == 1)
+          yy <- .C("node_height", as.integer(Ntip), as.integer(Nnode),
+                   as.integer(x$edge[, 1]), as.integer(x$edge[, 2]),
+                   as.integer(Nedge), as.double(yy),
+                   DUP = FALSE, PACKAGE = "ape")[[6]]
+        else {
+          ## node_height_clado requires the number of descendants
+          ## for each node, so we compute `xx' at the same time
+          ans <- .C("node_height_clado", as.integer(Ntip),
+                    as.integer(Nnode), as.integer(x$edge[, 1]),
+                    as.integer(x$edge[, 2]), as.integer(Nedge),
+                    double(Ntip + Nnode), as.double(yy),
+                    DUP = FALSE, PACKAGE = "ape")
+          xx <- ans[[6]] - 1
+          yy <- ans[[7]]
+        }
+        if (!use.edge.length) {
+            if(node.pos != 2)
+              xx <- .C("node_depth", as.integer(Ntip), as.integer(Nnode),
+                       as.integer(x$edge[, 1]), as.integer(x$edge[, 2]),
+                       as.integer(Nedge), double(Ntip + Nnode),
+                       DUP = FALSE, PACKAGE = "ape")[[6]] - 1
+            xx <- max(xx) - xx
+        } else  {
+              xx <- .C("node_depth_edgelength", as.integer(Ntip),
+                       as.integer(Nnode), as.integer(x$edge[, 1]),
+                       as.integer(x$edge[, 2]), as.integer(Nedge),
+                       as.double(x$edge.length), double(Ntip + Nnode),
+                       DUP = FALSE, PACKAGE = "ape")[[7]]
+        }
+    }
+    if (type == "unrooted") {
+        XY <- if (use.edge.length)
+          unrooted.xy(Ntip, Nnode, x$edge, x$edge.length)
+        else
+          unrooted.xy(Ntip, Nnode, x$edge, rep(1, Nedge))
+        ## rescale so that we have only positive values
+        xx <- XY$M[, 1] - min(XY$M[, 1])
+        yy <- XY$M[, 2] - min(XY$M[, 2])
+    }
+    if (phyloORclado && root.edge) {
+        if (direction == "rightwards") xx <- xx + x$root.edge
+    }
+    if (is.null(x.lim)) {
+        if (phyloORclado) {
+            if (horizontal) {
+                x.lim <- c(0, NA)
+                tmp <-
+                  if (show.tip.label) nchar(x$tip.label) * 0.018 * max(xx) * cex
+                  else 0
+                x.lim[2] <- max(xx[1:Ntip] + tmp)
+            } else x.lim <- c(1, Ntip)
+        }
+
+        if (type == "unrooted") {
+            if (show.tip.label) {
+                offset <- max(nchar(x$tip.label) * 0.018 * max(yy) * cex)
+                x.lim <- c(0 - offset, max(xx) + offset)
+            } else x.lim <- c(0, max(xx))
+        }
+
+    } else if (length(x.lim) == 1) {
+        x.lim <- c(0, x.lim)
+        if (type %in% c("fan", "unrooted") && show.tip.label)
+          x.lim[1] <- -max(nchar(x$tip.label) * 0.018 * max(yy) * cex)
+    }
+    if (is.null(y.lim)) {
+        if (phyloORclado) {
+            if (horizontal) y.lim <- c(1, Ntip) else {
+                y.lim <- c(0, NA)
+                tmp <-
+                  if (show.tip.label) nchar(x$tip.label) * 0.018 * max(yy) * cex
+                  else 0
+                y.lim[2] <-
+                  if (direction == "downwards") max(yy[ROOT] + tmp)
+                  else max(yy[1:Ntip] + tmp)
+            }
+        }
+
+        if (type == "unrooted") {
+            if (show.tip.label) {
+                offset <- max(nchar(x$tip.label) * 0.018 * max(yy) * cex)
+                y.lim <- c(0 - offset, max(yy) + offset)
+            } else y.lim <- c(0, max(yy))
+        }
+    } else if (length(y.lim) == 1) {
+        y.lim <- c(0, y.lim)
+        if (phyloORclado && horizontal) y.lim[1] <- 1
+        if (type %in% c("fan", "unrooted") && show.tip.label)
+          y.lim[1] <- -max(nchar(x$tip.label) * 0.018 * max(yy) * cex)
+    }
+    ## fix by Klaus Schliep (2008-03-28):
+    asp <- if (type %in% c("fan", "radial")) 1 else NA
+    if (is.null(adj))
+      adj <- 0
+    if (phyloORclado) {
+        MAXSTRING <- max(strwidth(x$tip.label, cex = cex))
+        if (direction == "rightwards") {
+            lox <- label.offset + MAXSTRING * 1.05 * adj
+            loy <- 0
+        }
+    }
+    
+
+    if (show.tip.label) {
+        pushViewport(viewport(layout = treelayout, layout.pos.col = 2, name = 'tip_labels'))
+        grid.text(x$tip.label, x = rep(0, length(x$tip.label)), y = (yy/max(yy))[TIPS])
+        popViewport()
+    }
+    if (type == "phylogram") {
+        phylogram.plot2(x$edge, Ntip, Nnode, xx, yy,
+                       horizontal, edge.color, edge.width, xlim = x.lim, ylim = y.lim, layout = treelayout)
+    } else {
+        cladogram.plot(x$edge, xx, yy, edge.color, edge.width)
+    }
+    if (root.edge)
+      switch(direction,
+             "rightwards" = grid.segments(0, yy[ROOT], x$root.edge, yy[ROOT]))
+    L <- list(type = type, use.edge.length = use.edge.length,
+              node.pos = node.pos, show.tip.label = show.tip.label,
+              show.node.label = show.node.label, font = font,
+              cex = cex, adj = adj, srt = srt, no.margin = no.margin,
+              label.offset = label.offset, x.lim = x.lim, y.lim = y.lim,
+              direction = direction, tip.color = tip.color,
+              Ntip = Ntip, Nnode = Nnode)
+    assign("last_plot.phylo", c(L, list(edge = xe, xx = xx, yy = yy)),
+           envir = .PlotPhyloEnv)
+    invisible(L)
+}
+
+phylogram.plot2 <- function(edge, Ntip, Nnode, xx, yy,
+                           horizontal, edge.color, edge.width, xlim, ylim, layout)
+{
+    nodes <- (Ntip + 1):(Ntip + Nnode)
+    if (!horizontal) {
+        tmp <- yy
+        yy <- xx
+        xx <- tmp
+    }
+    ## un trait vertical à chaque noeud...
+    x0v <- xx[nodes]
+    y0v <- y1v <- numeric(Nnode)
+    for (i in nodes) {
+        j <- edge[which(edge[, 1] == i), 2]
+        y0v[i - Ntip] <- min(yy[j])
+        y1v[i - Ntip] <- max(yy[j])
+    }
+    ## ... et un trait horizontal partant de chaque tip et chaque noeud
+    ##  vers la racine
+    sq <- if (Nnode == 1) 1:Ntip else c(1:Ntip, nodes[-1])
+    y0h <- yy[sq]
+    x1h <- xx[sq]
+    ## match() is very useful here becoz each element in edge[, 2] is
+    ## unique (not sure this is so useful in edge[, 1]; needs to be checked)
+    ## `pos' gives for each element in `sq' its index in edge[, 2]
+    pos <- match(sq, edge[, 2])
+    x0h <- xx[edge[pos, 1]]
+
+    e.w <- unique(edge.width)
+    if (length(e.w) == 1) width.v <- rep(e.w, Nnode)
+    else {
+        width.v <- rep(1, Nnode)
+        for (i in 1:Nnode) {
+            br <- edge[which(edge[, 1] == i + Ntip), 2]
+            width <- unique(edge.width[br])
+            if (length(width) == 1) width.v[i] <- width
+        }
+    }
+    e.c <- unique(edge.color)
+    if (length(e.c) == 1) color.v <- rep(e.c, Nnode)
+    else {
+        color.v <- rep("black", Nnode)
+        for (i in 1:Nnode) {
+            br <- which(edge[, 1] == i + Ntip)
+            #br <- edge[which(edge[, 1] == i + Ntip), 2]
+            color <- unique(edge.color[br])
+            if (length(color) == 1) color.v[i] <- color
+        }
+    }
+
+    ## we need to reorder `edge.color' and `edge.width':
+    edge.width <- edge.width[pos]
+    edge.color <- edge.color[pos]
+    xmax <- xlim[2]
+    ymax <- ylim[2]
+    pushViewport(viewport(xmax/(xmax * 2) , ymax / (ymax * 2), xmax, ymax, layout = layout, layout.pos.col = 1, name = 'tree'))
+    grid.segments((x0v/xmax), (y0v/ymax), (x0v/xmax), (y1v/ymax), name = "vert") #, gp = gpar(col = color.v, lwd = width.v)) # draws vertical lines
+    grid.segments(x0h/xmax, y0h/ymax, x1h/xmax, y0h/ymax, name = "horz") #, gp = gpar(col = edge.color, lwd = edge.width)) # draws horizontal lines
+    popViewport()
+}
+
+cladogram.plot <- function(edge, xx, yy, edge.color, edge.width)
+  segments(xx[edge[, 1]], yy[edge[, 1]], xx[edge[, 2]], yy[edge[, 2]],
+           col = edge.color, lwd = edge.width)
+
+unrooted.xy <- function(Ntip, Nnode, edge, edge.length)
+{
+    foo <- function(node, ANGLE, AXIS) {
+        ind <- which(edge[, 1] == node)
+        sons <- edge[ind, 2]
+        start <- AXIS - ANGLE/2
+        for (i in 1:length(sons)) {
+            h <- edge.length[ind[i]]
+            angle[sons[i]] <<- alpha <- ANGLE*nb.sp[sons[i]]/nb.sp[node]
+            axis[sons[i]] <<- beta <- start + alpha/2   
+            start <- start + alpha
+            xx[sons[i]] <<- h*cos(beta) + xx[node]
+            yy[sons[i]] <<- h*sin(beta) + yy[node]
+        }
+        for (i in sons)
+          if (i > Ntip) foo(i, angle[i], axis[i])
+    }
+    root <- Ntip + 1
+    Nedge <- dim(edge)[1]
+    yy <- xx <- numeric(Ntip + Nnode)
+    nb.sp <- .C("node_depth", as.integer(Ntip), as.integer(Nnode),
+                as.integer(edge[, 1]), as.integer(edge[, 2]),
+                as.integer(Nedge), double(Ntip + Nnode),
+                DUP = FALSE, PACKAGE = "ape")[[6]]
+    ## `angle': the angle allocated to each node wrt their nb of tips
+    ## `axis': the axis of each branch
+    axis <- angle <- numeric(Ntip + Nnode)
+    ## start with the root...
+    ## xx[root] <- yy[root] <- 0 # already set!
+    foo(root, 2*pi, 0)
+
+    M <- cbind(xx, yy)
+    axe <- axis[1:Ntip] # the axis of the terminal branches (for export)
+    axeGTpi <- axe > pi
+    ## insures that returned angles are in [-PI, +PI]:
+    axe[axeGTpi] <- axe[axeGTpi] - 2*pi
+    list(M = M, axe = axe)
+}
+
+node.depth <- function(phy)
+{
+    n <- length(phy$tip.label)
+    m <- phy$Nnode
+    N <- dim(phy$edge)[1]
+    phy <- reorder(phy, order = "pruningwise")
+    .C("node_depth", as.integer(n), as.integer(m),
+       as.integer(phy$edge[, 1]), as.integer(phy$edge[, 2]),
+       as.integer(N), double(n + m), DUP = FALSE, PACKAGE = "ape")[[6]]
+}
+
+plot.multiPhylo <- function(x, layout = 1, ...)
+{
+    if (layout > 1)
+      layout(matrix(1:layout, ceiling(sqrt(layout)), byrow = TRUE))
+    else layout(matrix(1))
+    if (!par("ask")) {
+        par(ask = TRUE)
+        on.exit(par(ask = FALSE))
+    }
+    for (i in 1:length(x)) plot(x[[i]], ...)
+}
+
+## testing
+## myplot(bar, show.tip.label = TRUE)
+## bar$tip.label <- c("one", "two", "three", "four", "five", "six", "seven")
