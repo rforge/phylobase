@@ -25,7 +25,8 @@ myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
     if (Ntip == 1) stop("found only one tip in the tree!")
     Nedge <- dim(x$edge)[1]
     if (any(tabulate(x$edge[, 1]) == 1))
-      stop("there are single (non-splitting) nodes in your tree; you may need to use collapse.singles().")
+      stop("there are single (non-splitting) nodes in your tree; 
+        you may need to use collapse.singles().")
     Nnode <- x$Nnode
     ROOT <- Ntip + 1
     type <- match.arg(type, c("phylogram"))
@@ -169,21 +170,30 @@ myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
         }
     }
     
-
+    ## Grid calls Peter GSOC
     if (show.tip.label) {
-        pushViewport(viewport(layout = treelayout, layout.pos.col = 2, name = 'tip_labels'))
-        grid.text(x$tip.label, x = rep(0, length(x$tip.label)), y = (yy/max(yy))[TIPS])
+        pushViewport(viewport(
+            layout = treelayout, 
+            layout.pos.col = 2, 
+            name = 'tip_labels'))
+        grid.text(
+            x$tip.label, 
+            x = rep(0, length(x$tip.label)), 
+            y = (yy/max(yy))[TIPS])
         popViewport()
     }
     if (type == "phylogram") {
         phylogram.plot2(x$edge, Ntip, Nnode, xx, yy,
-                       horizontal, edge.color, edge.width, xlim = x.lim, ylim = y.lim, layout = treelayout)
+                       horizontal, edge.color, edge.width, 
+                       xlim = x.lim, ylim = y.lim, layout = treelayout)
     } else {
         cladogram.plot(x$edge, xx, yy, edge.color, edge.width)
     }
-    if (root.edge)
-      switch(direction,
-             "rightwards" = grid.segments(0, yy[ROOT], x$root.edge, yy[ROOT]))
+    
+    if (root.edge) {
+        grid.segments(0, yy[ROOT], x$root.edge, yy[ROOT])
+    }
+    
     L <- list(type = type, use.edge.length = use.edge.length,
               node.pos = node.pos, show.tip.label = show.tip.label,
               show.node.label = show.node.label, font = font,
@@ -251,9 +261,20 @@ phylogram.plot2 <- function(edge, Ntip, Nnode, xx, yy,
     edge.color <- edge.color[pos]
     xmax <- xlim[2]
     ymax <- ylim[2]
-    pushViewport(viewport(xmax/(xmax * 2) , ymax / (ymax * 2), xmax, ymax, layout = layout, layout.pos.col = 1, name = 'tree'))
-    grid.segments((x0v/xmax), (y0v/ymax), (x0v/xmax), (y1v/ymax), name = "vert") #, gp = gpar(col = color.v, lwd = width.v)) # draws vertical lines
-    grid.segments(x0h/xmax, y0h/ymax, x1h/xmax, y0h/ymax, name = "horz") #, gp = gpar(col = edge.color, lwd = edge.width)) # draws horizontal lines
+    ## grid calls Peter GSOC
+    pushViewport(viewport(
+        x = xmax/(xmax * 2), y = ymax / (ymax * 2), 
+        width = xmax, height = ymax, 
+        layout = layout, layout.pos.col = 1, 
+        name = 'tree'))
+    grid.segments( # draws vertical lines
+        x0 = x0v/xmax, y0 = y0v/ymax, 
+        x1 = x0v/xmax, y1 = y1v/ymax, 
+        name = "vert") #, gp = gpar(col = color.v, lwd = width.v)) 
+    grid.segments(  # draws horizontal lines
+        x0 = x0h/xmax, y0 = y0h/ymax, 
+        x1 = x1h/xmax, y1 = y0h/ymax, 
+        name = "horz") #, gp = gpar(col = edge.color, lwd = edge.width))
     popViewport()
 }
 
