@@ -62,6 +62,7 @@ Additional information:
 <li>A current copy (0.3r104) of the package
 <a href="misc/phylobase.pdf"><strong>vignette</strong></a></li>
 <li>The <strong>project summary page</strong> can found <a href="http://r-forge.r-project.org/projects/phylobase/"><strong>here</strong></a>. </li>
+<li>Google Summer of Code <a href= "gsoc.html" title = "GSOC"><strong>project description and progress</strong></a>. </li>
 </ul>
 
 The phylobase email lists can be accessed and subscribed to from <a href="http://r-forge.r-project.org/mail/?group_id=111">this page.</a>
