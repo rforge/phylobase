@@ -183,7 +183,8 @@ myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
         grid.text(
             x$tip.label, 
             x = rep(0, length(x$tip.label)), 
-            y = (yy/max(yy))[TIPS], rot = rot
+            y = (yy/max(yy))[TIPS], 
+            rot = rot, just = 'left'
             )
         popViewport()
     }
@@ -338,7 +339,7 @@ node.depth <- function(phy)
 }
 
 ## testing
-require(ape)
-bar <- rcoal(7)
-bar$tip.label <- c("one", "two", "three", "four", "five", "six", "seven")
-myplot(bar, show.tip.label = TRUE)
+## require(ape)
+## bar <- rcoal(7)
+## bar$tip.label <- c("one", "two", "three", "four", "five", "six", "seven")
+## myplot(bar, show.tip.label = TRUE)
