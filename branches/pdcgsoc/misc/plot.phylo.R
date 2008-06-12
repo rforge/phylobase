@@ -17,17 +17,16 @@ myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
                        adj = NULL, srt = 0, no.margin = FALSE,
                        root.edge = FALSE, label.offset = 0, underscore = FALSE,
                        x.lim = NULL, y.lim = NULL, direction = "rightwards",
-                       lab4ut = "horizontal", tip.color = "black", ...)
+                       lab4ut = "horizontal", tip.color = "black", rot = 0,  ...)
 {
     require(grid)
-    require(ape)
     Ntip <- length(x$tip.label)
     if (Ntip == 1) stop("found only one tip in the tree!")
     Nedge <- dim(x$edge)[1]
-    if (any(tabulate(x$edge[, 1]) == 1))
-      stop("there are single (non-splitting) nodes in your tree; 
-        you may need to use collapse.singles().")
-    Nnode <- x$Nnode
+    ## if (any(tabulate(x$edge[, 1]) == 1))
+    ##    stop("there are single (non-splitting) nodes in your tree; 
+    ##      you may need to use collapse.singles().")
+     Nnode <- x$Nnode
     ROOT <- Ntip + 1
     type <- match.arg(type, c("phylogram"))
     direction <- match.arg(direction, c("rightwards", "leftwards",
@@ -57,12 +56,17 @@ myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
     edge.width <- edge.width[ereorder]
     ## End of fix
     
+    ## grid calls Peter GSOC
     grid.newpage()
     if(show.tip.label) {
-        treelayout <- grid.layout(1, 2, widths = unit(c(1, 1), c('null', 'strwidth'), list(NULL, 'seven')))
+        treelayout <- grid.layout(nrow = 1, ncol = 2, 
+            widths = unit(c(1, 1), c('null', 'strwidth'), list(NULL, 'seven')))
     } else {treelayout = NULL}
-    pushViewport(viewport(0.5, 0.5, 0.8, 0.8, layout = treelayout, name = 'treelayout'))
-    grid.edit('treelayout', rot = 90)
+    pushViewport(viewport(
+        x = 0.5, y = 0.5, 
+        width = 0.8, height = 0.8, 
+        layout = treelayout, name = 'treelayout', angle = -rot)) # rotataion set here
+    
     if (phyloORclado) {
         if (is.null(node.pos)) {
             node.pos <- 1
@@ -179,7 +183,8 @@ myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
         grid.text(
             x$tip.label, 
             x = rep(0, length(x$tip.label)), 
-            y = (yy/max(yy))[TIPS])
+            y = (yy/max(yy))[TIPS], rot = rot
+            )
         popViewport()
     }
     if (type == "phylogram") {
@@ -332,18 +337,8 @@ node.depth <- function(phy)
        as.integer(N), double(n + m), DUP = FALSE, PACKAGE = "ape")[[6]]
 }
 
-plot.multiPhylo <- function(x, layout = 1, ...)
-{
-    if (layout > 1)
-      layout(matrix(1:layout, ceiling(sqrt(layout)), byrow = TRUE))
-    else layout(matrix(1))
-    if (!par("ask")) {
-        par(ask = TRUE)
-        on.exit(par(ask = FALSE))
-    }
-    for (i in 1:length(x)) plot(x[[i]], ...)
-}
-
 ## testing
-## myplot(bar, show.tip.label = TRUE)
-## bar$tip.label <- c("one", "two", "three", "four", "five", "six", "seven")
+require(ape)
+bar <- rcoal(7)
+bar$tip.label <- c("one", "two", "three", "four", "five", "six", "seven")
+myplot(bar, show.tip.label = TRUE)
