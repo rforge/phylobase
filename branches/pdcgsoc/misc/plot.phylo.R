@@ -26,6 +26,14 @@ myorder <- function(edge, tips, root = tips + 1) {
     c(nord, which(index))
 }
 
+reorder.phylo4 <- function(phy) {
+    index <- myorder(phy@edge, length(phy@tip.label))
+    phy@edge        <- phy@edge[index, ]
+    phy@edge.label  <- phy@edge.label[index]
+    phy@edge.length <- phy@edge.length[index]
+    phy
+}
+
 myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
                        node.pos = NULL, show.tip.label = TRUE,
                        show.node.label = FALSE, edge.color = "black",
@@ -52,7 +60,7 @@ myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
     if (!use.edge.length) root.edge <- FALSE
 
     xe <- x@edge
-    x@edge <- x@edge[myorder(x@edge, Ntip), ]
+    x <- reorder.phylo4(x)
     ## TODO does is make sense to pile edge and node data into a phylo4d object?
     ## Fix from Klaus Schliep (2007-06-16):
     ## fix from Li-San Wang (2007-01-23):
@@ -284,15 +292,15 @@ node.depth <- function(phy)
     n <- length(phy@tip.label)
     m <- phy@Nnode
     N <- dim(phy@edge)[1]
-    phy@edge <- phy@edge[myorder(phy@edge, n), ]
+    phy <- reorder.phylo4(phy)
     .C("node_depth", as.integer(n), as.integer(m),
        as.integer(phy@edge[, 1]), as.integer(phy@edge[, 2]),
        as.integer(N), double(n + m), DUP = FALSE, PACKAGE = "ape")[[6]]
 }
 
 ## testing
-## require(phylobase)
-## bar <- rcoal(7)
-## bar$tip.label <- c("one", "two", "three", "four", "five", "six", "seven")
-## bar <- as(bar, 'phylo4')
-## myplot(bar, show.tip.label = TRUE)
+require(phylobase)
+bar <- rcoal(7)
+bar$tip.label <- c("one", "two", "three", "four", "five", "six", "seven")
+bar <- as(bar, 'phylo4')
+myplot(bar, show.tip.label = TRUE)
