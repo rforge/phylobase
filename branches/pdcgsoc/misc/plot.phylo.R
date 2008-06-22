@@ -10,6 +10,22 @@
 ## This file is part of the R-package `ape'.
 ## See the file ../COPYING for licensing issues.
 
+myorder <- function(edge, tips, root = tips + 1) {
+    ## if(is.null(root)) {
+    ##     root <- tips + 1
+    ## }
+    ## if(root <= tips) {return()}
+    index <- edge[, 1] == root
+    nextr <- edge[index, 2]
+    ## paths <- apply(as.matrix(nextr), 1, reorder, edge = edge, tips = tips)
+    nord <- NULL
+    for(i in nextr) {
+        if(i <= tips) {next()}
+        nord <- c(nord, myorder(edge, tips, root = i))
+    }
+    c(nord, which(index))
+}
+
 myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
                        node.pos = NULL, show.tip.label = TRUE,
                        show.node.label = FALSE, edge.color = "black",
@@ -20,42 +36,38 @@ myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
                        lab4ut = "horizontal", tip.color = "black", rot = 0,  ...)
 {
     require(grid)
-    Ntip <- length(x$tip.label)
+    Ntip <- length(x@tip.label)
+    
     if (Ntip == 1) stop("found only one tip in the tree!")
-    Nedge <- dim(x$edge)[1]
-    ## if (any(tabulate(x$edge[, 1]) == 1))
-    ##    stop("there are single (non-splitting) nodes in your tree; 
-    ##      you may need to use collapse.singles().")
-     Nnode <- x$Nnode
+    
+    Nedge <- dim(x@edge)[1]
+    Nnode <- x@Nnode
+    
     ROOT <- Ntip + 1
-    type <- match.arg(type, c("phylogram"))
+        
     direction <- match.arg(direction, c("rightwards", "leftwards",
                                         "upwards", "downwards"))
-    if (is.null(x$edge.length)) use.edge.length <- FALSE
-    if (type == "unrooted" || !use.edge.length) root.edge <- FALSE
-    phyloORclado <- type %in% c("phylogram", "cladogram")
-    horizontal <- direction %in% c("rightwards", "leftwards")
-    if (phyloORclado) {
-        ## we first compute the y-coordinates of the tips.
-        ## Fix from Klaus Schliep (2007-06-16):
-        if (!is.null(attr(x, "order")))
-          if (attr(x, "order") == "pruningwise")
-            x <- reorder(x)
-        ## End of fix
-        yy <- numeric(Ntip + Nnode)
-        TIPS <- x$edge[x$edge[, 2] <= Ntip, 2]
-        yy[TIPS] <- 1:Ntip
-    }
-    edge.color <- rep(edge.color, length.out = Nedge)
-    edge.width <- rep(edge.width, length.out = Nedge)
+    
+    if (is.null(x@edge.length)) use.edge.length <- FALSE
+    if (!use.edge.length) root.edge <- FALSE
+
+    xe <- x@edge
+    x@edge <- x@edge[myorder(x@edge, Ntip), ]
+    ## TODO does is make sense to pile edge and node data into a phylo4d object?
+    ## Fix from Klaus Schliep (2007-06-16):
     ## fix from Li-San Wang (2007-01-23):
-    xe <- x$edge
-    x <- reorder(x, order = "pruningwise")
-    ereorder <- match(x$edge[, 2], xe[, 2])
+
+    ereorder <- match(x@edge[, 2], xe[, 2])
     edge.color <- edge.color[ereorder]
     edge.width <- edge.width[ereorder]
-    ## End of fix
-    
+
+    edge.color <- rep(edge.color, length.out = Nedge)
+    edge.width <- rep(edge.width, length.out = Nedge)
+
+    yy <- numeric(Ntip + Nnode)
+    TIPS <- x@edge[x@edge[, 2] <= Ntip, 2]
+    yy[TIPS] <- 1:Ntip
+
     ## grid calls Peter GSOC
     grid.newpage()
     if(show.tip.label) {
@@ -67,112 +79,60 @@ myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
         width = 0.8, height = 0.8, 
         layout = treelayout, name = 'treelayout', angle = -rot)) # rotataion set here
     
-    if (phyloORclado) {
-        if (is.null(node.pos)) {
-            node.pos <- 1
-        }
-        if (node.pos == 1)
-          yy <- .C("node_height", as.integer(Ntip), as.integer(Nnode),
-                   as.integer(x$edge[, 1]), as.integer(x$edge[, 2]),
-                   as.integer(Nedge), as.double(yy),
-                   DUP = FALSE, PACKAGE = "ape")[[6]]
-        else {
-          ## node_height_clado requires the number of descendants
-          ## for each node, so we compute `xx' at the same time
-          ans <- .C("node_height_clado", as.integer(Ntip),
-                    as.integer(Nnode), as.integer(x$edge[, 1]),
-                    as.integer(x$edge[, 2]), as.integer(Nedge),
-                    double(Ntip + Nnode), as.double(yy),
-                    DUP = FALSE, PACKAGE = "ape")
-          xx <- ans[[6]] - 1
-          yy <- ans[[7]]
-        }
-        if (!use.edge.length) {
-            if(node.pos != 2)
-              xx <- .C("node_depth", as.integer(Ntip), as.integer(Nnode),
-                       as.integer(x$edge[, 1]), as.integer(x$edge[, 2]),
-                       as.integer(Nedge), double(Ntip + Nnode),
-                       DUP = FALSE, PACKAGE = "ape")[[6]] - 1
-            xx <- max(xx) - xx
-        } else  {
-              xx <- .C("node_depth_edgelength", as.integer(Ntip),
-                       as.integer(Nnode), as.integer(x$edge[, 1]),
-                       as.integer(x$edge[, 2]), as.integer(Nedge),
-                       as.double(x$edge.length), double(Ntip + Nnode),
-                       DUP = FALSE, PACKAGE = "ape")[[7]]
-        }
+    if (is.null(node.pos)) {
+        node.pos <- 1
     }
-    if (type == "unrooted") {
-        XY <- if (use.edge.length)
-          unrooted.xy(Ntip, Nnode, x$edge, x$edge.length)
-        else
-          unrooted.xy(Ntip, Nnode, x$edge, rep(1, Nedge))
-        ## rescale so that we have only positive values
-        xx <- XY$M[, 1] - min(XY$M[, 1])
-        yy <- XY$M[, 2] - min(XY$M[, 2])
+    if (node.pos == 1)
+      yy <- .C("node_height", as.integer(Ntip), as.integer(Nnode),
+               as.integer(x@edge[, 1]), as.integer(x@edge[, 2]),
+               as.integer(Nedge), as.double(yy),
+               DUP = FALSE, PACKAGE = "ape")[[6]]
+    else {
+      ## node_height_clado requires the number of descendants
+      ## for each node, so we compute `xx' at the same time
+      ans <- .C("node_height_clado", as.integer(Ntip),
+                as.integer(Nnode), as.integer(x@edge[, 1]),
+                as.integer(x@edge[, 2]), as.integer(Nedge),
+                double(Ntip + Nnode), as.double(yy),
+                DUP = FALSE, PACKAGE = "ape")
+      xx <- ans[[6]] - 1
+      yy <- ans[[7]]
     }
-    if (phyloORclado && root.edge) {
-        if (direction == "rightwards") xx <- xx + x$root.edge
+    if (!use.edge.length) {
+        if(node.pos != 2)
+          xx <- .C("node_depth", as.integer(Ntip), as.integer(Nnode),
+                   as.integer(x@edge[, 1]), as.integer(x@edge[, 2]),
+                   as.integer(Nedge), double(Ntip + Nnode),
+                   DUP = FALSE, PACKAGE = "ape")[[6]] - 1
+        xx <- max(xx) - xx
+    } else  {
+          xx <- .C("node_depth_edgelength", as.integer(Ntip),
+                   as.integer(Nnode), as.integer(x@edge[, 1]),
+                   as.integer(x@edge[, 2]), as.integer(Nedge),
+                   as.double(x@edge.length), double(Ntip + Nnode),
+                   DUP = FALSE, PACKAGE = "ape")[[7]]
     }
+        
     if (is.null(x.lim)) {
-        if (phyloORclado) {
-            if (horizontal) {
-                x.lim <- c(0, NA)
-                tmp <-
-                  if (show.tip.label) nchar(x$tip.label) * 0.018 * max(xx) * cex
-                  else 0
-                x.lim[2] <- max(xx[1:Ntip] + tmp)
-            } else x.lim <- c(1, Ntip)
-        }
-
-        if (type == "unrooted") {
-            if (show.tip.label) {
-                offset <- max(nchar(x$tip.label) * 0.018 * max(yy) * cex)
-                x.lim <- c(0 - offset, max(xx) + offset)
-            } else x.lim <- c(0, max(xx))
-        }
-
+        x.lim <- c(0, NA)
+        tmp <-
+          if (show.tip.label) nchar(x@tip.label) * 0.018 * max(xx) * cex
+          else 0
+        x.lim[2] <- max(xx[1:Ntip] + tmp)
     } else if (length(x.lim) == 1) {
         x.lim <- c(0, x.lim)
-        if (type %in% c("fan", "unrooted") && show.tip.label)
-          x.lim[1] <- -max(nchar(x$tip.label) * 0.018 * max(yy) * cex)
     }
-    if (is.null(y.lim)) {
-        if (phyloORclado) {
-            if (horizontal) y.lim <- c(1, Ntip) else {
-                y.lim <- c(0, NA)
-                tmp <-
-                  if (show.tip.label) nchar(x$tip.label) * 0.018 * max(yy) * cex
-                  else 0
-                y.lim[2] <-
-                  if (direction == "downwards") max(yy[ROOT] + tmp)
-                  else max(yy[1:Ntip] + tmp)
-            }
-        }
 
-        if (type == "unrooted") {
-            if (show.tip.label) {
-                offset <- max(nchar(x$tip.label) * 0.018 * max(yy) * cex)
-                y.lim <- c(0 - offset, max(yy) + offset)
-            } else y.lim <- c(0, max(yy))
-        }
+    if (is.null(y.lim)) {
+        y.lim <- c(1, Ntip)
     } else if (length(y.lim) == 1) {
         y.lim <- c(0, y.lim)
-        if (phyloORclado && horizontal) y.lim[1] <- 1
-        if (type %in% c("fan", "unrooted") && show.tip.label)
-          y.lim[1] <- -max(nchar(x$tip.label) * 0.018 * max(yy) * cex)
+        y.lim[1] <- 1
     }
+
     ## fix by Klaus Schliep (2008-03-28):
-    asp <- if (type %in% c("fan", "radial")) 1 else NA
     if (is.null(adj))
       adj <- 0
-    if (phyloORclado) {
-        MAXSTRING <- max(strwidth(x$tip.label, cex = cex))
-        if (direction == "rightwards") {
-            lox <- label.offset + MAXSTRING * 1.05 * adj
-            loy <- 0
-        }
-    }
     
     ## Grid calls Peter GSOC
     if (show.tip.label) {
@@ -181,23 +141,19 @@ myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
             layout.pos.col = 2, 
             name = 'tip_labels'))
         grid.text(
-            x$tip.label, 
-            x = rep(0, length(x$tip.label)), 
+            x@tip.label, 
+            x = rep(0, length(x@tip.label)), 
             y = (yy/max(yy))[TIPS], 
             rot = rot, just = 'left'
             )
         popViewport()
     }
-    if (type == "phylogram") {
-        phylogram.plot2(x$edge, Ntip, Nnode, xx, yy,
-                       horizontal, edge.color, edge.width, 
+    phylogram.plot2(x@edge, Ntip, Nnode, xx, yy,
+                       edge.color, edge.width, 
                        xlim = x.lim, ylim = y.lim, layout = treelayout)
-    } else {
-        cladogram.plot(x$edge, xx, yy, edge.color, edge.width)
-    }
     
     if (root.edge) {
-        grid.segments(0, yy[ROOT], x$root.edge, yy[ROOT])
+        grid.segments(0, yy[ROOT], x@root.edge, yy[ROOT])
     }
     
     L <- list(type = type, use.edge.length = use.edge.length,
@@ -213,14 +169,10 @@ myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
 }
 
 phylogram.plot2 <- function(edge, Ntip, Nnode, xx, yy,
-                           horizontal, edge.color, edge.width, xlim, ylim, layout)
+                            edge.color, edge.width, xlim, ylim, layout)
 {
     nodes <- (Ntip + 1):(Ntip + Nnode)
-    if (!horizontal) {
-        tmp <- yy
-        yy <- xx
-        xx <- tmp
-    }
+
     ## un trait vertical à chaque noeud...
     x0v <- xx[nodes]
     y0v <- y1v <- numeric(Nnode)
@@ -329,17 +281,18 @@ unrooted.xy <- function(Ntip, Nnode, edge, edge.length)
 
 node.depth <- function(phy)
 {
-    n <- length(phy$tip.label)
-    m <- phy$Nnode
-    N <- dim(phy$edge)[1]
-    phy <- reorder(phy, order = "pruningwise")
+    n <- length(phy@tip.label)
+    m <- phy@Nnode
+    N <- dim(phy@edge)[1]
+    phy@edge <- phy@edge[myorder(phy@edge, n), ]
     .C("node_depth", as.integer(n), as.integer(m),
-       as.integer(phy$edge[, 1]), as.integer(phy$edge[, 2]),
+       as.integer(phy@edge[, 1]), as.integer(phy@edge[, 2]),
        as.integer(N), double(n + m), DUP = FALSE, PACKAGE = "ape")[[6]]
 }
 
 ## testing
-## require(ape)
+## require(phylobase)
 ## bar <- rcoal(7)
 ## bar$tip.label <- c("one", "two", "three", "four", "five", "six", "seven")
+## bar <- as(bar, 'phylo4')
 ## myplot(bar, show.tip.label = TRUE)
