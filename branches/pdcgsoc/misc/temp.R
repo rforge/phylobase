@@ -59,51 +59,71 @@ treePlot <- function(phy, type = 'phylogram', tip.order = NULL) {
 }
 
 phyloXXYY <- function(phy, tip.order = NULL) {
+    ## initalize the output
     xxyy = list(
         yy = rep(NA, nrow(phy@edge)), 
         xx = numeric(nrow(phy@edge)), 
+        ## record the order that nodes are visited in
         traverse = NULL) 
     
-    ## TODO tip ordering should be dealt with at a higher level
-    ## if(!is.null(tip.order)) { 
+    # TODO tip ordering should be dealt with at a higher level
+    # if(!is.null(tip.order)) { 
         ## TODO do we need to acount for line weight when plotting close to edges?
-    ##     yy[which(phy@edge[, 2] == tip.order)] <- seq(
+    #     yy[which(phy@edge[, 2] == tip.order)] <- seq(
         ## TODO perhaps we want to use match here?
         ## 0, 1, length.out = length(phy@tip.label)) 
-    ## } else {
+    # } else {
+        ## reoder the phylo and assign even y spacing to the tips
         phy <- reorder.phylo4(phy)
         xxyy$yy[phy@edge[, 2] <= length(phy@tip.label)] <- seq(
             0, 1, length.out = length(phy@tip.label)
         )
-    ## }
+    # }
     
+    ## a recurvise preorder traversal 
+    ## node  -- initalized to be root, is the starting point for the traversal
+    ## phy   -- the phylogeny
+    ## xxyy  -- the list initalized below that holds the output
+    ## prevx -- the sum of ancestral branch lengths
     calc.node.xy <- function(node, phy, xxyy, prevx = 0) {
+        ## if node == root node, and there is no root edge set get descendants
+        ## and set index to NULL index is used for indexing output
         if(any(phy@edge[, 2] == node) == FALSE) {
             decdex <- which(phy@edge[, 1] == node)
             index <- NULL
         } else {
+            ## non-root node behavior
+            ## get row in edge matrix corresponding to node, get descendants
             index <- which(phy@edge[, 2] == node)
             decdex <- which(phy@edge[, 1] == phy@edge[index, 2])
         }
         if(is.null(index)) {
+            ## if root node start at x = 0
             newx <- 0
         } else {
+            ## non-root node x location 
             newx <- xxyy$xx[index] <- phy@edge.length[index] + prevx
         }
         if(!is.null(index)) {
+            ## if the x value is already set we are at a tip and we return
             if(!is.na(xxyy$yy[index])) { return(xxyy) }
         }
         for(i in phy@edge[decdex, 2]) {
+            ## for each decendant call the function again
             xxyy <- calc.node.xy(i, phy, xxyy, newx)
         }
         if(!is.null(index)) {
+            ## set y value by averaging the decendants
             xxyy$yy[index] <- mean(xxyy$yy[decdex])
         }
         ## TODO performance improvement here? rely on above ordering?
+        ## keep track of the nodes and order we visited them
         xxyy$traverse <- c(xxyy$traverse, phy@edge[decdex, 2]) 
         xxyy
     }
+    ## call function for the first time
     xxyy <- calc.node.xy(length(phy@tip.label) + 1, phy, xxyy)
+    ## scale the x values
     xxyy$xx <- xxyy$xx / max(xxyy$xx)
     xxyy
 }
