@@ -8,7 +8,8 @@ treePlot <- function(phy, type = 'phylogram', tip.order = NULL) {
         xxyy <- unrootxxyy(phy)
     }
     
-    edges <- edgechar(phy, params) ## TODO do these parameters even require a whole fun?
+    ## TODO do these parameters even require a whole fun?
+    edges <- edgechar(phy, params) 
     
     tipplots <- tipPlot(...)
     
@@ -26,7 +27,8 @@ treePlot <- function(phy, type = 'phylogram', tip.order = NULL) {
     pushViewport(viewport(
         x = 0.5, y = 0.5, 
         width = 0.8, height = 0.8, 
-        layout = treelayout, name = 'treelayout', angle = -rot)) # rotataion set here
+        # rotataion set here
+        layout = treelayout, name = 'treelayout', angle = -rot))
     
     if (show.tip.label) {
         pushViewport(viewport(
@@ -56,56 +58,6 @@ treePlot <- function(phy, type = 'phylogram', tip.order = NULL) {
 
 }
 
-####################################################    
-    scratchYY <- function(phy, tip.order = NULL) {
-        yy <- rep(NA, nrow(phy@edge))
-        if(!is.null(tip.order)) { ## TODO do we need to acount for line weight when plotting close to edges?
-            yy[which(phy@edge[, 2] == tip.order)] <- seq(0, 1, length.out = length(phy@tip.label)) ## TODO perhaps we want to use match here?
-        } else {
-            phy <- reorder.phylo4(phy)
-            yy[phy@edge[, 2] <= length(phy@tip.label)] <- seq(0, 1, length.out = length(phy@tip.label)) 
-        }
-    
-        calc.node.y <- function(x, phy, yy) {
-            # recursive
-            if(any(phy@edge[, 2] == x) == FALSE) {
-                decdex <- which(phy@edge[, 1] == x)
-                index <- 0 ## TODO hackish!
-            } else {
-                index <- which(phy@edge[, 2] == x)
-                if(!is.na(yy[index])) { return(yy) }
-                decdex <- which(phy@edge[, 1] == phy@edge[index, 2])
-            }
-            for(i in phy@edge[decdex, 2]) {
-                yy <- calc.node.y(i, phy, yy)
-            }
-            yy[index] <- mean(yy[decdex])
-            yy
-        }
-        yy <- calc.node.y(length(phy@tip.label) + 1, phy, yy)
-        yy
-####################################################
-    }
-
-    scratchXX <- function(phy) {
-        ## xx <- rep(NA, nrow(phy@edge))
-        calc.node.x <- function(node, phy, xx = numeric(nrow(phy@edge)), prevx = NULL) {
-            ## recursive
-            index <- which(phy@edge[, 2] == node)
-            if(length(index) == 0) {
-                newx <- 0
-            } else {
-                xx[index] <- phy@edge.length[index] + prevx
-                newx <- xx[index]
-            }
-            for(i in phy@edge[phy@edge[, 1] == node, 2]) {
-                xx <- calc.node.x(i, phy, xx, newx)
-            }
-            xx
-        }
-        calc.node.x(length(phy@tip.label) + 1, phy)
-    }
-
 phyloXXYY <- function(phy, tip.order = NULL) {
     xxyy = list(
         yy = rep(NA, nrow(phy@edge)), 
@@ -113,8 +65,11 @@ phyloXXYY <- function(phy, tip.order = NULL) {
         traverse = NULL) 
     
     ## TODO tip ordering should be dealt with at a higher level
-    ## if(!is.null(tip.order)) { ## TODO do we need to acount for line weight when plotting close to edges?
-    ##     yy[which(phy@edge[, 2] == tip.order)] <- seq(0, 1, length.out = length(phy@tip.label)) ## TODO perhaps we want to use match here?
+    ## if(!is.null(tip.order)) { 
+        ## TODO do we need to acount for line weight when plotting close to edges?
+    ##     yy[which(phy@edge[, 2] == tip.order)] <- seq(
+        ## TODO perhaps we want to use match here?
+        ## 0, 1, length.out = length(phy@tip.label)) 
     ## } else {
         phy <- reorder.phylo4(phy)
         xxyy$yy[phy@edge[, 2] <= length(phy@tip.label)] <- seq(
