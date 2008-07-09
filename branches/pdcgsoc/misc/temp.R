@@ -1,10 +1,12 @@
+require(phylobase)
+require(grid)
 treePlot <- function(phy, type = 'phylogram', tip.order = NULL) {
     
-    if (type = 'phylogram') {
+    if (type == 'phylogram') {
         xxyy <- phyloXXYY(phy, tip.order)
     }
     
-    if (type = 'unrooted') {
+    if (type == 'unrooted') {
         xxyy <- unrootxxyy(phy)
     }
     
@@ -130,5 +132,5 @@ phyloXXYY <- function(phy, tip.order = NULL) {
 
 ## How do we translate this info into a plot?
 ## Test code
-## out <- scratch(foo <- as(rcoal(5), 'phylo4'))
+out <- phyloXXYY(foo <- as(rcoal(5), 'phylo4'))
 
