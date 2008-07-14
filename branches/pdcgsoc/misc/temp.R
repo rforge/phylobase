@@ -1,21 +1,25 @@
 require(phylobase)
 require(grid)
-treePlot <- function(phy, type = 'phylogram', tip.order = NULL) {
+treePlot <- function(phy, 
+                     type = 'phylogram', 
+                     show.tip.label = TRUE, 
+                     tip.order = NULL,
+                     rot = 0
+                     ) 
+    {
     
     if (type == 'phylogram') {
         xxyy <- phyloXXYY(phy, tip.order)
+        segs <- segs(xxyy$phy, XXYY = xxyy$xxyy)
     }
     
-    if (type == 'unrooted') {
-        xxyy <- unrootxxyy(phy)
-    }
     
     ## TODO do these parameters even require a whole fun?
-    edges <- edgechar(phy, params) 
+    ## edges <- edgechar(phy, params) 
     
-    tipplots <- tipPlot(...)
+    ## tipplots <- tipPlot(...)
     
-    nodeplot <- nodPlot(...)
+    ## nodeplot <- nodPlot(...)
     
     ## initialize canvas
     # call appropriate plot type
@@ -23,6 +27,7 @@ treePlot <- function(phy, type = 'phylogram', tip.order = NULL) {
     grid.newpage()
     if(show.tip.label) {
         treelayout <- grid.layout(nrow = 1, ncol = 2, 
+            ## TODO find the best way to get max label width
             widths = unit(c(1, 1), c('null', 'strwidth'), list(NULL, 'seven')))
     } else {treelayout = NULL}
     
@@ -38,23 +43,24 @@ treePlot <- function(phy, type = 'phylogram', tip.order = NULL) {
             layout.pos.col = 2, 
             name = 'tip_labels'))
         grid.text(
-            x@tip.label, 
-            x = rep(0, length(x@tip.label)), 
-            y = (yy/max(yy))[TIPS], 
+            phy@tip.label, 
+            x = rep(0, length(phy@tip.label)), 
+            ## TODO yuck!!
+            y = xxyy$xxyy$yy[which(phy@edge[, 2] < length(phy@tip.label))], 
             rot = rot, just = 'left'
             )
         popViewport()
     }
     pushViewport(viewport(
-        layout = layout, layout.pos.col = 1, 
+        layout = treelayout, layout.pos.col = 1, 
         name = 'tree'))
     grid.segments( # draws vertical lines
-        x0 = x0v/xmax, y0 = y0v/ymax, 
-        x1 = x0v/xmax, y1 = y1v/ymax, 
+        x0 = segs$v0x, y0 = segs$v0y, 
+        x1 = segs$v1x, y1 = segs$v1y, 
         name = "vert") #, gp = gpar(col = color.v, lwd = width.v)) 
     grid.segments(  # draws horizontal lines
-        x0 = x0h/xmax, y0 = y0h/ymax, 
-        x1 = x1h/xmax, y1 = y0h/ymax, 
+        x0 = segs$h0x, y0 = segs$h0y, 
+        x1 = segs$h1x, y1 = segs$h1y, 
         name = "horz") #, gp = gpar(col = edge.color, lwd = edge.width))
     popViewport()
 
@@ -127,10 +133,48 @@ phyloXXYY <- function(phy, tip.order = NULL) {
     xxyy <- calc.node.xy(length(phy@tip.label) + 1, phy, xxyy)
     ## scale the x values
     xxyy$xx <- xxyy$xx / max(xxyy$xx)
-    xxyy
+    list(xxyy = xxyy, phy = phy)
+}
+
+segs <- function(phy, XXYY) {
+    treelen <- rep(NA, nrow(phy@edge) + 1)
+    segs <- list(v0x = treelen, v0y = treelen, v1x = treelen, v1y = treelen,
+                 h0x = treelen, h0y = treelen, h1x = treelen, h1y = treelen)
+    troot <- length(phy@tip.label) + 1
+
+    get.coor <- function(node, segs) {
+        if(any(phy@edge[, 2] == node) == FALSE) {
+            decdex <- which(phy@edge[, 1] == node)
+            index <- length(treelen)
+            segs$v0x[index] <- segs$v1x[index] <- 0
+            
+            segs$h0y[index] <- segs$h1y[index] <- NA
+            segs$h0x[index] <- segs$h1x[index] <- NA
+            segs$h0x[decdex] <- 0            
+        } else {
+            index <- which(phy@edge[, 2] == node)
+            if(!any(phy@edge[, 1] == node)) {
+                return(segs)
+            }
+            decdex <- which(phy@edge[, 1] == phy@edge[index, 2])
+            segs$v0x[index] <- segs$v1x[index] <- XXYY$xx[index]
+            segs$h0x[decdex] <- XXYY$xx[index]
+        }
+        segs$h1x[decdex] <- XXYY$xx[decdex]
+        segs$h0y[decdex] <- segs$h1y[decdex] <- XXYY$yy[decdex]
+        
+        segs$v0y[index] <- min(XXYY$yy[decdex])
+        segs$v1y[index] <- max(XXYY$yy[decdex])
+        
+        for(i in phy@edge[decdex, 2]) {
+            segs <- get.coor(i, segs)
+        }
+        segs
+    }
+    get.coor(troot, segs)
 }
 
 ## How do we translate this info into a plot?
 ## Test code
-out <- phyloXXYY(foo <- as(rcoal(5), 'phylo4'))
+## out <- phyloXXYY(foo <- as(rcoal(3), 'phylo4'))
 
