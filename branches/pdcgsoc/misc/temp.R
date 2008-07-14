@@ -1,12 +1,14 @@
 require(phylobase)
 require(grid)
+require(lattice)
 treePlot <- function(phy, 
                      type = 'phylogram', 
                      show.tip.label = TRUE, 
                      tip.order = NULL,
                      plot.data = FALSE,
-                     rot = 0
-                     ) 
+                     rot = 0,
+                     tip.plot.fun = function() {grid.points()}
+            )
     {
     
     if (type == 'phylogram') {
@@ -72,15 +74,13 @@ treePlot <- function(phy,
             name = 'data_plots'))
             
         for(i in xxyy$xxyy$yy[which(phy@edge[, 2] <= length(phy@tip.label))]) {
-            print(i)
             pushViewport(viewport(
                 y = i, 
                 height = unit(1, 'snpc'), 
                 width = unit(1, 'snpc'), 
                 name = paste('data_plot', i),
                 just = "center"))
-            grid.rect()
-            grid.points()
+                tip.plot.fun()
             popViewport()
         }
         popViewport()
