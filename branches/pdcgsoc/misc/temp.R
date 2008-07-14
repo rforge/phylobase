@@ -7,7 +7,8 @@ treePlot <- function(phy,
                      tip.order = NULL,
                      plot.data = FALSE,
                      rot = 0,
-                     tip.plot.fun = function() {grid.points()}
+                     tip.plot.fun = function() {grid.lines(1:10/10, rnorm(10, sd = .2, mean = .5))}
+                     ## tip.plot.fun = function() {}
             )
     {
     
@@ -17,7 +18,6 @@ treePlot <- function(phy,
         phy <- xxyy$phy
         segs <- segs(phy, XXYY = xxyy$xxyy)
     }
-    
     
     ## TODO do these parameters even require a whole fun?
     ## edges <- edgechar(phy, params) 
@@ -33,13 +33,13 @@ treePlot <- function(phy,
     if(plot.data) {
         treelayout <- grid.layout(nrow = 1, ncol = 3,
             widths = unit(c(1, 1, .1), c('null', 'strwidth', 'npc'), 
-            list(NULL, 'seven', NULL)
+            list(NULL, phy@tip.label, NULL)
             ))
     ## TODO handle showing data and labels better
     } else if(show.tip.label) {
         treelayout <- grid.layout(nrow = 1, ncol = 2, 
             ## TODO find the best way to get max label width
-            widths = unit(c(1, 1), c('null', 'strwidth'), list(NULL, 'seven')))
+            widths = unit(c(1, 1), c('null', 'strwidth'), list(NULL, phy@tip.label)))
     } else {treelayout = NULL}
     
     pushViewport(viewport(
@@ -72,14 +72,14 @@ treePlot <- function(phy,
             ## layout = datalayout, 
             layout.pos.col = 3, 
             name = 'data_plots'))
-            
+        ## TODO should plots float at tips, or only along edge?
         for(i in xxyy$xxyy$yy[which(phy@edge[, 2] <= length(phy@tip.label))]) {
             pushViewport(viewport(
                 y = i, 
                 height = unit(1, 'snpc'), 
                 width = unit(1, 'snpc'), 
                 name = paste('data_plot', i),
-                just = "center"))
+                just = "left"))
                 tip.plot.fun()
             popViewport()
         }
@@ -147,6 +147,8 @@ phyloXXYY <- function(phy, tip.order = NULL) {
             ## non-root node x location 
             newx <- xxyy$xx[index] <- phy@edge.length[index] + prevx
         }
+        ## TODO this if can be combined with the above in the else section
+        # which might be able to go in the first if
         if(!is.null(index)) {
             ## if the x value is already set we are at a tip and we return
             if(!is.na(xxyy$yy[index])) { return(xxyy) }
@@ -212,5 +214,11 @@ segs <- function(phy, XXYY) {
 ## How do we translate this info into a plot?
 ## Test code
 out <- phyloXXYY(foo <- as(rcoal(3), 'phylo4'))
+data(geospiza)
+## TODO true arbitary functions with data from associated data frames
+## grid.points(
+##     x = rep(1:ncol(geospiza@tip.data), 
+##     nrow(geospiza@tip.data))/ncol(geospiza@tip.data) - .2, 
+##     y = scale(geospiza@tip.data))
 
-treePlot(foo, plot.data = TRUE)
+treePlot(geospiza, plot.data = TRUE)
