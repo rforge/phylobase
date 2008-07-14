@@ -134,22 +134,15 @@ phyloXXYY <- function(phy, tip.order = NULL) {
         if(any(phy@edge[, 2] == node) == FALSE) {
             decdex <- which(phy@edge[, 1] == node)
             index <- NULL
+            ## if root node start at x = 0
+            newx <- 0
         } else {
             ## non-root node behavior
             ## get row in edge matrix corresponding to node, get descendants
             index <- which(phy@edge[, 2] == node)
             decdex <- which(phy@edge[, 1] == phy@edge[index, 2])
-        }
-        if(is.null(index)) {
-            ## if root node start at x = 0
-            newx <- 0
-        } else {
             ## non-root node x location 
             newx <- xxyy$xx[index] <- phy@edge.length[index] + prevx
-        }
-        ## TODO this if can be combined with the above in the else section
-        # which might be able to go in the first if
-        if(!is.null(index)) {
             ## if the x value is already set we are at a tip and we return
             if(!is.na(xxyy$yy[index])) { return(xxyy) }
         }
