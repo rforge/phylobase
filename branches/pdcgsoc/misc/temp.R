@@ -4,13 +4,16 @@ treePlot <- function(phy,
                      type = 'phylogram', 
                      show.tip.label = TRUE, 
                      tip.order = NULL,
+                     plot.data = FALSE,
                      rot = 0
                      ) 
     {
     
     if (type == 'phylogram') {
         xxyy <- phyloXXYY(phy, tip.order)
-        segs <- segs(xxyy$phy, XXYY = xxyy$xxyy)
+        ## because we may reoder the tip, we need to update the phy objec
+        phy <- xxyy$phy
+        segs <- segs(phy, XXYY = xxyy$xxyy)
     }
     
     
@@ -25,7 +28,13 @@ treePlot <- function(phy,
     # call appropriate plot type
     ## grid calls Peter GSOC
     grid.newpage()
-    if(show.tip.label) {
+    if(plot.data) {
+        treelayout <- grid.layout(nrow = 1, ncol = 3,
+            widths = unit(c(1, 1, .1), c('null', 'strwidth', 'npc'), 
+            list(NULL, 'seven', NULL)
+            ))
+    ## TODO handle showing data and labels better
+    } else if(show.tip.label) {
         treelayout <- grid.layout(nrow = 1, ncol = 2, 
             ## TODO find the best way to get max label width
             widths = unit(c(1, 1), c('null', 'strwidth'), list(NULL, 'seven')))
@@ -37,7 +46,8 @@ treePlot <- function(phy,
         # rotataion set here
         layout = treelayout, name = 'treelayout', angle = -rot))
     
-    if (show.tip.label) {
+    ## TODO handle better show label | data
+    if (show.tip.label | plot.data) {
         pushViewport(viewport(
             layout = treelayout, 
             layout.pos.col = 2, 
@@ -46,11 +56,36 @@ treePlot <- function(phy,
             phy@tip.label, 
             x = rep(0, length(phy@tip.label)), 
             ## TODO yuck!!
-            y = xxyy$xxyy$yy[which(phy@edge[, 2] < length(phy@tip.label))], 
+            y = xxyy$xxyy$yy[which(phy@edge[, 2] <= length(phy@tip.label))], 
             rot = rot, just = 'left'
             )
         popViewport()
     }
+    if (plot.data) {
+        ## datalayout <- grid.layout(
+        ##                 nrow = length(phy@tip.label), 
+        ##                 ncol = 1,
+        ##                 respect = TRUE)
+        pushViewport(viewport(
+            ## layout = datalayout, 
+            layout.pos.col = 3, 
+            name = 'data_plots'))
+            
+        for(i in xxyy$xxyy$yy[which(phy@edge[, 2] <= length(phy@tip.label))]) {
+            print(i)
+            pushViewport(viewport(
+                y = i, 
+                height = unit(1, 'snpc'), 
+                width = unit(1, 'snpc'), 
+                name = paste('data_plot', i),
+                just = "center"))
+            grid.rect()
+            grid.points()
+            popViewport()
+        }
+        popViewport()
+    }
+    
     pushViewport(viewport(
         layout = treelayout, layout.pos.col = 1, 
         name = 'tree'))
@@ -63,8 +98,8 @@ treePlot <- function(phy,
         x1 = segs$h1x, y1 = segs$h1y, 
         name = "horz") #, gp = gpar(col = edge.color, lwd = edge.width))
     popViewport()
-
 }
+
 
 phyloXXYY <- function(phy, tip.order = NULL) {
     ## initalize the output
@@ -176,5 +211,6 @@ segs <- function(phy, XXYY) {
 
 ## How do we translate this info into a plot?
 ## Test code
-## out <- phyloXXYY(foo <- as(rcoal(3), 'phylo4'))
+out <- phyloXXYY(foo <- as(rcoal(3), 'phylo4'))
 
+treePlot(foo, plot.data = TRUE)
