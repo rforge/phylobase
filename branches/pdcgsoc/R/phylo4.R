@@ -78,8 +78,53 @@ setGeneric("hasNodeData", function(x) {
 
 setGeneric("na.omit")
 
-setGeneric("reorder", function(phy) {
-    standardGeneric("reorder")
+setGeneric("reorder", def = function(object, type = 'pruningwise') {
+    reorder.prune <- function(edge, tips, root = tips + 1) {
+        ## if(is.null(root)) {
+        ##     root <- tips + 1
+        ## }
+        ## if(root <= tips) {return()}
+        index <- edge[, 1] == root
+        nextr <- edge[index, 2]
+        ## paths <- apply(as.matrix(nextr), 1, reorder, edge = edge, tips = tips)
+        nord <- NULL
+        for(i in nextr) {
+            if(i <= tips) {next()}
+            nord <- c(nord, myorder(edge, tips, root = i))
+        }
+        c(nord, which(index))
+    }
+    if(type == 'pruningwise') {
+        index <- reorder.prune(phy@edge, length(phy@tip.label))
+    }
+    phy@edge        <- phy@edge[index, ]
+    phy@edge.label  <- phy@edge.label[index]
+    phy@edge.length <- phy@edge.length[index]
+    phy
+},
+    useAsDefault = function(object, type = 'pruningwise') {
+        reorder.prune <- function(edge, tips, root = tips + 1) {
+            ## if(is.null(root)) {
+            ##     root <- tips + 1
+            ## }
+            ## if(root <= tips) {return()}
+            index <- edge[, 1] == root
+            nextr <- edge[index, 2]
+            ## paths <- apply(as.matrix(nextr), 1, reorder, edge = edge, tips = tips)
+            nord <- NULL
+            for(i in nextr) {
+                if(i <= tips) {next()}
+                nord <- c(nord, myorder(edge, tips, root = i))
+            }
+            c(nord, which(index))
+        }
+        if(type == 'pruningwise') {
+            index <- reorder.prune(phy@edge, length(phy@tip.label))
+        }
+        phy@edge        <- phy@edge[index, ]
+        phy@edge.label  <- phy@edge.label[index]
+        phy@edge.length <- phy@edge.length[index]
+        phy
 })
 
 
