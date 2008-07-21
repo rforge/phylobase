@@ -90,17 +90,17 @@ setGeneric("reorder", def = function(object, type = 'pruningwise') {
         nord <- NULL
         for(i in nextr) {
             if(i <= tips) {next()}
-            nord <- c(nord, myorder(edge, tips, root = i))
+            nord <- c(nord, reorder.prune(edge, tips, root = i))
         }
         c(nord, which(index))
     }
     if(type == 'pruningwise') {
-        index <- reorder.prune(phy@edge, length(phy@tip.label))
+        index <- reorder.prune(object@edge, length(object@tip.label))
     }
-    phy@edge        <- phy@edge[index, ]
-    phy@edge.label  <- phy@edge.label[index]
-    phy@edge.length <- phy@edge.length[index]
-    phy
+    object@edge        <- object@edge[index, ]
+    object@edge.label  <- object@edge.label[index]
+    object@edge.length <- object@edge.length[index]
+    object
 },
     useAsDefault = function(object, type = 'pruningwise') {
         reorder.prune <- function(edge, tips, root = tips + 1) {
@@ -114,17 +114,17 @@ setGeneric("reorder", def = function(object, type = 'pruningwise') {
             nord <- NULL
             for(i in nextr) {
                 if(i <= tips) {next()}
-                nord <- c(nord, myorder(edge, tips, root = i))
+                nord <- c(nord, reorder.prune(edge, tips, root = i))
             }
             c(nord, which(index))
         }
         if(type == 'pruningwise') {
-            index <- reorder.prune(phy@edge, length(phy@tip.label))
+            index <- reorder.prune(object@edge, length(object@tip.label))
         }
-        phy@edge        <- phy@edge[index, ]
-        phy@edge.label  <- phy@edge.label[index]
-        phy@edge.length <- phy@edge.length[index]
-        phy
+        object@edge        <- object@edge[index, ]
+        object@edge.label  <- object@edge.label[index]
+        object@edge.length <- object@edge.length[index]
+        object
 })
 
 
