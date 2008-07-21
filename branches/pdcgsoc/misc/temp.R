@@ -121,7 +121,7 @@ phyloXXYY <- function(phy, tip.order = NULL) {
         ## 0, 1, length.out = length(phy@tip.label)) 
     # } else {
         ## reoder the phylo and assign even y spacing to the tips
-        phy <- reorder.phylo4(phy)
+        phy <- reorder(phy)
         xxyy$yy[phy@edge[, 2] <= length(phy@tip.label)] <- seq(
             0, 1, length.out = length(phy@tip.label)
         )
