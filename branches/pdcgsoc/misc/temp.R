@@ -7,10 +7,14 @@ treePlot <- function(phy,
                      tip.order = NULL,
                      plot.data = FALSE,
                      rot = 0,
-                     tip.plot.fun = function() {grid.lines(1:10/10, rnorm(10, sd = .2, mean = .5))}
+                     tip.plot.fun = function() {grid.lines(1:10/10, rnorm(10, sd = .2, mean = .5))},
+                     edge.color = 'black', ## TODO colors for branhes and nodes seperately?
+                     node.color = 'black',
+                     lwd = 1 ## TODO currently only one width is allowed allow many?
                      ## tip.plot.fun = function() {}
             )
     {
+    
     
     if (type == 'phylogram') {
         xxyy <- phyloXXYY(phy, tip.order)
@@ -92,11 +96,11 @@ treePlot <- function(phy,
     grid.segments( # draws vertical lines
         x0 = segs$v0x, y0 = segs$v0y, 
         x1 = segs$v1x, y1 = segs$v1y, 
-        name = "vert") #, gp = gpar(col = color.v, lwd = width.v)) 
+        name = "vert", gp = gpar(col = node.color, lwd = lwd)) 
     grid.segments(  # draws horizontal lines
         x0 = segs$h0x, y0 = segs$h0y, 
         x1 = segs$h1x, y1 = segs$h1y, 
-        name = "horz") #, gp = gpar(col = edge.color, lwd = edge.width))
+        name = "horz", gp = gpar(col = edge.color, lwd = lwd))
     popViewport()
 }
 
@@ -214,4 +218,4 @@ data(geospiza)
 ##     nrow(geospiza@tip.data))/ncol(geospiza@tip.data) - .2, 
 ##     y = scale(geospiza@tip.data))
 
-treePlot(geospiza, plot.data = TRUE)
+treePlot(geospiza, plot.data = TRUE, edge.color = c('red', 'blue'))
