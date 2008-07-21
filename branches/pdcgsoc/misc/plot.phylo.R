@@ -10,30 +10,6 @@
 ## This file is part of the R-package `ape'.
 ## See the file ../COPYING for licensing issues.
 
-myorder <- function(edge, tips, root = tips + 1) {
-    ## if(is.null(root)) {
-    ##     root <- tips + 1
-    ## }
-    ## if(root <= tips) {return()}
-    index <- edge[, 1] == root
-    nextr <- edge[index, 2]
-    ## paths <- apply(as.matrix(nextr), 1, reorder, edge = edge, tips = tips)
-    nord <- NULL
-    for(i in nextr) {
-        if(i <= tips) {next()}
-        nord <- c(nord, myorder(edge, tips, root = i))
-    }
-    c(nord, which(index))
-}
-
-reorder.phylo4 <- function(phy) {
-    index <- myorder(phy@edge, length(phy@tip.label))
-    phy@edge        <- phy@edge[index, ]
-    phy@edge.label  <- phy@edge.label[index]
-    phy@edge.length <- phy@edge.length[index]
-    phy
-}
-
 myplot <- function(x, type = "phylogram", use.edge.length = TRUE,
                        node.pos = NULL, show.tip.label = TRUE,
                        show.node.label = FALSE, edge.color = "black",
