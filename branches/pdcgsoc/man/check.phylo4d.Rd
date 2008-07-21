@@ -7,14 +7,17 @@
   (i.e. \linkS4class{phylo4d} objects).
 }
 \usage{
-check_data(object, use.tip.names=TRUE, missing.tip.data=c("fail","OK","warn"), extra.tip.data=c("fail","OK","warn"), default.tip.names=c("warn","OK","fail"), use.node.names=FALSE, missing.node.data=c("OK","warn","fail"), extra.node.data=c("OK","warn","fail"), default.node.names=c("warn","OK","fail"),\dots)
+check_data(object, label.type = c("row.names", "column"), 
+label.column = 1, use.tip.names=TRUE, missing.tip.data=c("fail","OK","warn"), extra.tip.data=c("fail","OK","warn"), default.tip.names=c("warn","OK","fail"), use.node.names=FALSE, missing.node.data=c("OK","warn","fail"), extra.node.data=c("OK","warn","fail"), default.node.names=c("warn","OK","fail"),\dots)
 
-attach_data(object, use.tip.names = TRUE, use.node.names = FALSE,
-     \dots)
+attach_data(object, label.type = c("row.names", "column"), label.column = 1,
+use.tip.names = TRUE, use.node.names = FALSE,\dots)
 }
 
 \arguments{
   \item{object}{A phylo4d object}
+  \item{label.type}{Obtain labels for matching data to tree labels from the row.names or a column of the data? (default=\code{row.names})}
+  \item{label.column}{If label.type="column", number or name of column to use for matching data to tree labels (default=\code{1})}
   \item{use.tip.names}{Use tip data names if present (default=\code{TRUE})}
   \item{missing.tip.data}{Can tip data taxa be a subset of tree taxa? (default=\code{fail})}
   \item{extra.tip.data}{Can tip data taxa be a superset of tree taxa? (default=\code{fail})}
@@ -46,31 +49,36 @@ attach_data(object, use.tip.names = TRUE, use.node.names = FALSE,
 require(ape)
 #generate a tree and some data
 p3 <- rcoal(5)
-dat <- data.frame(a=rnorm(5),b=rnorm(5),row.names=p3$tip.label)
+dat <- data.frame(a = rnorm(5), b = rnorm(5), row.names = p3$tip.label)
 dat.defaultnames <- dat
 row.names(dat.defaultnames) <- NULL
-dat.superset <- rbind(dat,rnorm(2))
-dat.subset <- dat[-1,]
+dat.superset <- rbind(dat, rnorm(2))
+dat.subset <- dat[-1, ]
+
 #create a phylo4 object from a phylo object
-p4 <- as(p3,"phylo4")
+p4 <- as(p3, "phylo4")
+
 #create phylo4d objects with tip data
-p4d <- phylo4d(p4,dat)
+p4d <- phylo4d(p4, dat)
 check_data(p4d)
-p4d.sorted <- phylo4d(p4,dat[5:1,])
-try(p4d.nonames <- phylo4d(p4,dat.defaultnames))
-p4d.nonames <- phylo4d(p4,dat.defaultnames,use.tip.names=FALSE)
+p4d.sorted <- phylo4d(p4, dat[5:1, ])
+try(p4d.nonames <- phylo4d(p4, dat.defaultnames))
+p4d.nonames <- phylo4d(p4, dat.defaultnames, use.tip.names = FALSE)
+
 \dontrun{
-p4d.subset <- phylo4d(p4,dat.subset)
+p4d.subset <- phylo4d(p4, dat.subset)
+p4d.subset <- phylo4d(p4, dat.subset, missing.tip.data = "OK")
+try(p4d.superset <- phylo4d(p4, dat.superset))
+p4d.superset <- phylo4d(p4, dat.superset, extra.tip.data = "OK")
 }
-\dontrun{p4d.subset <- phylo4d(p4,dat.subset,missing.tip.data="OK")
-try(p4d.superset <- phylo4d(p4,dat.superset))
-p4d.superset <- phylo4d(p4,dat.superset,extra.tip.data="OK")
-}
+
 #create phylo4d objects with node data
-nod.dat <- data.frame(a=rnorm(4),b=rnorm(4))
-p4d.nod <- phylo4d(p4,node.data=nod.dat,which="node")
+nod.dat <- data.frame(a = rnorm(4), b = rnorm(4))
+p4d.nod <- phylo4d(p4, node.data = nod.dat, which = "node")
+
 #create phylo4 objects with node and tip data
-p4d.all1 <- phylo4d(p4,node.data=nod.dat,tip.data=dat,which="all")
-p4d.all2 <- phylo4d(p4,all.data=rbind(dat,nod.dat),which="all")
+p4d.all1 <- phylo4d(p4, node.data = nod.dat, tip.data = dat, 
+  which = "all")
+p4d.all2 <- phylo4d(p4, all.data = rbind(dat, nod.dat), which = "all")
 }
 \keyword{misc}
