@@ -295,3 +295,28 @@ setMethod("labels<-","phylo4", function(object,...,value) {
     object
 })
 
+setMethod("reorder", signature(object = 'phylo4'), function(object, type = 'pruningwise') {
+    reorder.prune <- function(edge, tips, root = tips + 1) {
+        ## if(is.null(root)) {
+        ##     root <- tips + 1
+        ## }
+        ## if(root <= tips) {return()}
+        index <- edge[, 1] == root
+        nextr <- edge[index, 2]
+        ## paths <- apply(as.matrix(nextr), 1, reorder, edge = edge, tips = tips)
+        nord <- NULL
+        for(i in nextr) {
+            if(i <= tips) {next()}
+            nord <- c(nord, reorder.prune(edge, tips, root = i))
+        }
+        c(nord, which(index))
+    }
+    if(type == 'pruningwise') {
+        index <- reorder.prune(object@edge, length(object@tip.label))
+    }
+    print('test')
+    object@edge        <- object@edge[index, ]
+    object@edge.label  <- object@edge.label[index]
+    object@edge.length <- object@edge.length[index]
+    object
+})
