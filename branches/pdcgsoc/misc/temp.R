@@ -10,12 +10,13 @@ treePlot <- function(phy,
                      tip.plot.fun = function() {grid.lines(1:10/10, rnorm(10, sd = .2, mean = .5))},
                      edge.color = 'black', ## TODO colors for branhes and nodes seperately?
                      node.color = 'black',
-                     lwd = 1 ## TODO currently only one width is allowed allow many?
+                     tip.color  = 'black', 
+                     edge.width = 1 ## TODO currently only one width is allowed allow many?
                      ## tip.plot.fun = function() {}
             )
     {
-    
-    
+    phy.orig <- phy
+    Å
     if (type == 'phylogram') {
         xxyy <- phyloXXYY(phy, tip.order)
         ## because we may reoder the tip, we need to update the phy objec
@@ -23,12 +24,20 @@ treePlot <- function(phy,
         segs <- segs(phy, XXYY = xxyy$xxyy)
     }
     
-    ## TODO do these parameters even require a whole fun?
-    ## edges <- edgechar(phy, params) 
+    eindex <- match(phy@edge[,2], phy.orig@edge[,2])
+    ## TODO check that colors are valid?
+    ## TODO edge colors are required to be in the order of edge matrix
+    if(length(edge.color) != nrow(phy@edge)) {
+        edge.color <- rep(edge.color, length.out = nrow(phy@edge))
+    }
+    edge.color <- edge.color[eindex]
     
-    ## tipplots <- tipPlot(...)
-    
-    ## nodeplot <- nodPlot(...)
+    ## TODO check that colors are valid?
+    nindex <- sort(eindex[phy@edge[, 2] > length(phy@tip.label)], index.return = TRUE)$ix
+    if(length(node.color) != length(nindex)) {
+        node.color <- rep(node.color, length.out = length(nindex))
+    }
+    node.color <- node.color[nindex]
     
     ## initialize canvas
     # call appropriate plot type
@@ -54,16 +63,21 @@ treePlot <- function(phy,
     
     ## TODO handle better show label | data
     if (show.tip.label | plot.data) {
+        tindex <- phy@edge[phy@edge[, 2] <= length(phy@tip.label), 2]
+        if(length(tip.color) != length(phy@tip.label)) {
+            tip.color <- rep(tip.color, length.out = length(phy@tip.label))
+        }
+        
         pushViewport(viewport(
             layout = treelayout, 
             layout.pos.col = 2, 
             name = 'tip_labels'))
         grid.text(
-            phy@tip.label, 
+            phy@tip.label[tindex], 
             x = rep(0, length(phy@tip.label)), 
             ## TODO yuck!!
-            y = xxyy$xxyy$yy[which(phy@edge[, 2] <= length(phy@tip.label))], 
-            rot = rot, just = 'left'
+            y = xxyy$xxyy$yy[phy@edge[, 2] %in% tindex], 
+            rot = rot, just = 'left', gp = gpar(col = tip.color[tindex])
             )
         popViewport()
     }
@@ -96,11 +110,11 @@ treePlot <- function(phy,
     grid.segments( # draws vertical lines
         x0 = segs$v0x, y0 = segs$v0y, 
         x1 = segs$v1x, y1 = segs$v1y, 
-        name = "vert", gp = gpar(col = node.color, lwd = lwd)) 
+        name = "vert", gp = gpar(col = node.color, lwd = 1)) 
     grid.segments(  # draws horizontal lines
         x0 = segs$h0x, y0 = segs$h0y, 
         x1 = segs$h1x, y1 = segs$h1y, 
-        name = "horz", gp = gpar(col = edge.color, lwd = lwd))
+        name = "horz", gp = gpar(col = edge.color, lwd = 1))
     popViewport()
 }
 
@@ -218,4 +232,9 @@ data(geospiza)
 ##     nrow(geospiza@tip.data))/ncol(geospiza@tip.data) - .2, 
 ##     y = scale(geospiza@tip.data))
 
-treePlot(geospiza, plot.data = TRUE, edge.color = c('red', 'blue'))
+treePlot(
+    geospiza, 
+    plot.data = TRUE, 
+    # edge.color = rainbow(nrow(geospiza@edge)),  
+    tip.color = c('red',  'black', 'blue')
+)
