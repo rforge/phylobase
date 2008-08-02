@@ -173,11 +173,11 @@ setMethod("reorder", signature(x = 'phylo4d'), function(x, order = 'cladewise') 
         }
         c(nord, which(index))
     }
-    if(type == 'pruningwise') {
-        index <- reorder.prune(object@edge, length(object@tip.label))
+    if(order == 'pruningwise') {
+        index <- reorder.prune(x@edge, length(x@tip.label))
     }
-    object@edge        <- object@edge[index, ]
-    object@edge.label  <- object@edge.label[index]
-    object@edge.length <- object@edge.length[index]
-    object
+    x@edge        <- x@edge[index, ]
+    x@edge.label  <- x@edge.label[index]
+    x@edge.length <- x@edge.length[index]
+    x
 })
