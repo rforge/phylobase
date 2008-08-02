@@ -12,18 +12,17 @@ treePlot <- function(phy,
                      node.color = 'black',
                      tip.color  = 'black', 
                      edge.width = 1 ## TODO currently only one width is allowed allow many?
-                     ## tip.plot.fun = function() {}
             )
-    {
+{
     phy.orig <- phy
-    Nedges   <- nrow(phy@edges)
+    Nedges   <- nrow(phy@edge)
     Ntips    <- length(phy@tip.label)
     
     if (type == 'phylogram') {
         xxyy <- phyloXXYY(phy, tip.order)
         ## because we may reoder the tip, we need to update the phy objec
         phy <- xxyy$phy
-        segs <- segs(phy, XXYY = xxyy$xxyy)
+        segs <- segs(phy, XXYY = xxyy)
     }
     
     eindex <- match(phy@edge[,2], phy.orig@edge[,2])
@@ -78,7 +77,7 @@ treePlot <- function(phy,
             phy@tip.label[tindex], 
             x = rep(0, Ntips), 
             ## TODO yuck!!
-            y = xxyy$xxyy$yy[phy@edge[, 2] %in% tindex], 
+            y = xxyy$yy[phy@edge[, 2] %in% tindex], 
             rot = rot, just = 'left', gp = gpar(col = tip.color[tindex])
             )
         popViewport()
@@ -93,7 +92,7 @@ treePlot <- function(phy,
             layout.pos.col = 3, 
             name = 'data_plots'))
         ## TODO should plots float at tips, or only along edge?
-        for(i in xxyy$xxyy$yy[which(phy@edge[, 2] <= Ntips)]) {
+        for(i in xxyy$yy[which(phy@edge[, 2] <= Ntips)]) {
             pushViewport(viewport(
                 y = i, 
                 height = unit(1, 'snpc'), 
@@ -123,6 +122,8 @@ treePlot <- function(phy,
 
 phyloXXYY <- function(phy, tip.order = NULL) {
     ## initalize the output
+    Nedges <- nrow(phy@edge)
+    Ntips  <- length(phy@tip.label)
     xxyy = list(
         yy = rep(NA, Nedges), 
         xx = numeric(Nedges), 
@@ -137,7 +138,7 @@ phyloXXYY <- function(phy, tip.order = NULL) {
         ## 0, 1, length.out = Ntips) 
     # } else {
         ## reoder the phylo and assign even y spacing to the tips
-        phy <- reorder(phy)
+        phy <- reorder(phy, 'pruningwise')
         xxyy$yy[phy@edge[, 2] <= Ntips] <- seq(
             0, 1, length.out = Ntips
         )
@@ -183,14 +184,14 @@ phyloXXYY <- function(phy, tip.order = NULL) {
     xxyy <- calc.node.xy(Ntips + 1, phy, xxyy)
     ## scale the x values
     xxyy$xx <- xxyy$xx / max(xxyy$xx)
-    list(xxyy = xxyy, phy = phy)
+    c(xxyy, phy = list(phy))
 }
 
 segs <- function(phy, XXYY) {
-    treelen <- rep(NA, Nedges + 1)
+    treelen <- rep(NA, nrow(phy@edge) + 1)
     segs <- list(v0x = treelen, v0y = treelen, v1x = treelen, v1y = treelen,
                  h0x = treelen, h0y = treelen, h1x = treelen, h1y = treelen)
-    troot <- Ntips + 1
+    troot <- length(phy@tip.label) + 1
 
     get.coor <- function(node, segs) {
         if(any(phy@edge[, 2] == node) == FALSE) {
@@ -224,15 +225,16 @@ segs <- function(phy, XXYY) {
     get.coor(troot, segs)
 }
 
+phylobubbles <- function(XXYY) {
+    phy <- XXYY$phy
+    
+}
+
 ## How do we translate this info into a plot?
 ## Test code
 out <- phyloXXYY(foo <- as(rcoal(3), 'phylo4'))
 data(geospiza)
 ## TODO true arbitary functions with data from associated data frames
-## grid.points(
-##     x = rep(1:ncol(geospiza@tip.data), 
-##     nrow(geospiza@tip.data))/ncol(geospiza@tip.data) - .2, 
-##     y = scale(geospiza@tip.data))
 
 treePlot(
     geospiza, 
