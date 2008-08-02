@@ -16,7 +16,9 @@ treePlot <- function(phy,
             )
     {
     phy.orig <- phy
-    Å
+    Nedges   <- nrow(phy@edges)
+    Ntips    <- length(phy@tip.label)
+    
     if (type == 'phylogram') {
         xxyy <- phyloXXYY(phy, tip.order)
         ## because we may reoder the tip, we need to update the phy objec
@@ -27,13 +29,13 @@ treePlot <- function(phy,
     eindex <- match(phy@edge[,2], phy.orig@edge[,2])
     ## TODO check that colors are valid?
     ## TODO edge colors are required to be in the order of edge matrix
-    if(length(edge.color) != nrow(phy@edge)) {
-        edge.color <- rep(edge.color, length.out = nrow(phy@edge))
+    if(length(edge.color) != Nedges) {
+        edge.color <- rep(edge.color, length.out = Nedges)
     }
     edge.color <- edge.color[eindex]
     
     ## TODO check that colors are valid?
-    nindex <- sort(eindex[phy@edge[, 2] > length(phy@tip.label)], index.return = TRUE)$ix
+    nindex <- sort(eindex[phy@edge[, 2] > Ntips], index.return = TRUE)$ix
     if(length(node.color) != length(nindex)) {
         node.color <- rep(node.color, length.out = length(nindex))
     }
@@ -63,9 +65,9 @@ treePlot <- function(phy,
     
     ## TODO handle better show label | data
     if (show.tip.label | plot.data) {
-        tindex <- phy@edge[phy@edge[, 2] <= length(phy@tip.label), 2]
-        if(length(tip.color) != length(phy@tip.label)) {
-            tip.color <- rep(tip.color, length.out = length(phy@tip.label))
+        tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
+        if(length(tip.color) != Ntips) {
+            tip.color <- rep(tip.color, length.out = Ntips)
         }
         
         pushViewport(viewport(
@@ -74,7 +76,7 @@ treePlot <- function(phy,
             name = 'tip_labels'))
         grid.text(
             phy@tip.label[tindex], 
-            x = rep(0, length(phy@tip.label)), 
+            x = rep(0, Ntips), 
             ## TODO yuck!!
             y = xxyy$xxyy$yy[phy@edge[, 2] %in% tindex], 
             rot = rot, just = 'left', gp = gpar(col = tip.color[tindex])
@@ -83,7 +85,7 @@ treePlot <- function(phy,
     }
     if (plot.data) {
         ## datalayout <- grid.layout(
-        ##                 nrow = length(phy@tip.label), 
+        ##                 nrow = Ntips, 
         ##                 ncol = 1,
         ##                 respect = TRUE)
         pushViewport(viewport(
@@ -91,7 +93,7 @@ treePlot <- function(phy,
             layout.pos.col = 3, 
             name = 'data_plots'))
         ## TODO should plots float at tips, or only along edge?
-        for(i in xxyy$xxyy$yy[which(phy@edge[, 2] <= length(phy@tip.label))]) {
+        for(i in xxyy$xxyy$yy[which(phy@edge[, 2] <= Ntips)]) {
             pushViewport(viewport(
                 y = i, 
                 height = unit(1, 'snpc'), 
@@ -122,8 +124,8 @@ treePlot <- function(phy,
 phyloXXYY <- function(phy, tip.order = NULL) {
     ## initalize the output
     xxyy = list(
-        yy = rep(NA, nrow(phy@edge)), 
-        xx = numeric(nrow(phy@edge)), 
+        yy = rep(NA, Nedges), 
+        xx = numeric(Nedges), 
         ## record the order that nodes are visited in
         traverse = NULL) 
     
@@ -132,12 +134,12 @@ phyloXXYY <- function(phy, tip.order = NULL) {
         ## TODO do we need to acount for line weight when plotting close to edges?
     #     yy[which(phy@edge[, 2] == tip.order)] <- seq(
         ## TODO perhaps we want to use match here?
-        ## 0, 1, length.out = length(phy@tip.label)) 
+        ## 0, 1, length.out = Ntips) 
     # } else {
         ## reoder the phylo and assign even y spacing to the tips
         phy <- reorder(phy)
-        xxyy$yy[phy@edge[, 2] <= length(phy@tip.label)] <- seq(
-            0, 1, length.out = length(phy@tip.label)
+        xxyy$yy[phy@edge[, 2] <= Ntips] <- seq(
+            0, 1, length.out = Ntips
         )
     # }
     
@@ -178,17 +180,17 @@ phyloXXYY <- function(phy, tip.order = NULL) {
         xxyy
     }
     ## call function for the first time
-    xxyy <- calc.node.xy(length(phy@tip.label) + 1, phy, xxyy)
+    xxyy <- calc.node.xy(Ntips + 1, phy, xxyy)
     ## scale the x values
     xxyy$xx <- xxyy$xx / max(xxyy$xx)
     list(xxyy = xxyy, phy = phy)
 }
 
 segs <- function(phy, XXYY) {
-    treelen <- rep(NA, nrow(phy@edge) + 1)
+    treelen <- rep(NA, Nedges + 1)
     segs <- list(v0x = treelen, v0y = treelen, v1x = treelen, v1y = treelen,
                  h0x = treelen, h0y = treelen, h1x = treelen, h1y = treelen)
-    troot <- length(phy@tip.label) + 1
+    troot <- Ntips + 1
 
     get.coor <- function(node, segs) {
         if(any(phy@edge[, 2] == node) == FALSE) {
