@@ -157,7 +157,7 @@ setMethod("names", signature(x = "phylo4d"), function(x) {
     return(rev(temp))
 })
 
-setMethod("reorder", signature(object = 'phylo4d'), function(object, type = 'pruningwise') {
+setMethod("reorder", signature(x = 'phylo4d'), function(x, order = 'cladewise') {
     reorder.prune <- function(edge, tips, root = tips + 1) {
         ## if(is.null(root)) {
         ##     root <- tips + 1

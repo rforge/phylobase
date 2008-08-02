@@ -82,7 +82,7 @@ setGeneric("hasNodeData", function(x) {
 
 setGeneric("na.omit")
 
-setGeneric("reorder", def = function(object, type = 'pruningwise') {
+setGeneric("reorder", def = function(x, order = 'cladewise') {
     standardGeneric("reorder")}, package = 'phylobase', useAsDefault = FALSE)
 
 

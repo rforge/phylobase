@@ -295,7 +295,7 @@ setMethod("labels<-","phylo4", function(object,...,value) {
     object
 })
 
-setMethod("reorder", signature(object = 'phylo4'), function(object, type = 'pruningwise') {
+setMethod("reorder", signature(x = 'phylo4'), function(x, order = 'cladewise') {
     reorder.prune <- function(edge, tips, root = tips + 1) {
         ## if(is.null(root)) {
         ##     root <- tips + 1
@@ -314,7 +314,6 @@ setMethod("reorder", signature(object = 'phylo4'), function(object, type = 'prun
     if(type == 'pruningwise') {
         index <- reorder.prune(object@edge, length(object@tip.label))
     }
-    print('test')
     object@edge        <- object@edge[index, ]
     object@edge.label  <- object@edge.label[index]
     object@edge.length <- object@edge.length[index]
