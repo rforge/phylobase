@@ -228,17 +228,85 @@ segs <- function(phy, XXYY) {
 phylobubbles <- function(XXYY) {
     phy <- XXYY$phy
     
+    tys <- XXYY$yy[phy@edge[, 2] <= nTips(phy)]
+    
+    traits <- phy@tip.data
+
+    maxr <- ifelse(ncol(traits) > nTips(phy), .75/ncol(traits), .75/nTips(phy))
+
+    tnames <- names(traits)
+    traits <- scale(traits)
+    traits <- apply(traits, 2, function(x) maxr * x / max(abs(x), na.rm = T))
+    names(traits) <- tnames
+    print(colnames(traits))
+    
+    if(ncol(traits) == 1) {
+        xpos <- 0.5
+    } else {
+        xpos <- seq(0+maxr, 1-maxr, length.out = ncol(traits))
+    }
+    tys <- tys * (1 - (2 * maxr)) + maxr
+    
+    xrep <- rep(xpos, each = length(tys))
+    ccol <- ifelse(traits < 0, 'black', 'white')
+    nays <- tys[apply(traits, 1, function(x) any(is.na(x)))]
+    naxs <- xpos[apply(traits, 2, function(x) any(is.na(x)))]
+    traits[is.na(traits)] <- 0
+    
+    grid.newpage()
+    bublayout <- grid.layout(nrow = 2, ncol = 2,
+        widths = unit(c(1, 1), c('null', 'strwidth'), 
+            list(NULL, phy@tip.label)), 
+        heights = unit(c(1, 1), c('null', 'strwidth'), 
+            list(NULL, colnames(traits)))
+        )
+    pushViewport(viewport(
+        x = 0.5, y = 0.5, 
+        width = 0.8, height = 0.8, 
+        layout = bublayout, name = 'bublayout'))
+    pushViewport(viewport( 
+        name = 'bubble_plots', 
+        layout = bublayout, 
+        layout.pos.col = 1, 
+        layout.pos.row = 1
+    ))
+    grid.segments(x0 = 0,  x1 = 1, y0 = tys, y1 = tys, gp = gpar(col = 'grey'))
+    grid.segments(x0 = xpos,  x1 = xpos, y0 = 0, y1 = 1, gp = gpar(col = 'grey'))
+    grid.text('x', naxs, nays)
+    grid.circle(xrep, tys, r = unlist(traits), gp = gpar(fill = ccol)
+        )
+    popViewport()
+    pushViewport(viewport( 
+        name = 'bubble_tip_labels', 
+        layout = bublayout, 
+        layout.pos.col = 2, 
+        layout.pos.row = 1
+    ))
+    grid.text(phy@tip.label, 0.2, tys, just = 'left')
+    popViewport()
+    pushViewport(viewport( 
+        name = 'bubble_data_labels', 
+        layout = bublayout, 
+        layout.pos.col = 1, 
+        layout.pos.row = 2
+    ))
+    grid.text(colnames(traits), xpos, .8, rot = 90, just = 'right')
+    popViewport()
+
+    popViewport()
 }
 
 ## How do we translate this info into a plot?
 ## Test code
-out <- phyloXXYY(foo <- as(rcoal(3), 'phylo4'))
+# out <- phyloXXYY(foo <- as(rcoal(3), 'phylo4'))
 data(geospiza)
+foo <- phyloXXYY(geospiza)
+phylobubbles(foo)
 ## TODO true arbitary functions with data from associated data frames
 
-treePlot(
-    geospiza, 
-    plot.data = TRUE, 
-    # edge.color = rainbow(nrow(geospiza@edge)),  
-    tip.color = c('red',  'black', 'blue')
-)
+# treePlot(
+#     geospiza, 
+#     plot.data = TRUE, 
+#     # edge.color = rainbow(nrow(geospiza@edge)),  
+#     tip.color = c('red',  'black', 'blue')
+# )
