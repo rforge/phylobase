@@ -17,12 +17,18 @@ treePlot <- function(phy,
     phy.orig <- phy
     Nedges   <- nrow(phy@edge)
     Ntips    <- length(phy@tip.label)
-    
+    tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
     if (type == 'phylogram') {
         xxyy <- phyloXXYY(phy, tip.order)
         ## because we may reoder the tip, we need to update the phy objec
         phy <- xxyy$phy
         segs <- segs(phy, XXYY = xxyy)
+    }
+    if(show.tip.label) {
+        labwd <- stringWidth(phy@tip.label)
+        xrs <- max(unit(xxyy$xx[phy@edge[, 2] %in% tindex], 'npc') + labwd)
+    } else {
+        xrs <- unit(1, 'null', NULL)
     }
     
     eindex <- match(phy@edge[,2], phy.orig@edge[,2])
@@ -45,16 +51,16 @@ treePlot <- function(phy,
     ## grid calls Peter GSOC
     grid.newpage()
     if(plot.data) {
-        treelayout <- grid.layout(nrow = 1, ncol = 3,
-            widths = unit(c(1, 1, .1), c('null', 'strwidth', 'npc'), 
-            list(NULL, phy@tip.label, NULL)
-            ))
+        treelayout <- grid.layout(nrow = 1, ncol = 2,
+            widths = unit(c(1, 1), c('null', 'null'), list(NULL, NULL))
+            )
     ## TODO handle showing data and labels better
-    } else if(show.tip.label) {
-        treelayout <- grid.layout(nrow = 1, ncol = 2, 
-            ## TODO find the best way to get max label width
-            widths = unit(c(1, 1), c('null', 'strwidth'), list(NULL, phy@tip.label)))
-    } else {treelayout = NULL}
+    ## TODO find the best way to get max label width
+    } else {
+        treelayout <- grid.layout(nrow = 1, ncol = 1,
+            widths = unit(1, 'null', NULL)
+            )
+    }
     
     pushViewport(viewport(
         x = 0.5, y = 0.5, 
@@ -69,18 +75,6 @@ treePlot <- function(phy,
             tip.color <- rep(tip.color, length.out = Ntips)
         }
         
-        pushViewport(viewport(
-            layout = treelayout, 
-            layout.pos.col = 2, 
-            name = 'tip_labels'))
-        grid.text(
-            phy@tip.label[tindex], 
-            x = rep(0, Ntips), 
-            ## TODO yuck!!
-            y = xxyy$yy[phy@edge[, 2] %in% tindex], 
-            rot = rot, just = 'left', gp = gpar(col = tip.color[tindex])
-            )
-        popViewport()
     }
     if (plot.data) {
         ## datalayout <- grid.layout(
@@ -89,7 +83,7 @@ treePlot <- function(phy,
         ##                 respect = TRUE)
         pushViewport(viewport(
             ## layout = datalayout, 
-            layout.pos.col = 3, 
+            layout.pos.col = 2, 
             name = 'data_plots'))
         ## TODO should plots float at tips, or only along edge?
         for(i in xxyy$yy[which(phy@edge[, 2] <= Ntips)]) {
@@ -107,16 +101,35 @@ treePlot <- function(phy,
     
     pushViewport(viewport(
         layout = treelayout, layout.pos.col = 1, 
+        # trickery to space labels properly
+        # set the scale to 0 to an amount greater than one
+        # as scaled by the tip location and label widths
+        # then actually plot the tree in as native
+        # since x data range 0-1 space is left for the widest label
+        xscale = c(0, convertUnit(xrs * 1.02, 'npc')), 
         name = 'tree'))
-    grid.segments( # draws vertical lines
+    vseg <- grid.segments( # draws vertical lines
         x0 = segs$v0x, y0 = segs$v0y, 
         x1 = segs$v1x, y1 = segs$v1y, 
+        default.units = "native", 
         name = "vert", gp = gpar(col = node.color, lwd = 1)) 
-    grid.segments(  # draws horizontal lines
+    hseg <- grid.segments(  # draws horizontal lines
         x0 = segs$h0x, y0 = segs$h0y, 
         x1 = segs$h1x, y1 = segs$h1y, 
+        default.units = "native", 
         name = "horz", gp = gpar(col = edge.color, lwd = 1))
+    if(show.tip.label) {
+        labtext <- grid.text(
+            phy@tip.label[tindex], 
+            x = xxyy$xx[phy@edge[, 2] %in% tindex] + 0.02, 
+            ## TODO yuck!!
+            y = xxyy$yy[phy@edge[, 2] %in% tindex], 
+            default.units = "native", 
+            rot = rot, just = 'left', gp = gpar(col = tip.color[tindex])
+        )
+    }
     popViewport()
+    grobTree(vseg, hseg, labtext)
 }
 
 
@@ -300,13 +313,25 @@ phylobubbles <- function(XXYY) {
 ## Test code
 # out <- phyloXXYY(foo <- as(rcoal(3), 'phylo4'))
 data(geospiza)
-foo <- phyloXXYY(geospiza)
-phylobubbles(foo)
+# foo <- phyloXXYY(geospiza)
+# phylobubbles(foo)
 ## TODO true arbitary functions with data from associated data frames
 
-# treePlot(
+# p1 <- treePlot(
 #     geospiza, 
 #     plot.data = TRUE, 
+#     show.tip.label = TRUE, 
 #     # edge.color = rainbow(nrow(geospiza@edge)),  
 #     tip.color = c('red',  'black', 'blue')
 # )
+
+tree1 <- as(rtree(10), 'phylo4')
+tree1@tip.label <- replicate(10, paste(sample(LETTERS, 14), collapse = ""))
+
+p2 <- treePlot(
+    tree1 #, plot.data = TRUE
+)
+
+# pushViewport(viewport(
+#     width = unit(1, 'grobwidth', list(p2))
+#     ))
