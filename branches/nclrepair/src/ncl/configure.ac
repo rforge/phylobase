@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(NCL, 2.1.02, paul.lewis@uconn.edu)
+AC_INIT(NCL, 2.1.03, paul.lewis@uconn.edu)
 AC_CONFIG_HEADERS([config.h])
 
 AC_PREREQ(2.57)
