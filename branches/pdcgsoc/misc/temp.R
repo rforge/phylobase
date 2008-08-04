@@ -7,7 +7,7 @@ treePlot <- function(phy,
                      tip.order = NULL,
                      plot.data = FALSE,
                      rot = 0,
-                     tip.plot.fun = function() {grid.lines(1:10/10, rnorm(10, sd = .2, mean = .5))},
+                     tip.plot.fun = 'bubbles',
                      edge.color = 'black', ## TODO colors for branhes and nodes seperately?
                      node.color = 'black',
                      tip.color  = 'black', 
@@ -22,120 +22,139 @@ treePlot <- function(phy,
         xxyy <- phyloXXYY(phy, tip.order)
         ## because we may reoder the tip, we need to update the phy objec
         phy <- xxyy$phy
-        segs <- segs(phy, XXYY = xxyy)
-    }
-    if(show.tip.label) {
-        labwd <- stringWidth(phy@tip.label)
-        xrs <- max(unit(xxyy$xx[phy@edge[, 2] %in% tindex], 'npc') + labwd)
-    } else {
-        xrs <- unit(1, 'null', NULL)
     }
     
-    eindex <- match(phy@edge[,2], phy.orig@edge[,2])
+    if(plot.data) {
+        phyplotlayout <- grid.layout(nrow = 1, ncol = 2,
+            widths = unit(c(1, 1), c('null', 'null'), list(NULL, NULL))
+            )
+    } else {
+        phyplotlayout <- grid.layout(nrow = 1, ncol = 1)
+    }
+    ## TODO handle showing data and labels better
+    grid.newpage()
+    pushViewport(viewport(
+        x = 0.5, y = 0.5, 
+        width = 0.9, height = 0.9, 
+        # rotataion set here
+        layout = phyplotlayout, name = 'phyplotlayout', angle = -rot))
+    pushViewport(viewport(layout.pos.col = 1))
+        tree.plot(xxyy, show.tip.label, edge.color, node.color, tip.color, edge.width, rot)
+    upViewport()
+    ## TODO handle better show label | data
+    if (plot.data) {
+        tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
+        if(length(tip.color) != Ntips) {
+            tip.color <- rep(tip.color, length.out = Ntips)
+        }
+        if (tip.plot.fun == 'bubbles') {
+            pushViewport(viewport(layout.pos.col = 2))
+                phylobubbles(xxyy)
+            popViewport()
+        } else {
+            ## datalayout <- grid.layout(
+            ##                 nrow = Ntips, 
+            ##                 ncol = 1,
+            ##                 respect = TRUE)
+            pushViewport(viewport(
+                ## layout = datalayout, 
+                layout.pos.col = 2, 
+                name = 'data_plots'))
+            ## TODO should plots float at tips, or only along edge?
+            for(i in xxyy$yy[which(phy@edge[, 2] <= Ntips)]) {
+                pushViewport(viewport(
+                    y = i, 
+                    height = unit(1, 'snpc'), 
+                    width = unit(1, 'snpc'), 
+                    name = paste('data_plot', i),
+                    just = "left"))
+                    # tip.plot.fun()
+                popViewport()
+            }
+            popViewport()
+        }
+    }
+}
+
+tree.plot <- function(xxyy, show.tip.label, edge.color, 
+                        node.color, tip.color, edge.width, rot) 
+{
+
+    # TODO switch to phylobase abstractions
+    phy <- xxyy$phy
+    Nedges   <- nrow(phy@edge)
+    Ntips    <- length(phy@tip.label)
+    tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
+    eindex <- match(phy@edge[,2], xxyy$phy.orig@edge[,2])
+    segs <- segs(phy, XXYY = xxyy)
+
     ## TODO check that colors are valid?
     ## TODO edge colors are required to be in the order of edge matrix
     if(length(edge.color) != Nedges) {
         edge.color <- rep(edge.color, length.out = Nedges)
     }
     edge.color <- edge.color[eindex]
-    
+
     ## TODO check that colors are valid?
     nindex <- sort(eindex[phy@edge[, 2] > Ntips], index.return = TRUE)$ix
     if(length(node.color) != length(nindex)) {
         node.color <- rep(node.color, length.out = length(nindex))
     }
     node.color <- node.color[nindex]
-    
-    ## initialize canvas
-    # call appropriate plot type
-    ## grid calls Peter GSOC
-    grid.newpage()
-    if(plot.data) {
+
+    if(show.tip.label) {
+        labw <- max(stringWidth(phy@tip.label))
+        # print(convertUnit(labw, 'inches'))
         treelayout <- grid.layout(nrow = 1, ncol = 2,
-            widths = unit(c(1, 1), c('null', 'null'), list(NULL, NULL))
+            widths = unit.c(unit(1, 'null', NULL), labw)
             )
-    ## TODO handle showing data and labels better
-    ## TODO find the best way to get max label width
-    } else {
-        treelayout <- grid.layout(nrow = 1, ncol = 1,
-            widths = unit(1, 'null', NULL)
-            )
-    }
-    
-    pushViewport(viewport(
-        x = 0.5, y = 0.5, 
-        width = 0.8, height = 0.8, 
-        # rotataion set here
-        layout = treelayout, name = 'treelayout', angle = -rot))
-    
-    ## TODO handle better show label | data
-    if (show.tip.label | plot.data) {
         tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
         if(length(tip.color) != Ntips) {
             tip.color <- rep(tip.color, length.out = Ntips)
         }
-        
+    } else {
+        treelayout <- grid.layout(nrow = 1, ncol = 1)
     }
-    if (plot.data) {
-        ## datalayout <- grid.layout(
-        ##                 nrow = Ntips, 
-        ##                 ncol = 1,
-        ##                 respect = TRUE)
-        pushViewport(viewport(
-            ## layout = datalayout, 
-            layout.pos.col = 2, 
-            name = 'data_plots'))
-        ## TODO should plots float at tips, or only along edge?
-        for(i in xxyy$yy[which(phy@edge[, 2] <= Ntips)]) {
-            pushViewport(viewport(
-                y = i, 
-                height = unit(1, 'snpc'), 
-                width = unit(1, 'snpc'), 
-                name = paste('data_plot', i),
-                just = "left"))
-                tip.plot.fun()
-            popViewport()
-        }
-        popViewport()
-    }
-    
+    # grid.show.layout(treelayout)
+    pushViewport(viewport(
+        x = 0.5, y = 0.5, 
+        width = 1, height = 1, 
+        # rotataion set here
+        layout = treelayout, name = 'treelayout', angle = -rot))
     pushViewport(viewport(
         layout = treelayout, layout.pos.col = 1, 
-        # trickery to space labels properly
-        # set the scale to 0 to an amount greater than one
-        # as scaled by the tip location and label widths
-        # then actually plot the tree in as native
-        # since x data range 0-1 space is left for the widest label
-        xscale = c(0, convertUnit(xrs * 1.02, 'npc')), 
         name = 'tree'))
     vseg <- grid.segments( # draws vertical lines
         x0 = segs$v0x, y0 = segs$v0y, 
         x1 = segs$v1x, y1 = segs$v1y, 
-        default.units = "native", 
         name = "vert", gp = gpar(col = node.color, lwd = 1)) 
     hseg <- grid.segments(  # draws horizontal lines
         x0 = segs$h0x, y0 = segs$h0y, 
         x1 = segs$h1x, y1 = segs$h1y, 
-        default.units = "native", 
         name = "horz", gp = gpar(col = edge.color, lwd = 1))
+    upViewport()
     if(show.tip.label) {
+        pushViewport(viewport(
+            layout = treelayout, layout.pos.col = 1, 
+            ))
         labtext <- grid.text(
             phy@tip.label[tindex], 
             x = xxyy$xx[phy@edge[, 2] %in% tindex] + 0.02, 
             ## TODO yuck!!
             y = xxyy$yy[phy@edge[, 2] %in% tindex], 
-            default.units = "native", 
+            default.units = 'npc', 
             rot = rot, just = 'left', gp = gpar(col = tip.color[tindex])
         )
+        upViewport()
     }
-    popViewport()
-    grobTree(vseg, hseg, labtext)
+    # grobTree(vseg, hseg, labtext)
 }
 
 
 phyloXXYY <- function(phy, tip.order = NULL) {
     ## initalize the output
     Nedges <- nrow(phy@edge)
+    phy.orig <- phy
     Ntips  <- length(phy@tip.label)
     xxyy = list(
         yy = rep(NA, Nedges), 
@@ -197,7 +216,8 @@ phyloXXYY <- function(phy, tip.order = NULL) {
     xxyy <- calc.node.xy(Ntips + 1, phy, xxyy)
     ## scale the x values
     xxyy$xx <- xxyy$xx / max(xxyy$xx)
-    c(xxyy, phy = list(phy))
+    # TODO return an index vector instead of a second phy object
+    c(xxyy, phy = list(phy), phy.orig = list(phy.orig))
 }
 
 segs <- function(phy, XXYY) {
@@ -266,7 +286,6 @@ phylobubbles <- function(XXYY) {
     naxs <- xpos[apply(traits, 2, function(x) any(is.na(x)))]
     traits[is.na(traits)] <- 0
     
-    grid.newpage()
     bublayout <- grid.layout(nrow = 2, ncol = 2,
         widths = unit(c(1, 1), c('null', 'strwidth'), 
             list(NULL, phy@tip.label)), 
@@ -275,7 +294,7 @@ phylobubbles <- function(XXYY) {
         )
     pushViewport(viewport(
         x = 0.5, y = 0.5, 
-        width = 0.8, height = 0.8, 
+        width = 1, height = 1, 
         layout = bublayout, name = 'bublayout'))
     pushViewport(viewport( 
         name = 'bubble_plots', 
@@ -320,16 +339,16 @@ data(geospiza)
 # p1 <- treePlot(
 #     geospiza, 
 #     plot.data = TRUE, 
-#     show.tip.label = TRUE, 
+#     show.tip.label = FALSE, 
 #     # edge.color = rainbow(nrow(geospiza@edge)),  
 #     tip.color = c('red',  'black', 'blue')
 # )
 
 tree1 <- as(rtree(10), 'phylo4')
-tree1@tip.label <- replicate(10, paste(sample(LETTERS, 14), collapse = ""))
+tree1@tip.label <- replicate(10, paste(sample(LETTERS, sample(2:20, 1)), collapse = ""))
 
 p2 <- treePlot(
-    tree1 #, plot.data = TRUE
+    tree1, #, plot.data = TRUE
 )
 
 # pushViewport(viewport(
