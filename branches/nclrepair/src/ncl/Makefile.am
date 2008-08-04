@@ -1,6 +1,6 @@
 SUBDIRS = ncl example $(MAYBE_TEST_DIR)
 
-EXTRA_DIST = data html test ncl/nxsemptyblock.h ncl/nxsemptyblock.cpp
+EXTRA_DIST = data html test Jamroot
 
 dist-hook:
 	find "$(distdir)/data" -depth -and -name .svn -and -type d -and -exec rm -rf {} \; 

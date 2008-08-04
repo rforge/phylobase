@@ -5,8 +5,8 @@
 #		information to know that it needs to run automake and config.status
 #		whenever an Makefile.am changes.
 set -x
-aclocal -I config/m4 || exit
+aclocal -I config || exit
 autoheader || exit
 automake || exit
 autoconf
-
+#libtoolize

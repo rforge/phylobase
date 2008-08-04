@@ -1,4 +1,30 @@
-Copyright (c) 2003 by Paul O. Lewis
+Copyright (c) 2004 by Paul O. Lewis
+
+Building from svn checkout (the prompt is "$" ):
+	$ sh bootstrap.sh
+	$ cd ..
+	$ mkdir build
+	$ cd build
+	$ ../v2.1/configure
+	$ make
+	$ make check
+	$ make install
+	$ make installcheck
+Note that if you are anticipating keeping up-to-date with the
+repository or have multiple NCL builds that you test against, then
+you may want to install in a non-standard location.
+For instance invoking:
+	$ ../v2.1/configure --prefix=`pwd`/installed
+will make the install products go inside an installed subdirectory
+of your build directory. This is paricularly helpful if you 
+build several different variants (you can have builddebug and buildrelease
+directories built from the same source tree).
+
+NCL also includes a Jamroot file for users who have projects that are built
+with the bjam tool.
+
+Old instructions:
+
 Installation instructions for Linux/Unix/Mac
 ----------------------------------------
 

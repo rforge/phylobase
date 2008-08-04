@@ -10,4 +10,6 @@ applications.
 
 ACKNOWLEDGEMENTS
 	Many of the files used for testing were provided by Arlin Stoltzfus (see
-http://www.molevol.org/camel/projects/nexus/ for more information)
+http://www.molevol.org/camel/projects/nexus/ for more information), the Mesquite
+package, and from TreeBase (thanks, to Bill Piel!).
+

@@ -1,3 +1,76 @@
+ChangeLog for NCL 2.1.02
+================================================================================
+2.1.02 (relative to 2.1.00)
+================================================================================
+minor bug fixes and const correctness 
+
+================================================================================
+Since 2.1-specific changes.
+================================================================================
+Support for multiple instances of the same block type
+	* NxsBlockFactory mechanism API - see the examples/normalizer for an 
+		example of usage. Full adoption of these API's is not required, but may
+		make your life easier.
+	* Reader now stores "implied blocks" -- e.g. makes a DATA block look to the
+		client code like a TAXA block and CHARACTERS block. This improves the
+		abstraction for library users.
+
+Other features added:
+	* commas tolerated in multiple state lists in the cells of a matrix {A,G}
+		the same as {AG}.  Such files are not legal, but are common.
+	* handling for TITLE and BLOCKID commands added to NxsBlock
+	* optimizations (tokenizing and data structures in taxa block) -- now 50
+		fold faster than 2.0 on the 11361 Taxon, 1360 Character file in the 
+		CIPRES test files.
+	* TaxPartition and TreePartition read
+	* SETS and CODONS blocks now read. Actually read as a big, fat ASSUMPTIONS
+		block that spawns implied blocks (to deal with common practice of mixing 
+		the commands in these blocks).
+	* WtSet, UserType, and TypeSet command
+	* now tolerating DATATYPE not being first in FORMAT command (to deal with
+		Clustal exports)
+	* tokenizer now skipping embedded comments (note that this changes the
+		behavior of command comment storing -- they are only returned if they 
+		precede token)
+	* support for DATATYPE=MIXED added in CHARACTERS block
+	* trees block can now validates trees as they are read to improve error
+		reporting  -- this feature not used unless TreesBlock::
+		SetProcessAllTreesDuringParse(true) is called on the trees block 
+		instance.
+	* some support for NHX parsing -- in the TreesDescription.
+	* support for LINK command (as introduced by Mesquite)
+	* support Mesquite-style CharSet/TaxSet syntax.
+ 	* NCL_MAJOR_VERSION and  NCL_MINOR_VERSION defines added. You can wrap any 
+ 		ncl-2.1 specific code (you shouldn't need much) as follows:
+
+================================================================================
+#	if defined(NCL_MAJOR_VERSION) && (NCL_MAJOR_VERSION >= 2) && (NCL_MINOR_VERSION >= 1)
+		trees->SetAllowImplicitNames(true);
+#	endif
+================================================================================
+
+
+
+bug fixes:
+	* RNA equates bug reported by DZ
+	* case of equate keys  (characters of both cases are now added for molecular
+		data) reported by DZ
+	* Tax and Charset reading now tolerate Standard keywords (they still
+		generate errors for VECTOR)
+	* fixes to the Distances block if the input order is not identical to the
+		taxa block order
+	* Some CharSet reading 
+	* Lots more that I forgot to document.
+
+Behavior changes (could be called features or bugs depending on your POV):
+	* Now converts any built in CHARACTERS datatype that has symbols extensions
+		to standard datatype.
+
+
+
+================================================================================
+Since 2.0.0
+================================================================================
 12 Dec 2007 Mark Holder (mholder@users.sourceforge.net)
 	* Version 2.0.04 (https://svn.sourceforge.net/svnroot/ncl/branches/v2-stable
 revision 75)

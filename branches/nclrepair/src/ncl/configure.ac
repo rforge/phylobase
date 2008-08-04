@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(NCL, 2.0.04, paul.lewis@uconn.edu)
+AC_INIT(NCL, 2.1.02, paul.lewis@uconn.edu)
 AC_CONFIG_HEADERS([config.h])
 
 AC_PREREQ(2.57)
@@ -13,15 +13,16 @@ AC_CONFIG_AUX_DIR([config])
 #	According to (http://www.mail-archive.com/autoconf@gnu.org/msg14232.html)
 #		this macro should be after AC_INIT but before AM_INIT_AUTOMAKE
 ################################################################################
-AC_CONFIG_MACRO_DIR(config/m4)
+AC_CONFIG_MACRO_DIR(config)
 
 AM_INIT_AUTOMAKE([1.6 foreign dist-zip tar-ustar filename-length-max=299])
 
-AC_CONFIG_SRCDIR([ncl/ncl.h])
+AC_CONFIG_SRCDIR([ChangeLog])
 
 # Checks for programs.
 AC_PROG_LN_S
 AC_PROG_INSTALL
+AC_PROG_LIBTOOL
 
 ################################################################################
 # calling AC_PROG_CXX resets CXXFLAGS, we use our own flags set in the 
@@ -33,12 +34,12 @@ ARG_CXX_FLAGS="$CXXFLAGS"
 ARG_CXX_FLAGS="$CXXFLAGS"
 AC_PROG_CXX
 AC_PROG_RANLIB
-AC_PROG_LIBTOOL
 CXXFLAGS="$ARG_CXX_FLAGS"
 AX_CXXFLAGS
 AC_SUBST(CXXFLAGS)
+AC_CXX_RTTI
 
-
+CPPFLAGS="-I\$(top_srcdir) $CPPFLAGS"
 # Checks for libraries.
 
 # Checks for header files.
@@ -78,10 +79,12 @@ AC_PROG_MAKE_SET
 AC_CONFIG_FILES([					\
 	Makefile 						\
 	example/Makefile				\
-	example/ncltest/Makefile		\
-	example/nclsimplest/Makefile	\
 	example/basiccmdline/Makefile	\
+	example/basicfactory/Makefile	\
+	example/nclsimplest/Makefile	\
+	example/ncltest/Makefile		\
 	example/normalizer/Makefile		\
+	example/patristic/Makefile		\
 	ncl/Makefile					\
 	test/Makefile
 	])
