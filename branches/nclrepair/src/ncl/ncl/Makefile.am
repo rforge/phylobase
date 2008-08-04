@@ -3,7 +3,7 @@ libncl_ladir = $(includedir)/ncl
 libncl_la_LDFLAGS = -release @PACKAGE_VERSION@
 
 
-NCL_HEADER_FILES = \
+libncl_la_HEADERS = \
 	ncl.h \
 	nxsassumptionsblock.h \
 	nxsblock.cpp \
@@ -12,30 +12,29 @@ NCL_HEADER_FILES = \
 	nxsdatablock.h \
 	nxsdefs.h \
 	nxsdiscretedatum.h \
-	nxsdiscretematrix.h \
 	nxsdistancedatum.h \
 	nxsdistancesblock.h \
 	nxsexception.h \
-	nxsindent.h \
+	nxsmultiformat.h \
+	nxspublicblocks.h \
 	nxsreader.h \
 	nxssetreader.h \
 	nxsstring.h \
 	nxstaxablock.h \
 	nxstoken.h \
 	nxstreesblock.h \
-	nxsunalignedblock.h \
-	nxsunalignedblock.inl
+	nxsunalignedblock.h 
 
-NCL_SOURCE_FILES = \
+libncl_la_SOURCES = \
 	nxsassumptionsblock.cpp \
 	nxsblock.cpp \
 	nxscharactersblock.cpp \
 	nxsdatablock.cpp \
-	nxsdiscretedatum.cpp \
-	nxsdiscretematrix.cpp \
 	nxsdistancedatum.cpp \
 	nxsdistancesblock.cpp \
 	nxsexception.cpp \
+	nxsmultiformat.cpp \
+	nxspublicblocks.cpp \
 	nxsreader.cpp \
 	nxssetreader.cpp \
 	nxsstring.cpp \
@@ -44,11 +43,4 @@ NCL_SOURCE_FILES = \
 	nxstreesblock.cpp \
 	nxsunalignedblock.cpp
 
-libncl_la_HEADERS = $(NCL_HEADER_FILES)
-libncl_la_SOURCES = $(NCL_SOURCE_FILES)
-
-#lib_LIBRARIES = libncl.a
-#libncl_adir = $(includedir)/ncl
-#libncl_a_HEADERS = $(NCL_HEADER_FILES)
-#libncl_a_SOURCES = $(NCL_SOURCE_FILES)
-	
+EXTRA_DIST = nxsemptyblock.h nxsemptyblock.cpp
