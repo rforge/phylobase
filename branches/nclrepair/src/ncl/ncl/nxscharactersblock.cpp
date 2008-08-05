@@ -20,10 +20,10 @@
  * This file includes contributions by Brian O'Meara. August 2005.
  * These changes include the ability to parse continuous data types.
  */
+#include <iomanip>
+#include <climits>
 
 #include "ncl/nxscharactersblock.h"
-
-#include <iomanip>
 
 #include "ncl/nxsreader.h"
 #include "ncl/nxsassumptionsblock.h"

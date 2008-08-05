@@ -22,6 +22,7 @@
 
 #include <sstream>
 #include <cfloat>
+#include <climits>
 
 #include "ncl/nxsdiscretedatum.h"
 #include "ncl/nxsdefs.h"

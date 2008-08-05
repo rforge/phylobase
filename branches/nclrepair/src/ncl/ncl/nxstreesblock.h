@@ -19,7 +19,7 @@
 
 #ifndef NCL_NXSTREESBLOCK_H
 #define NCL_NXSTREESBLOCK_H
-
+#include <climits>
 #include <cfloat>
 #include "ncl/nxstaxablock.h"
 

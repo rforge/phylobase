@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <set>
 #include <fstream>
+#include <climits>
 #include "ncl/nxsreader.h"
 
 #include "ncl/nxscharactersblock.h"
