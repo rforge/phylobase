@@ -183,6 +183,10 @@ phyloXXYY <- function(phy, tip.order = NULL) {
         xx = numeric(Nedges), 
         ## record the order that nodes are visited in
         traverse = NULL) 
+    if(is.null(edgeLength(phy))) {
+        # TODO there should be an abstraction for assigning branch lengths
+        phy@edge.length <- rep(1, nrow(phy@edge))
+    }
     
     # TODO tip ordering should be dealt with at a higher level
     # if(!is.null(tip.order)) { 
@@ -374,7 +378,8 @@ data(geospiza)
 # )
 
 treeWpoly <- as(read.tree(text = '((a,b,c),d);'), 'phylo4')
-print(phyloXXYY(treeWpoly))
+# print(phyloXXYY(treeWpoly))
+treePlot(treeWpoly)
 
 # tree1 <- as(rtree(10), 'phylo4')
 # tree1@tip.label <- replicate(10, paste(sample(LETTERS, sample(2:20, 1)), collapse = ""))
