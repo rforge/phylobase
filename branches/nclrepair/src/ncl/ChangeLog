@@ -108,3 +108,8 @@ defined objects on some Linux variants)
 20 May 2003 Paul Lewis (paul.lewis@uconn.edu)
 	* Version 2.0 released (first official release)
 
+================================================================================
+Latest changes
+================================================================================
+
+Added inclusion of <climits> for gcc 4.3 (bug report by Brian Omeara)
