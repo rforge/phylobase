@@ -27,6 +27,7 @@ using namespace QuantLib;
 #else
 #include <sstream>
 #include <string>
+#include <cstring>  //Brian O'Meara added call to cstring to hopefully deal with errors from GCC 4.3.1 (see http://gcc.gnu.org/gcc-4.3/porting_to.html )
 #include <list>
 #include <map>
 #endif
