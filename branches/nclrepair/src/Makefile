@@ -23,14 +23,14 @@ NCLInterface.o: NCLInterface.cpp
 	${RM} $(LINKOBJ)
 	cd ncl
 	sh bootstrap.sh
-        cd ..
-        mkdir build
-        cd build
-        ../v2.1/configure
-        make
-        make check
-        make install
-        make installcheck
+	cd ..
+	mkdir build
+	cd build
+	../v2.1/configure
+	make
+	make check
+	make install
+	make installcheck
 
 	$(CXX) -c NCLInterface.cpp -o NCLInterface.o $(CXXFLAGS)
     
