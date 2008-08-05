@@ -2074,6 +2074,7 @@ cd ../..
 
 echo "Building libncl.a in ncl..."
 cd src/ncl
+sh bootstrap.sh
 ./configure
 make
 cd ../..
