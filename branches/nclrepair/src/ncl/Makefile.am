@@ -1,4 +1,4 @@
-SUBDIRS = ncl example $(MAYBE_TEST_DIR)
+SUBDIRS = ncl $(MAYBE_TEST_DIR)
 
 EXTRA_DIST = data html test Jamroot
 
