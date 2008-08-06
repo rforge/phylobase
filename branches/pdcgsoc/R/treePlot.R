@@ -1,5 +1,5 @@
 treePlot <- function(phy, 
-                     type = c('phylogram', 'cladogram'), 
+                     type = c('phylogram', 'cladogram', 'fan'), 
                      show.tip.label = TRUE,
                      show.node.label = FALSE, 
                      tip.order = NULL,
@@ -14,6 +14,7 @@ treePlot <- function(phy,
             )
 {
     require(grid)
+    if (!isRooted(phy)) stop("treePlot function requires a rooted tree.")
     width <- height <- 0.9
     type <- match.arg(type)
     phy.orig <- phy
@@ -43,7 +44,7 @@ treePlot <- function(phy,
                             layout = phyplotlayout, 
                             name = 'phyplotlayout', angle = -rot))
         pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
-            tree.plot(xxyy, show.tip.label, show.node.label, 
+            tree.plot(xxyy, type, show.tip.label, show.node.label, 
                 edge.color, node.color, tip.color, 
                 edge.width, rot)
         upViewport()
@@ -67,7 +68,7 @@ treePlot <- function(phy,
                                     layout = datalayout, 
                                     name = 'datalayout', angle = -rot))
                 pushViewport(viewport(layout.pos.col = 1:Ntips))
-                    tree.plot(xxyy, show.tip.label, show.node.label, 
+                    tree.plot(xxyy, type, show.tip.label, show.node.label, 
                         edge.color, node.color, tip.color, 
                         edge.width, rot)
                 upViewport()
@@ -110,7 +111,7 @@ treePlot <- function(phy,
                     phylobubbles(xxyy, ...)
                 upViewport()
                 pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
-                    tree.plot(xxyy, show.tip.label, show.node.label, 
+                    tree.plot(xxyy, type, show.tip.label, show.node.label, 
                         edge.color, node.color, tip.color, 
                         edge.width, rot)
                 upViewport()
@@ -119,7 +120,7 @@ treePlot <- function(phy,
     }
 }
 
-tree.plot <- function(xxyy, show.tip.label, show.node.label, edge.color, 
+tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color, 
                         node.color, tip.color, edge.width, rot) 
 {
     # TODO switch to phylobase abstractions
@@ -165,14 +166,23 @@ tree.plot <- function(xxyy, show.tip.label, show.node.label, edge.color,
     pushViewport(viewport(
         layout = treelayout, layout.pos.col = 1, 
         name = 'tree'))
-    vseg <- grid.segments( # draws vertical lines
-        x0 = segs$v0x, y0 = segs$v0y, 
-        x1 = segs$v1x, y1 = segs$v1y, 
-        name = "vert", gp = gpar(col = edge.color, lwd = edge.width)) 
-    hseg <- grid.segments(  # draws horizontal lines
-        x0 = segs$h0x, y0 = segs$h0y, 
-        x1 = segs$h1x, y1 = segs$h1y, 
-        name = "horz", gp = gpar(col = edge.color, lwd = edge.width))
+    if (identical(type,"fan")) {
+        dseg <- grid.segments( # draws vertical lines
+            x0 = segs$v0x, y0 = segs$v0y, 
+            x1 = segs$h1x, y1 = segs$h1y, 
+            name = "diag", gp = gpar(col = edge.color, lwd = edge.width))     
+    }
+    else
+    {
+        vseg <- grid.segments( # draws vertical lines
+            x0 = segs$v0x, y0 = segs$v0y, 
+            x1 = segs$v1x, y1 = segs$v1y, 
+            name = "vert", gp = gpar(col = edge.color, lwd = edge.width)) 
+        hseg <- grid.segments(  # draws horizontal lines
+            x0 = segs$h0x, y0 = segs$h0y, 
+            x1 = segs$h1x, y1 = segs$h1y, 
+            name = "horz", gp = gpar(col = edge.color, lwd = edge.width))
+    }
     upViewport()
     if(show.tip.label) {
         pushViewport(viewport(
