@@ -30,7 +30,7 @@ treePlot <- function(phy,
     if(type == 'cladogram') {
         xxyy$xx[phy@edge[, 2] <= Ntips] <- 1
     }
-
+    # TODO add symbols at the nodes, allow coloirng and sizing downViewport approach?
     # TODO cladogram methods incorrect
     # TODO abstract, make ultrametric? good algorithms for this?
     grid.newpage()
@@ -85,7 +85,7 @@ treePlot <- function(phy,
                         just = "left"
                         ))
                         grid.rect()
-                        tip.plot.fun(tdata(phy, which = 'tip')[i, ])
+                        tip.plot.fun(t(tdata(phy, which = 'tip')[i, ]))
                     upViewport()
                 }
                 upViewport()
