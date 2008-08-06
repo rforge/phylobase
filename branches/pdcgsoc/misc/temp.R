@@ -3,7 +3,8 @@ require(grid)
 require(lattice)
 treePlot <- function(phy, 
                      type = c('phylogram', 'cladogram'), 
-                     show.tip.label = TRUE, 
+                     show.tip.label = TRUE,
+                     show.node.label = FALSE, 
                      tip.order = NULL,
                      plot.data = is(phy, 'phylo4d'),
                      rot = 0,
@@ -44,7 +45,7 @@ treePlot <- function(phy,
                             layout = phyplotlayout, 
                             name = 'phyplotlayout', angle = -rot))
         pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
-            tree.plot(xxyy, show.tip.label, 
+            tree.plot(xxyy, show.tip.label, show.node.label, 
                 edge.color, node.color, tip.color, 
                 edge.width, rot)
         upViewport()
@@ -68,7 +69,7 @@ treePlot <- function(phy,
                                     layout = datalayout, 
                                     name = 'datalayout', angle = -rot))
                 pushViewport(viewport(layout.pos.col = 1:Ntips))
-                    tree.plot(xxyy, show.tip.label, 
+                    tree.plot(xxyy, show.tip.label, show.node.label, 
                         edge.color, node.color, tip.color, 
                         edge.width, rot)
                 upViewport()
@@ -77,7 +78,7 @@ treePlot <- function(phy,
                     yscale = c(-0.5/Ntips, 1 + 0.5/Ntips), 
                     layout.pos.col = Ntips + 1, 
                     name = 'data_plots'))
-                    grid.rect(gp = gpar(col = 2))
+                    # grid.rect(gp = gpar(col = 2))
                 ## TODO should plots float at tips, or only along edge?
                 for(i in xxyy$yy[which(phy@edge[, 2] <= Ntips)]) {
                     pushViewport(viewport(
@@ -111,7 +112,7 @@ treePlot <- function(phy,
                     phylobubbles(xxyy, ...)
                 upViewport()
                 pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
-                    tree.plot(xxyy, show.tip.label, 
+                    tree.plot(xxyy, show.tip.label, show.node.label, 
                         edge.color, node.color, tip.color, 
                         edge.width, rot)
                 upViewport()
@@ -120,7 +121,7 @@ treePlot <- function(phy,
     }
 }
 
-tree.plot <- function(xxyy, show.tip.label, edge.color, 
+tree.plot <- function(xxyy, show.tip.label, show.node.label, edge.color, 
                         node.color, tip.color, edge.width, rot) 
 {
     # TODO switch to phylobase abstractions
@@ -186,6 +187,21 @@ tree.plot <- function(xxyy, show.tip.label, edge.color,
             y = xxyy$yy[phy@edge[, 2] %in% tindex], 
             default.units = 'npc', 
             rot = rot, just = 'left', gp = gpar(col = tip.color[tindex])
+        )
+        upViewport()
+    }
+    # TODO probably want to be able to adjust the location of these guys
+    if(show.node.label) {
+        pushViewport(viewport(
+            layout = treelayout, layout.pos.col = 1, 
+            ))
+        labtext <- grid.text(
+            phy@node.label[nindex], 
+            x = xxyy$xx[phy@edge[, 2] > Ntips], 
+            ## TODO yuck!!
+            y = xxyy$yy[phy@edge[, 2] > Ntips], 
+            default.units = 'npc', 
+            rot = rot, just = 'left', gp = gpar(col = node.color[nindex])
         )
         upViewport()
     }
@@ -392,6 +408,7 @@ data(geospiza)
 p1 <- treePlot(
     geospiza, 
     # show.tip.label = FALSE, 
+    show.node.label = TRUE, 
     # edge.color = rainbow(nrow(geospiza@edge)),  
     # plot.data = FALSE, 
     tip.plot.fun = function() {grid.lines(1:10/10, runif(10))}, 
