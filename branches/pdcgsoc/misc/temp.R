@@ -84,7 +84,7 @@ treePlot <- function(phy,
                     pushViewport(viewport(
                         y = i, 
                         x = 0.5, 
-                        height = unit(1, 'snpc'), # snpc keeps the viewports sq
+                        height = unit(1/Ntips, 'npc'), # snpc keeps the viewports sq
                         width = unit(1, 'snpc'), 
                         name = paste('data_plot', i),
                         just = "center"
@@ -130,7 +130,7 @@ tree.plot <- function(xxyy, show.tip.label, show.node.label, edge.color,
     Ntips    <- length(phy@tip.label)
     tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
     eindex <- match(phy@edge[,2], xxyy$phy.orig@edge[,2])
-    segs <- segs(phy, XXYY = xxyy)
+    segs <- segs(XXYY = xxyy)
 
     ## TODO check that colors are valid?
     ## TODO edge colors are required to be in the order of edge matrix
@@ -283,7 +283,8 @@ phyloXXYY <- function(phy, tip.order = NULL) {
     c(xxyy, phy = list(phy), phy.orig = list(phy.orig))
 }
 
-segs <- function(phy, XXYY) {
+segs <- function(XXYY) {
+    phy <- XXYY$phy
     treelen <- rep(NA, nrow(phy@edge) + 1)
     segs <- list(v0x = treelen, v0y = treelen, v1x = treelen, v1y = treelen,
                  h0x = treelen, h0y = treelen, h1x = treelen, h1y = treelen)
@@ -405,15 +406,18 @@ data(geospiza)
 # phylobubbles(foo)
 ## TODO true arbitary functions with data from associated data frames
 
+ff <- function() {grid.lines(1:10/10, runif(10))}
+
 p1 <- treePlot(
     geospiza, 
     # show.tip.label = FALSE, 
     show.node.label = TRUE, 
-    # edge.color = rainbow(nrow(geospiza@edge)),  
+    edge.color = rainbow(nrow(geospiza@edge)),  
+    # node.color = rainbow(nrow(geospiza@edge)), 
     # plot.data = FALSE, 
-    tip.plot.fun = function() {grid.lines(1:10/10, runif(10))}, 
+    # tip.plot.fun = ff, 
     tip.color = c('red',  'black', 'blue'), 
-    square = TRUE
+    square = FALSE
 )
 
 treeWpoly <- as(read.tree(text = '((a,b,c),d);'), 'phylo4')
@@ -423,6 +427,6 @@ treeWpoly <- as(read.tree(text = '((a,b,c),d);'), 'phylo4')
 # n <- 10
 # tree1 <- as(rtree(n), 'phylo4')
 # tree1@tip.label <- replicate(n, paste(sample(LETTERS, sample(2:20, 1)), collapse = ""))
-# treePlot(tree1, type = "cladogram")
-# 
+# treePlot(tree1)
+
 
