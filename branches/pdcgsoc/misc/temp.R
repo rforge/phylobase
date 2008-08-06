@@ -15,6 +15,7 @@ treePlot <- function(phy,
                      ...
             )
 {
+    width <- height <- 0.9
     type <- match.arg(type)
     phy.orig <- phy
     Nedges   <- nrow(phy@edge)
@@ -30,81 +31,98 @@ treePlot <- function(phy,
     if(type == 'cladogram') {
         xxyy$xx[phy@edge[, 2] <= Ntips] <- 1
     }
+
     # TODO cladogram methods incorrect
     # TODO abstract, make ultrametric? good algorithms for this?
     grid.newpage()
     ## because we may reoder the tip, we need to update the phy objec
     
-    if(!is(phy, 'phylo4d')) {
+    if(!plot.data) {
         phyplotlayout <- grid.layout(nrow = 1, ncol = 1)
         # TODO for very long plots, alternative margin setting useful
-        pushViewport(viewport(x = 0.5, y = 0.5, 
-                            width = 0.9, height = 0.9, 
+        pushViewport(viewport(width = width, height = height, 
                             layout = phyplotlayout, 
                             name = 'phyplotlayout', angle = -rot))
         pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
-            tree.plot(xxyy, show.tip.label, edge.color, node.color, tip.color, edge.width, rot)
+            tree.plot(xxyy, show.tip.label, 
+                edge.color, node.color, tip.color, 
+                edge.width, rot)
         upViewport()
         upViewport()
-        return()
+        # TODO should return something useful
+        return(invisible())
     }
     
     if(plot.data) {
         if(is.function(tip.plot.fun)) {
-            # nothing yet
+            # to keep the tip plots square and non-overlapping create a
+            # Ntip * Ntip + 1 grid.  The last column is respected which scales
+            # the width of the data col with the height of the window
+            # this might be excessive with a performance penalty
+            datalayout <- grid.layout(nrow = Ntips, ncol = Ntips + 1,
+                # width = unit.c(unit(rep(1, Ntips), rep('null', Ntips)), unit(1/Ntips, 'npc')), 
+                respect = matrix(c(rep(0, Ntips * Ntips), rep(0, Ntips - 1),  1), nrow = Ntips)
+                )
+                # TODO this is done multiple times, 
+                pushViewport(viewport(width = width, height = height, 
+                                    layout = datalayout, 
+                                    name = 'datalayout', angle = -rot))
+                pushViewport(viewport(layout.pos.col = 1:Ntips))
+                    tree.plot(xxyy, show.tip.label, 
+                        edge.color, node.color, tip.color, 
+                        edge.width, rot)
+                upViewport()
+                
+                pushViewport(viewport(
+                    yscale = c(-0.5/Ntips, 1 + 0.5/Ntips), 
+                    layout.pos.col = Ntips + 1, 
+                    name = 'data_plots'))
+                    grid.rect(gp = gpar(col = 2))
+                ## TODO should plots float at tips, or only along edge?
+                for(i in xxyy$yy[which(phy@edge[, 2] <= Ntips)]) {
+                    pushViewport(viewport(
+                        y = i, 
+                        x = 0.5, 
+                        height = unit(1, 'snpc'), # snpc keeps the viewports sq
+                        width = unit(1, 'snpc'), 
+                        name = paste('data_plot', i),
+                        just = "center"
+                        ))
+                        grid.rect()
+                        tip.plot.fun()
+                    upViewport()
+                }
+                upViewport()
+                upViewport()
         } else {
             # use phylobubbles as default
-            datalabwidth <- max(stringWidth(colnames(phy@tip.data)))
+            dlabwdth <- max(stringWidth(colnames(phy@tip.data)))
             phyplotlayout <- grid.layout(nrow = 2, ncol = 2, 
-                heights = unit.c(unit(1, 'null', NULL), datalabwidth), 
+                heights = unit.c(unit(1, 'null', NULL), dlabwdth), 
                 widths = unit(c(1, 1), c('null', 'null'), list(NULL, NULL))
                 )
-                pushViewport(viewport(x = 0.5, y = 0.5, 
-                                    width = 0.9, height = 0.9, 
+                pushViewport(viewport(width = width, height = height, 
                                     layout = phyplotlayout, 
                                     name = 'phyplotlayout', angle = -rot))
                 pushViewport(viewport(layout.pos.row = 1:2, layout.pos.col = 2,
-                                    height = unit(1, 'npc', NULL) + convertUnit(datalabwidth, 'npc'), 
+                                    height = unit(1, 'npc', NULL) + 
+                                                convertUnit(dlabwdth, 'npc'), 
                                     default.units = 'native'))
                     phylobubbles(xxyy, ...)
-                popViewport()
-                pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
-                    tree.plot(xxyy, show.tip.label, edge.color, node.color, tip.color, edge.width, rot)
                 upViewport()
-                
-            popViewport()
+                pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
+                    tree.plot(xxyy, show.tip.label, 
+                        edge.color, node.color, tip.color, 
+                        edge.width, rot)
+                upViewport()
+            upViewport()
         }
     }
-        # phyplotlayout <- grid.layout(nrow = 1, ncol = 2,
-        #     widths = unit(c(1, 1), c('null', 'null'), list(NULL, NULL))
-        #     )
-        # tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
-        # if(length(tip.color) != Ntips) {
-        #     tip.color <- rep(tip.color, length.out = Ntips)
-        # } else {
-        #     pushViewport(viewport(
-        #         ## layout = datalayout, 
-        #         layout.pos.col = 2, 
-        #         name = 'data_plots'))
-        #     ## TODO should plots float at tips, or only along edge?
-        #     for(i in xxyy$yy[which(phy@edge[, 2] <= Ntips)]) {
-        #         pushViewport(viewport(
-        #             y = i, 
-        #             height = unit(1, 'snpc'), 
-        #             width = unit(1, 'snpc'), 
-        #             name = paste('data_plot', i),
-        #             just = "left"))
-        #             # tip.plot.fun()
-        #         popViewport()
-        #     }
-        #     popViewport()
-        # }
 }
 
 tree.plot <- function(xxyy, show.tip.label, edge.color, 
                         node.color, tip.color, edge.width, rot) 
 {
-
     # TODO switch to phylobase abstractions
     phy <- xxyy$phy
     Nedges   <- nrow(phy@edge)
@@ -130,7 +148,7 @@ tree.plot <- function(xxyy, show.tip.label, edge.color,
     if(show.tip.label) {
         labw <- max(stringWidth(phy@tip.label))
         treelayout <- grid.layout(nrow = 1, ncol = 2,
-            widths = unit.c(unit(1, 'null', NULL), labw)
+            widths = unit.c(unit(1, 'null', NULL), labw + unit(0.02, 'npc'))
             )
         tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
         if(length(tip.color) != Ntips) {
@@ -171,6 +189,7 @@ tree.plot <- function(xxyy, show.tip.label, edge.color,
         )
         upViewport()
     }
+    upViewport()
     # grobTree(vseg, hseg, labtext)
 }
 
@@ -374,6 +393,8 @@ p1 <- treePlot(
     geospiza, 
     # show.tip.label = FALSE, 
     # edge.color = rainbow(nrow(geospiza@edge)),  
+    # plot.data = FALSE, 
+    tip.plot.fun = function() {grid.lines(1:10/10, runif(10))}, 
     tip.color = c('red',  'black', 'blue'), 
     square = TRUE
 )
