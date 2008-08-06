@@ -1,6 +1,3 @@
-require(phylobase)
-require(grid)
-require(lattice)
 treePlot <- function(phy, 
                      type = c('phylogram', 'cladogram'), 
                      show.tip.label = TRUE,
@@ -16,6 +13,7 @@ treePlot <- function(phy,
                      ...
             )
 {
+    require(grid)
     width <- height <- 0.9
     type <- match.arg(type)
     phy.orig <- phy
