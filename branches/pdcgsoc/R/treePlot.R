@@ -168,11 +168,11 @@ tree.plot <- function(xxyy, show.tip.label, show.node.label, edge.color,
     vseg <- grid.segments( # draws vertical lines
         x0 = segs$v0x, y0 = segs$v0y, 
         x1 = segs$v1x, y1 = segs$v1y, 
-        name = "vert", gp = gpar(col = node.color, lwd = 1)) 
+        name = "vert", gp = gpar(col = edge.color, lwd = edge.width)) 
     hseg <- grid.segments(  # draws horizontal lines
         x0 = segs$h0x, y0 = segs$h0y, 
         x1 = segs$h1x, y1 = segs$h1y, 
-        name = "horz", gp = gpar(col = edge.color, lwd = 1))
+        name = "horz", gp = gpar(col = edge.color, lwd = edge.width))
     upViewport()
     if(show.tip.label) {
         pushViewport(viewport(
@@ -290,27 +290,27 @@ segs <- function(XXYY) {
 
     get.coor <- function(node, segs) {
         if(any(phy@edge[, 2] == node) == FALSE) {
+            #root
             decdex <- which(phy@edge[, 1] == node)
             index <- length(treelen)
-            segs$v0x[index] <- segs$v1x[index] <- 0
-            
+            segs$v0y[index] <- segs$v1y[index] <- NA
+            segs$v0x[index] <- segs$v1x[index] <- NA
             segs$h0y[index] <- segs$h1y[index] <- NA
             segs$h0x[index] <- segs$h1x[index] <- NA
-            segs$h0x[decdex] <- 0            
+            segs$v0x[decdex] <- segs$v1x[decdex] <- segs$h0x[decdex] <- 0            
+            segs$v0y[decdex] <- mean(XXYY$yy[decdex])            
         } else {
+            #not root
             index <- which(phy@edge[, 2] == node)
+            segs$h1x[index] <- XXYY$xx[index]
+            segs$h0y[index] <- segs$h1y[index] <- segs$v1y[index] <- XXYY$yy[index]
             if(!any(phy@edge[, 1] == node)) {
                 return(segs)
             }
             decdex <- which(phy@edge[, 1] == phy@edge[index, 2])
-            segs$v0x[index] <- segs$v1x[index] <- XXYY$xx[index]
-            segs$h0x[decdex] <- XXYY$xx[index]
+            segs$v0x[decdex] <- segs$v1x[decdex] <- segs$h0x[decdex] <- XXYY$xx[index]            
+            segs$v0y[decdex] <- mean(XXYY$yy[decdex])           
         }
-        segs$h1x[decdex] <- XXYY$xx[decdex]
-        segs$h0y[decdex] <- segs$h1y[decdex] <- XXYY$yy[decdex]
-        
-        segs$v0y[index] <- min(XXYY$yy[decdex])
-        segs$v1y[index] <- max(XXYY$yy[decdex])
         
         for(i in phy@edge[decdex, 2]) {
             segs <- get.coor(i, segs)
