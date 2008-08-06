@@ -401,26 +401,26 @@ phylobubbles <- function(XXYY, square = FALSE) {
 ## How do we translate this info into a plot?
 ## Test code
 # out <- phyloXXYY(foo <- as(rcoal(3), 'phylo4'))
-data(geospiza)
+# data(geospiza)
 # foo <- phyloXXYY(geospiza)
 # phylobubbles(foo)
 ## TODO true arbitary functions with data from associated data frames
 
-ff <- function() {grid.lines(1:10/10, runif(10))}
-
-p1 <- treePlot(
-    geospiza, 
-    # show.tip.label = FALSE, 
-    show.node.label = TRUE, 
-    edge.color = rainbow(nrow(geospiza@edge)),  
-    # node.color = rainbow(nrow(geospiza@edge)), 
-    # plot.data = FALSE, 
-    # tip.plot.fun = ff, 
-    tip.color = c('red',  'black', 'blue'), 
-    square = FALSE
-)
-
-treeWpoly <- as(read.tree(text = '((a,b,c),d);'), 'phylo4')
+# ff <- function() {grid.lines(1:10/10, runif(10))}
+# 
+# p1 <- treePlot(
+#     geospiza, 
+#     # show.tip.label = FALSE, 
+#     show.node.label = TRUE, 
+#     edge.color = rainbow(nrow(geospiza@edge)),  
+#     # node.color = rainbow(nrow(geospiza@edge)), 
+#     # plot.data = FALSE, 
+#     # tip.plot.fun = ff, 
+#     tip.color = c('red',  'black', 'blue'), 
+#     square = FALSE
+# )
+# 
+# treeWpoly <- as(read.tree(text = '((a,b,c),d);'), 'phylo4')
 # print(phyloXXYY(treeWpoly))
 # treePlot(treeWpoly,  type = "cladogram")
 
