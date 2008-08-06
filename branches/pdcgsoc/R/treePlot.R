@@ -13,7 +13,6 @@ treePlot <- function(phy,
                      ...
             )
 {
-    require(grid)
     if (!isRooted(phy)) stop("treePlot function requires a rooted tree.")
     width <- height <- 0.9
     type <- match.arg(type)
@@ -55,19 +54,14 @@ treePlot <- function(phy,
     
     if(plot.data) {
         if(is.function(tip.plot.fun)) {
-            # to keep the tip plots square and non-overlapping create a
-            # Ntip * Ntip + 1 grid.  The last column is respected which scales
-            # the width of the data col with the height of the window
-            # this might be excessive with a performance penalty
-            datalayout <- grid.layout(nrow = Ntips, ncol = Ntips + 1,
-                # width = unit.c(unit(rep(1, Ntips), rep('null', Ntips)), unit(1/Ntips, 'npc')), 
-                respect = matrix(c(rep(0, Ntips * Ntips), rep(0, Ntips - 1),  1), nrow = Ntips)
+            datalayout <- grid.layout(ncol = 2,
+                width = unit(c(1, 1/Ntips), c('null', 'null')) 
                 )
                 # TODO this is done multiple times, 
                 pushViewport(viewport(width = width, height = height, 
                                     layout = datalayout, 
                                     name = 'datalayout', angle = -rot))
-                pushViewport(viewport(layout.pos.col = 1:Ntips))
+                pushViewport(viewport(layout.pos.col = 1))
                     tree.plot(xxyy, type, show.tip.label, show.node.label, 
                         edge.color, node.color, tip.color, 
                         edge.width, rot)
@@ -75,21 +69,23 @@ treePlot <- function(phy,
                 
                 pushViewport(viewport(
                     yscale = c(-0.5/Ntips, 1 + 0.5/Ntips), 
-                    layout.pos.col = Ntips + 1, 
+                    xscale = c(0, 1 + 1/Ntips), 
+                    layout.pos.col = 1, 
                     name = 'data_plots'))
-                    # grid.rect(gp = gpar(col = 2))
                 ## TODO should plots float at tips, or only along edge?
-                for(i in xxyy$yy[which(phy@edge[, 2] <= Ntips)]) {
+                hc <- convertY(unit(1/Ntips, 'snpc'), 'npc')
+                for(i in 1:Ntips) {
                     pushViewport(viewport(
-                        y = i, 
-                        x = 0.5, 
-                        height = unit(1/Ntips, 'npc'), # snpc keeps the viewports sq
-                        width = unit(1, 'snpc'), 
+                        y = xxyy$yy[phy@edge[, 2] == i],
+                        x = 1, # xxyy$xx[phy@edge[, 2] == i], 
+                        height = hc, 
+                        width = hc, 
+                        # default.units = 'native', 
                         name = paste('data_plot', i),
-                        just = "center"
+                        just = "left"
                         ))
                         grid.rect()
-                        tip.plot.fun()
+                        tip.plot.fun(tdata(phy, which = 'tip')[i, ])
                     upViewport()
                 }
                 upViewport()
@@ -405,36 +401,4 @@ phylobubbles <- function(XXYY, square = FALSE) {
 
     popViewport()
 }
-
-## How do we translate this info into a plot?
-## Test code
-# out <- phyloXXYY(foo <- as(rcoal(3), 'phylo4'))
-# data(geospiza)
-# foo <- phyloXXYY(geospiza)
-# phylobubbles(foo)
-## TODO true arbitary functions with data from associated data frames
-
-# ff <- function() {grid.lines(1:10/10, runif(10))}
-# 
-# p1 <- treePlot(
-#     geospiza, 
-#     # show.tip.label = FALSE, 
-#     show.node.label = TRUE, 
-#     edge.color = rainbow(nrow(geospiza@edge)),  
-#     # node.color = rainbow(nrow(geospiza@edge)), 
-#     # plot.data = FALSE, 
-#     # tip.plot.fun = ff, 
-#     tip.color = c('red',  'black', 'blue'), 
-#     square = FALSE
-# )
-# 
-# treeWpoly <- as(read.tree(text = '((a,b,c),d);'), 'phylo4')
-# print(phyloXXYY(treeWpoly))
-# treePlot(treeWpoly,  type = "cladogram")
-
-# n <- 10
-# tree1 <- as(rtree(n), 'phylo4')
-# tree1@tip.label <- replicate(n, paste(sample(LETTERS, sample(2:20, 1)), collapse = ""))
-# treePlot(tree1)
-
 
