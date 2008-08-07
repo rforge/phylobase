@@ -33,7 +33,12 @@ treePlot <- function(phy,
     # TODO add symbols at the nodes, allow coloirng and sizing downViewport approach?
     # TODO cladogram methods incorrect
     # TODO abstract, make ultrametric? good algorithms for this?
+    # call plot.new so that gridBase plots work properly
+    # calls to base plot functions need to be cleared w/ par(new = T) which fails
+    # if no plot is present TODO perhpas there's a better solution than calling plot.new
+    plot.new()
     grid.newpage()
+    
     ## because we may reoder the tip, we need to update the phy objec
     
     if(!plot.data) {
@@ -54,13 +59,16 @@ treePlot <- function(phy,
     
     if(plot.data) {
         if(tip.plot.fun == "density") {
-
-            tmin <- min(tdata(phy, which = 'tip'))
-            tmax <- max(tdata(phy, which = 'tip'))
+            tmin <- min(tdata(phy, which = 'tip'), na.rm = T)
+            tmax <- max(tdata(phy, which = 'tip'), na.rm = T)
             tip.plot.fun <- function(x) {
-                par(plt=gridFIG())   
-                par(new=TRUE)          
-                plot(density(t(x)),xlim=c(tmin,tmax),axes=FALSE,main="",xlab="",ylab="")
+                if(!all(is.na(x))) {
+                    # hack, set th plotting region to the grid fig region
+                    par(plt = gridFIG(), new = TRUE)
+                    dens <- density(x, na.rm = TRUE)
+                    plot.density(dens, xlim = c(tmin, tmax), axes = FALSE, 
+                                main = "", xlab = "", ylab = "")
+                }
             }
            
         }
