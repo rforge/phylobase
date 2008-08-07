@@ -218,11 +218,12 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
         pushViewport(viewport(
             layout = treelayout, layout.pos.col = 1, 
             ))
+            rty <- mean(xxyy$yy[phy@edge[, 1] == Ntips + 1])
         labtext <- grid.text(
-            phy@node.label[nindex], 
-            x = xxyy$xx[phy@edge[, 2] > Ntips], 
+            phy@node.label, 
+            x = c(0, xxyy$xx[phy@edge[, 2] > Ntips][nindex]), 
             ## TODO yuck!!
-            y = xxyy$yy[phy@edge[, 2] > Ntips], 
+            y = c(rty, xxyy$yy[phy@edge[, 2] > Ntips][nindex]), 
             default.units = 'npc', 
             rot = rot, just = 'left', gp = gpar(col = node.color[nindex])
         )
