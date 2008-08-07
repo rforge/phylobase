@@ -58,23 +58,24 @@ treePlot <- function(phy,
     }
     
     if(plot.data) {
-        if(tip.plot.fun == "density") {
-            if(!require(gridBase)) {
-                stop('To plot using base graphics (including the "density" plot) 
-                                       you need install the "gridBase" package')
-            }
-            tmin <- min(tdata(phy, which = 'tip'), na.rm = T)
-            tmax <- max(tdata(phy, which = 'tip'), na.rm = T)
-            tip.plot.fun <- function(x) {
-                if(!all(is.na(x))) {
-                    # hack, set th plotting region to the grid fig region
-                    par(plt = gridFIG(), new = TRUE)
-                    dens <- density(x, na.rm = TRUE)
-                    plot.density(dens, xlim = c(tmin, tmax), axes = FALSE, 
-                                main = "", xlab = "", ylab = "")
+        if(!is.function(tip.plot.fun)) {
+            if(tip.plot.fun == "density") {
+                if(!require(gridBase)) {
+                    stop('To plot using base graphics (including the "density" plot) 
+                                           you need install the "gridBase" package')
                 }
-            }
-           
+                tmin <- min(tdata(phy, which = 'tip'), na.rm = T)
+                tmax <- max(tdata(phy, which = 'tip'), na.rm = T)
+                tip.plot.fun <- function(x) {
+                    if(!all(is.na(x))) {
+                        # hack, set th plotting region to the grid fig region
+                        par(plt = gridFIG(), new = TRUE)
+                        dens <- density(x, na.rm = TRUE)
+                        plot.density(dens, xlim = c(tmin, tmax), axes = FALSE, 
+                                    main = "", xlab = "", ylab = "")
+                    }
+                }
+            }           
         }
         if(is.function(tip.plot.fun)) {
             datalayout <- grid.layout(ncol = 2,
