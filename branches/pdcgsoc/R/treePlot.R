@@ -53,6 +53,14 @@ treePlot <- function(phy,
     }
     
     if(plot.data) {
+        if(tip.plot.fun == "density") {
+            tmin <- min(tdata(phy, which = 'tip'))
+            tmax <- max(tdata(phy, which = 'tip'))
+            tip.plot.fun <- function(x) {
+                par(plt=gridFIG(),new=TRUE)
+                plot(density(t(x)),xlim=c(tmin,tmax))
+                }
+        }
         if(is.function(tip.plot.fun)) {
             datalayout <- grid.layout(ncol = 2,
                 width = unit(c(1, 1/Ntips), c('null', 'null')) 
@@ -84,7 +92,7 @@ treePlot <- function(phy,
                         name = paste('data_plot', i),
                         just = "left"
                         ))
-                        grid.rect()
+                        #grid.rect()
                         tip.plot.fun(t(tdata(phy, which = 'tip')[i, ]))
                     upViewport()
                 }
