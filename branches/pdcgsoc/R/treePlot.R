@@ -1,4 +1,4 @@
-treePlot <- function(phy, 
+`treePlot` <- function(phy, 
                      type = c('phylogram', 'cladogram', 'fan'), 
                      show.tip.label = TRUE,
                      show.node.label = FALSE, 
@@ -36,47 +36,47 @@ treePlot <- function(phy,
     # call plot.new so that gridBase plots work properly
     # calls to base plot functions need to be cleared w/ par(new = T) which fails
     # if no plot is present TODO perhpas there's a better solution than calling plot.new
-    plot.new()
-    grid.newpage()
     
     ## because we may reoder the tip, we need to update the phy objec
-    
-    if(!plot.data) {
-        phyplotlayout <- grid.layout(nrow = 1, ncol = 1)
-        # TODO for very long plots, alternative margin setting useful
-        pushViewport(viewport(width = width, height = height, 
-                            layout = phyplotlayout, 
-                            name = 'phyplotlayout', angle = -rot))
-        pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
-            tree.plot(xxyy, type, show.tip.label, show.node.label, 
-                edge.color, node.color, tip.color, 
-                edge.width, rot)
-        upViewport()
-        upViewport()
-        # TODO should return something useful
-        return(invisible())
-    }
-    
+    grid.newpage()
     if(plot.data) {
         if(!is.function(tip.plot.fun)) {
             if(tip.plot.fun == "density") {
                 if(!require(gridBase)) {
-                    stop('To plot using base graphics (including the "density" plot) 
-                                           you need install the "gridBase" package')
+                    stop('To plot using base graphics (including the "density"              
+                            plot) you need install the "gridBase" package')
                 }
+            }
+                plot.new()
                 tmin <- min(tdata(phy, which = 'tip'), na.rm = T)
                 tmax <- max(tdata(phy, which = 'tip'), na.rm = T)
                 tip.plot.fun <- function(x) {
+                    # par(omi = c(0,0,0,0))
+                    par(plt = gridPLT(), new = TRUE)
                     if(!all(is.na(x))) {
-                        # hack, set th plotting region to the grid fig region
-                        par(plt = gridFIG(), new = TRUE)
+                        # hack, set the plotting region to the grid fig region
                         dens <- density(x, na.rm = TRUE)
-                        plot.density(dens, xlim = c(tmin, tmax), axes = FALSE, 
-                                    main = "", xlab = "", ylab = "")
+                        plot.density(dens, xlim = c(tmin, tmax), axes = FALSE,      
+                            mar = c(0,0,0,0), main = "", xlab = "", ylab = "")
                     }
                 }
             }           
+        } else {
+            phyplotlayout <- grid.layout(nrow = 1, ncol = 1)
+            # TODO for very long plots, alternative margin setting useful
+            pushViewport(viewport(width = width, height = height, 
+                                layout = phyplotlayout, 
+                                name = 'phyplotlayout', angle = -rot))
+            pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
+                tree.plot(xxyy, type, show.tip.label, show.node.label, 
+                    edge.color, node.color, tip.color, 
+                    edge.width, rot)
+            upViewport()
+            upViewport()
+            # TODO should return something useful
+            return(invisible())
         }
+        
         if(is.function(tip.plot.fun)) {
             datalayout <- grid.layout(ncol = 2,
                 width = unit(c(1, 1/Ntips), c('null', 'null')) 
@@ -85,11 +85,6 @@ treePlot <- function(phy,
                 pushViewport(viewport(width = width, height = height, 
                                     layout = datalayout, 
                                     name = 'datalayout', angle = -rot))
-                pushViewport(viewport(layout.pos.col = 1))
-                    tree.plot(xxyy, type, show.tip.label, show.node.label, 
-                        edge.color, node.color, tip.color, 
-                        edge.width, rot)
-                upViewport()
                 
                 pushViewport(viewport(
                     yscale = c(-0.5/Ntips, 1 + 0.5/Ntips), 
@@ -112,6 +107,11 @@ treePlot <- function(phy,
                         tip.plot.fun(t(tdata(phy, which = 'tip')[i, ]))
                     upViewport()
                 }
+                pushViewport(viewport(layout.pos.col = 1))
+                    tree.plot(xxyy, type, show.tip.label, show.node.label, 
+                        edge.color, node.color, tip.color, 
+                        edge.width, rot)
+                upViewport()
                 upViewport()
                 upViewport()
         } else {
@@ -137,7 +137,6 @@ treePlot <- function(phy,
                 upViewport()
             upViewport()
         }
-    }
 }
 
 tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color, 
@@ -428,4 +427,3 @@ phylobubbles <- function(XXYY, square = FALSE) {
 
     popViewport()
 }
-
