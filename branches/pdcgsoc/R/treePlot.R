@@ -54,12 +54,15 @@ treePlot <- function(phy,
     
     if(plot.data) {
         if(tip.plot.fun == "density") {
+
             tmin <- min(tdata(phy, which = 'tip'))
             tmax <- max(tdata(phy, which = 'tip'))
             tip.plot.fun <- function(x) {
-                par(plt=gridFIG(),new=TRUE)
-                plot(density(t(x)),xlim=c(tmin,tmax))
-                }
+                par(plt=gridFIG())   
+                par(new=TRUE)          
+                plot(density(t(x)),xlim=c(tmin,tmax),axes=FALSE,main="",xlab="",ylab="")
+            }
+           
         }
         if(is.function(tip.plot.fun)) {
             datalayout <- grid.layout(ncol = 2,
@@ -339,7 +342,7 @@ phylobubbles <- function(XXYY, square = FALSE) {
     
     tys <- XXYY$yy[phy@edge[, 2] <= nTips(phy)]
     
-    traits <- phy@tip.data
+    traits <- tdata(phy,which="tip")
 
     maxr <- ifelse(ncol(traits) > nTips(phy), 1/ncol(traits), 1/nTips(phy))
 
@@ -378,7 +381,9 @@ phylobubbles <- function(XXYY, square = FALSE) {
     ))
     grid.segments(x0 = 0,  x1 = 1, y0 = tys, y1 = tys, gp = gpar(col = 'grey'))
     grid.segments(x0 = xpos,  x1 = xpos, y0 = 0, y1 = 1, gp = gpar(col = 'grey'))
-    grid.text('x', naxs, nays)
+    if (length(naxs)>0) {
+        grid.text('x', naxs, nays)
+    }
     if(square) {
         # to keep the squares square, yet resize nicely use the square npc
         sqedge <- unit(unlist(traits), 'snpc')
