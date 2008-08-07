@@ -59,6 +59,10 @@ treePlot <- function(phy,
     
     if(plot.data) {
         if(tip.plot.fun == "density") {
+            if(!require(gridBase)) {
+                stop('To plot using base graphics (including the "density" plot) 
+                                       you need install the "gridBase" package')
+            }
             tmin <- min(tdata(phy, which = 'tip'), na.rm = T)
             tmax <- max(tdata(phy, which = 'tip'), na.rm = T)
             tip.plot.fun <- function(x) {
