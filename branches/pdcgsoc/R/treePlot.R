@@ -52,7 +52,7 @@
     if(!plot.data) {
         phyplotlayout <- grid.layout(nrow = 1, ncol = 1)
         pushViewport(viewport(width = width, height = height, 
-                            layout = phyplotlayout, 
+                            layout = phyplotlayout, angle = rot,
                             name = "phyplotlayout"))
             pushTree(row = 1, col = 1)
         upViewport()
@@ -106,7 +106,7 @@
                 )
             # TODO this is done multiple times, 
             pushViewport(viewport(width = width, height = height, 
-                                layout = datalayout, 
+                                layout = datalayout, angle = rot,
                                 name = 'datalayout'))
             pushViewport(viewport(
                 yscale = c(-0.5/Ntips, 1 + 0.5/Ntips), 
@@ -118,12 +118,13 @@
             for(i in 1:Ntips) {
                 pushViewport(viewport(
                     y = xxyy$yy[phy@edge[, 2] == i],
-                    x = 1, # xxyy$xx[phy@edge[, 2] == i], 
+                    x = 1 + 1/(2 * Ntips), # xxyy$xx[phy@edge[, 2] == i], 
                     height = hc, 
                     width = hc, 
                     # default.units = 'native', 
                     name = paste('data_plot', i),
-                    just = "left"
+                    just = "center",
+                    angle = -rot
                     ))
                     #grid.rect()
                     tip.plot.fun(t(tdata(phy, which = 'tip')[i, ]))
@@ -191,7 +192,7 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
     pushViewport(viewport(
         x = 0.5, y = 0.5, 
         width = 1, height = 1, 
-        layout = treelayout, name = 'treelayout', angle = rot))
+        layout = treelayout, name = 'treelayout'))
     pushViewport(viewport(
         layout = treelayout, layout.pos.col = 1, 
         name = 'tree'))
