@@ -29,9 +29,20 @@
     phy <- xxyy$phy
     tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
     
+    pushTree <- function(row, col) {
+            pushViewport(viewport(layout.pos.row = row, layout.pos.col = col))
+                tree.plot(xxyy = xxyy, type = type, 
+                    show.tip.label = show.tip.label, 
+                    show.node.label = show.node.label, 
+                    edge.color = edge.color, node.color = node.color,
+                    tip.color = tip.color, edge.width = edge.width, rot = rot)
+            upViewport()
+    }
+    
     # TODO add symbols at the nodes, allow coloirng and sizing downViewport approach?
     # TODO cladogram methods incorrect
     # TODO abstract, make ultrametric? good algorithms for this?
+    # TODO for very long plots, alternative margin setting useful
     # call plot.new so that gridBase plots work properly
     # calls to base plot functions need to be cleared w/ par(new = T) which fails
     # if no plot is present TODO perhpas there's a better solution than calling plot.new
@@ -40,15 +51,10 @@
     grid.newpage()
     if(!plot.data) {
         phyplotlayout <- grid.layout(nrow = 1, ncol = 1)
-        # TODO for very long plots, alternative margin setting useful
         pushViewport(viewport(width = width, height = height, 
                             layout = phyplotlayout, 
-                            name = 'phyplotlayout', angle = -rot))
-        pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
-            tree.plot(xxyy, type, show.tip.label, show.node.label, 
-                edge.color, node.color, tip.color, 
-                edge.width, rot)
-        upViewport()
+                            name = "phyplotlayout"))
+            pushTree(row = 1, col = 1)
         upViewport()
         # TODO should return something useful
         return(invisible())
@@ -61,22 +67,19 @@
                     heights = unit.c(unit(1, 'null', NULL), dlabwdth), 
                     widths = unit(c(1, 1), c('null', 'null'), list(NULL, NULL))
                     )
-                    pushViewport(viewport(width = width, height = height, 
-                                        layout = phyplotlayout, 
-                                        name = 'phyplotlayout', angle = -rot))
+                pushViewport(viewport(width = width, height = height, 
+                                    layout = phyplotlayout, 
+                                    name = 'phyplotlayout'))
                     pushViewport(viewport(layout.pos.row = 1:2, layout.pos.col = 2,
                                         height = unit(1, 'npc', NULL) + 
                                                     convertUnit(dlabwdth, 'npc'), 
                                         default.units = 'native'))
                         phylobubbles(xxyy, ...)
                     upViewport()
-                    pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
-                        tree.plot(xxyy, type, show.tip.label, show.node.label, 
-                            edge.color, node.color, tip.color, 
-                            edge.width, rot)
-                    upViewport()
+                    pushTree(row = 1, col = 1)
                 upViewport()
                 return(invisible())
+                
             } else if(tip.plot.fun == "density") {
                 if(!require(gridBase)) {
                     stop('To plot using base graphics (including the "density"              
@@ -104,7 +107,7 @@
             # TODO this is done multiple times, 
             pushViewport(viewport(width = width, height = height, 
                                 layout = datalayout, 
-                                name = 'datalayout', angle = -rot))
+                                name = 'datalayout'))
             pushViewport(viewport(
                 yscale = c(-0.5/Ntips, 1 + 0.5/Ntips), 
                 xscale = c(0, 1 + 1/Ntips), 
@@ -126,11 +129,7 @@
                     tip.plot.fun(t(tdata(phy, which = 'tip')[i, ]))
                 upViewport()
             }
-            pushViewport(viewport(layout.pos.col = 1))
-                tree.plot(xxyy, type, show.tip.label, show.node.label, 
-                    edge.color, node.color, tip.color, 
-                    edge.width, rot)
-            upViewport()
+            pushTree(row = 1, col = 1)
             upViewport()
             upViewport()
             return(invisible())
@@ -168,14 +167,23 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
     node.color <- node.color[nindex]
 
     if(show.tip.label) {
-        labw <- max(stringWidth(phy@tip.label))
+        ## calculate several lab dimesisions
+        ## labw is a vector of string widths
+        ## adjlabw is the max width for adjusting the size of viewports
+        ## laboff, a vector of half string widths for 
+        ## offsetting center justified labels, handy for vp rotation 
+        labw    <- stringWidth(phy@tip.label)
+        adjlabw <- max(labw) + unit(0.02, 'npc')
+        laboff  <- convertUnit(labw, 'npc', valueOnly = TRUE) * .5
         treelayout <- grid.layout(nrow = 1, ncol = 2,
-            widths = unit.c(unit(1, 'null', NULL), labw + unit(0.02, 'npc'))
+            widths = unit.c(unit(1, 'null', NULL), adjlabw)
             )
         tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
         if(length(tip.color) != Ntips) {
             tip.color <- rep(tip.color, length.out = Ntips)
         }
+        # keep labels horizontal unless plot is upwards or downwards
+        lrot <- ifelse(rot %% 360 %in% c(90, 270), 0, -rot)
     } else {
         treelayout <- grid.layout(nrow = 1, ncol = 1)
     }
@@ -183,8 +191,7 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
     pushViewport(viewport(
         x = 0.5, y = 0.5, 
         width = 1, height = 1, 
-        # rotataion set here
-        layout = treelayout, name = 'treelayout', angle = -rot))
+        layout = treelayout, name = 'treelayout', angle = rot))
     pushViewport(viewport(
         layout = treelayout, layout.pos.col = 1, 
         name = 'tree'))
@@ -205,30 +212,27 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
     }
     upViewport()
     if(show.tip.label) {
-        pushViewport(viewport(
-            layout = treelayout, layout.pos.col = 1, 
-            ))
+        pushViewport(viewport(layout = treelayout, layout.pos.col = 1:2,
+            xscale = c(0, 1 + convertUnit(adjlabw, 'native', valueOnly = TRUE))))
         labtext <- grid.text(
             phy@tip.label[tindex], 
-            x = xxyy$xx[phy@edge[, 2] %in% tindex] + 0.02, 
+            x = xxyy$xx[phy@edge[, 2] %in% tindex] + laboff[tindex], rot = lrot,
             y = xxyy$yy[phy@edge[, 2] %in% tindex], 
-            default.units = 'npc', 
-            rot = rot, just = 'left', gp = gpar(col = tip.color[tindex])
+            default.units = 'native', name = 'tiplabels',
+            just = 'center', gp = gpar(col = tip.color[tindex])
         )
         upViewport()
     }
     # TODO probably want to be able to adjust the location of these guys
     if(show.node.label) {
-        pushViewport(viewport(
-            layout = treelayout, layout.pos.col = 1, 
-            ))
+        pushViewport(viewport(layout = treelayout, layout.pos.col = 1))
             rty <- mean(xxyy$yy[phy@edge[, 1] == Ntips + 1])
         labtext <- grid.text(
             phy@node.label, 
             x = c(0, xxyy$xx[phy@edge[, 2] > Ntips][nindex]), 
             y = c(rty, xxyy$yy[phy@edge[, 2] > Ntips][nindex]), 
-            default.units = 'npc', 
-            rot = rot, just = 'left', gp = gpar(col = node.color[nindex])
+            default.units = 'npc', name = 'nodelabels', rot = -rot,
+            just = 'center', gp = gpar(col = node.color[nindex])
         )
         upViewport()
     }
