@@ -6,30 +6,29 @@
                      plot.data = is(phy, 'phylo4d'),
                      rot = 0,
                      tip.plot.fun = 'bubbles',
-                     edge.color = 'black', ## TODO colors for branhes and nodes seperately?
-                     node.color = 'black',
+                     edge.color = 'black', 
+                     node.color = 'black', # TODO what do with node.color parameter
                      tip.color  = 'black', 
-                     edge.width = 1,  ## TODO currently only one width is allowed allow many?
+                     edge.width = 1,
                      ...
             )
 {
     if (!isRooted(phy)) stop("treePlot function requires a rooted tree.")
     width <- height <- 0.9
     type <- match.arg(type)
-    phy.orig <- phy
-    Nedges   <- nrow(phy@edge)
-    Ntips    <- length(phy@tip.label)
+    Nedges   <- nEdges(phy)
+    Ntips    <- nTips(phy)
+    # TODO remove the false cladogram option?
     if(is.null(edgeLength(phy)) || type == 'cladogram') {
-        # TODO there should be an abstraction for assigning branch lengths
-        phy@edge.length <- rep(1, nrow(phy@edge))
+        phy@edge.length <- rep(1, Nedges)
+        if(type == 'cladogram') {
+            xxyy$xx[phy@edge[, 2] <= Ntips] <- 1
+        }
     }
     xxyy <- phyloXXYY(phy, tip.order)
     phy <- xxyy$phy
-    # TODO this is pointless no? simply returns 1:Ntips
     tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
-    if(type == 'cladogram') {
-        xxyy$xx[phy@edge[, 2] <= Ntips] <- 1
-    }
+    
     # TODO add symbols at the nodes, allow coloirng and sizing downViewport approach?
     # TODO cladogram methods incorrect
     # TODO abstract, make ultrametric? good algorithms for this?
@@ -55,7 +54,7 @@
         return(invisible())
     } else {
         if(!is.function(tip.plot.fun)) {
-            if(identical(tip.plot.fun, "bubbles")) {
+            if(tip.plot.fun == "bubbles") {
                 # use phylobubbles as default
                 dlabwdth <- max(stringWidth(colnames(phy@tip.data)))
                 phyplotlayout <- grid.layout(nrow = 2, ncol = 2, 
@@ -78,7 +77,7 @@
                     upViewport()
                 upViewport()
                 return(invisible())
-            } else if(identical(tip.plot.fun, "density")) {
+            } else if(tip.plot.fun == "density") {
                 if(!require(gridBase)) {
                     stop('To plot using base graphics (including the "density"              
                             plot) you need install the "gridBase" package')
@@ -144,18 +143,22 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
 {
     # TODO switch to phylobase abstractions
     phy <- xxyy$phy
-    Nedges   <- nrow(phy@edge)
-    Ntips    <- length(phy@tip.label)
+    Nedges   <- nEdges(phy)
+    Ntips    <- nTips(phy)
     tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
     eindex <- match(phy@edge[,2], xxyy$phy.orig@edge[,2])
     segs <- segs(XXYY = xxyy)
 
     ## TODO check that colors are valid?
-    ## TODO edge colors are required to be in the order of edge matrix
     if(length(edge.color) != Nedges) {
         edge.color <- rep(edge.color, length.out = Nedges)
     }
     edge.color <- edge.color[eindex]
+    
+    if(length(edge.width) != Nedges) {
+        edge.width <- rep(edge.width, length.out = Nedges)
+    }
+    edge.width <- edge.width[eindex]
 
     ## TODO check that colors are valid?
     nindex <- sort(eindex[phy@edge[, 2] > Ntips], index.return = TRUE)$ix
@@ -185,7 +188,7 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
     pushViewport(viewport(
         layout = treelayout, layout.pos.col = 1, 
         name = 'tree'))
-    if (identical(type, "fan")) {
+    if (type == "fan") {
         dseg <- grid.segments( # draws vertical lines
             x0 = segs$v0x, y0 = segs$v0y, 
             x1 = segs$h1x, y1 = segs$h1y, 
@@ -208,7 +211,6 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
         labtext <- grid.text(
             phy@tip.label[tindex], 
             x = xxyy$xx[phy@edge[, 2] %in% tindex] + 0.02, 
-            ## TODO yuck!!
             y = xxyy$yy[phy@edge[, 2] %in% tindex], 
             default.units = 'npc', 
             rot = rot, just = 'left', gp = gpar(col = tip.color[tindex])
@@ -224,7 +226,6 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
         labtext <- grid.text(
             phy@node.label, 
             x = c(0, xxyy$xx[phy@edge[, 2] > Ntips][nindex]), 
-            ## TODO yuck!!
             y = c(rty, xxyy$yy[phy@edge[, 2] > Ntips][nindex]), 
             default.units = 'npc', 
             rot = rot, just = 'left', gp = gpar(col = node.color[nindex])
@@ -238,9 +239,9 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
 
 phyloXXYY <- function(phy, tip.order = NULL) {
     ## initalize the output
-    Nedges <- nrow(phy@edge)
+    Nedges <- nEdges(phy)
     phy.orig <- phy
-    Ntips  <- length(phy@tip.label)
+    Ntips  <- nTips(phy)
     xxyy = list(
         yy = rep(NA, Nedges), 
         xx = numeric(Nedges), 
@@ -253,7 +254,6 @@ phyloXXYY <- function(phy, tip.order = NULL) {
     
     # TODO tip ordering should be dealt with at a higher level
     # if(!is.null(tip.order)) { 
-        ## TODO do we need to acount for line weight when plotting close to edges?
     #     yy[which(phy@edge[, 2] == tip.order)] <- seq(
         ## TODO perhaps we want to use match here?
         ## 0, 1, length.out = Ntips) 
@@ -311,10 +311,10 @@ phyloXXYY <- function(phy, tip.order = NULL) {
 
 segs <- function(XXYY) {
     phy <- XXYY$phy
-    treelen <- rep(NA, nrow(phy@edge) + 1)
+    treelen <- rep(NA, nEdges(phy) + 1)
     segs <- list(v0x = treelen, v0y = treelen, v1x = treelen, v1y = treelen,
                  h0x = treelen, h0y = treelen, h1x = treelen, h1y = treelen)
-    troot <- length(phy@tip.label) + 1
+    troot <- nTips(phy) + 1
 
     get.coor <- function(node, segs) {
         if(any(phy@edge[, 2] == node) == FALSE) {
