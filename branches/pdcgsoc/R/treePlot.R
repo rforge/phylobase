@@ -10,6 +10,7 @@
                      node.color = 'black', # TODO what do with node.color parameter
                      tip.color  = 'black', 
                      edge.width = 1,
+                     newpage = TRUE,
                      ...
             )
 {
@@ -21,16 +22,18 @@
     # TODO remove the false cladogram option?
     if(is.null(edgeLength(phy)) || type == 'cladogram') {
         phy@edge.length <- rep(1, Nedges)
-        if(type == 'cladogram') {
-            xxyy$xx[phy@edge[, 2] <= Ntips] <- 1
-        }
     }
     xxyy <- phyloXXYY(phy, tip.order)
     phy <- xxyy$phy
     tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
+    if(type == 'cladogram') {
+        xxyy$xx[phy@edge[, 2] <= Ntips] <- 1
+    }
     
     pushTree <- function(row, col) {
-            pushViewport(viewport(layout.pos.row = row, layout.pos.col = col))
+            pushViewport(viewport(layout.pos.row = row, 
+                                  layout.pos.col = col,
+                                  name = 'treevp'))
                 tree.plot(xxyy = xxyy, type = type, 
                     show.tip.label = show.tip.label, 
                     show.node.label = show.node.label, 
@@ -48,7 +51,7 @@
     # if no plot is present TODO perhpas there's a better solution than calling plot.new
     
     ## because we may reoder the tip, we need to update the phy objec
-    grid.newpage()
+    if(newpage) grid.newpage()
     if(!plot.data) {
         phyplotlayout <- grid.layout(nrow = 1, ncol = 1)
         pushViewport(viewport(width = width, height = height, 
@@ -70,9 +73,11 @@
                 pushViewport(viewport(width = width, height = height, 
                                     layout = phyplotlayout, 
                                     name = 'phyplotlayout'))
-                    pushViewport(viewport(layout.pos.row = 1:2, layout.pos.col = 2,
-                                        height = unit(1, 'npc', NULL) + 
-                                                    convertUnit(dlabwdth, 'npc'), 
+                    pushViewport(viewport(layout.pos.row = 1:2, 
+                                            layout.pos.col = 2,
+                                            height = unit(1, 'npc', NULL) + 
+                                                convertUnit(dlabwdth, 'npc'),
+                                            name = 'bubbleplots', 
                                         default.units = 'native'))
                         phylobubbles(xxyy, ...)
                     upViewport()
@@ -214,7 +219,8 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
     upViewport()
     if(show.tip.label) {
         pushViewport(viewport(layout = treelayout, layout.pos.col = 1:2,
-            xscale = c(0, 1 + convertUnit(adjlabw, 'native', valueOnly = TRUE))))
+            xscale = c(0, 1 + convertUnit(adjlabw, 'native', valueOnly = TRUE)),
+            name = 'tiplabelvp'))
         labtext <- grid.text(
             phy@tip.label[tindex], 
             x = xxyy$xx[phy@edge[, 2] %in% tindex] + laboff[tindex], rot = lrot,
@@ -227,7 +233,7 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
     # TODO probably want to be able to adjust the location of these guys
     if(show.node.label) {
         pushViewport(viewport(layout = treelayout, layout.pos.col = 1))
-            rty <- mean(xxyy$yy[phy@edge[, 1] == Ntips + 1])
+            rty <- mean(xxyy$yy[phy@edge[, 1] == Ntips + 1], name = 'nodelabelvp')
         labtext <- grid.text(
             phy@node.label, 
             x = c(0, xxyy$xx[phy@edge[, 2] > Ntips][nindex]), 
@@ -354,6 +360,8 @@ segs <- function(XXYY) {
 }
 
 phylobubbles <- function(XXYY, square = FALSE) {
+    ## TODO remove data transformation from phylobubbles
+    ## TODO add legend command
     phy <- XXYY$phy
     
     tys <- XXYY$yy[phy@edge[, 2] <= nTips(phy)]
@@ -410,7 +418,7 @@ phylobubbles <- function(XXYY, square = FALSE) {
     } else {
         grid.circle(xrep, tys, r = unlist(traits), gp = gpar(fill = ccol))
     }
-    popViewport()
+    upViewport()
     pushViewport(viewport( 
         name = 'bubble_tip_labels', 
         layout = bublayout, 
@@ -418,7 +426,7 @@ phylobubbles <- function(XXYY, square = FALSE) {
         layout.pos.row = 1
     ))
     grid.text(phy@tip.label, 0.2, tys, just = 'left')
-    popViewport()
+    upViewport()
     pushViewport(viewport( 
         name = 'bubble_data_labels', 
         layout = bublayout, 
@@ -426,7 +434,7 @@ phylobubbles <- function(XXYY, square = FALSE) {
         layout.pos.row = 2
     ))
     grid.text(colnames(traits), xpos, .8, rot = 90, just = 'right')
-    popViewport()
+    upViewport()
 
-    popViewport()
+    upViewport()
 }
