@@ -360,7 +360,7 @@ segs <- function(XXYY) {
     get.coor(troot, segs)
 }
 
-phylobubbles <- function(XXYY, square = FALSE) {
+phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
     ## TODO remove data transformation from phylobubbles
     ## TODO add legend command
     phy <- XXYY$phy
@@ -406,8 +406,12 @@ phylobubbles <- function(XXYY, square = FALSE) {
         layout.pos.col = 1, 
         layout.pos.row = 1
     ))
-    grid.segments(x0 = 0,  x1 = 1, y0 = tys, y1 = tys, gp = gpar(col = 'grey'))
-    grid.segments(x0 = xpos,  x1 = xpos, y0 = 0, y1 = 1, gp = gpar(col = 'grey'))
+    if(grid) {
+        grid.segments(x0 = 0,   x1 = 1, 
+                      y0 = tys, y1 = tys, gp = gpar(col = 'grey'))
+        grid.segments(x0 = xpos, x1 = xpos, 
+                      y0 = 0,    y1 = 1, gp = gpar(col = 'grey'))
+    }    
     if (length(naxs) > 0) {
         grid.points(naxs, nays, pch = 4)
     }
