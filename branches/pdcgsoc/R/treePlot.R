@@ -65,7 +65,8 @@
         if(!is.function(tip.plot.fun)) {
             if(tip.plot.fun == "bubbles") {
                 # use phylobubbles as default
-                dlabwdth <- max(stringWidth(colnames(phy@tip.data)))
+                if(rot != 0) {stop("Rotation of bubble plots not yet implemented")}
+                dlabwdth <- max(stringWidth(colnames(phy@tip.data))) * 1.2
                 phyplotlayout <- grid.layout(nrow = 2, ncol = 2, 
                     heights = unit.c(unit(1, 'null', NULL), dlabwdth), 
                     widths = unit(c(1, 1), c('null', 'null'), list(NULL, NULL))
@@ -364,28 +365,33 @@ phylobubbles <- function(XXYY, square = FALSE) {
     ## TODO add legend command
     phy <- XXYY$phy
     
+    # tip y coordinates
     tys <- XXYY$yy[phy@edge[, 2] <= nTips(phy)]
     
-    traits <- tdata(phy,which="tip")
+    tipdata <- tdata(phy, which = "tip")
+    nVars <- ncol(tipdata) # number of bubble columns
     
-    maxr <- ifelse(ncol(traits) > nTips(phy), 1/ncol(traits), 1/nTips(phy))
+    maxr <- ifelse(ncol(tipdata) > nTips(phy), 1/ncol(tipdata), 1/nTips(phy))
+    tipdata <- apply(tipdata, 2, function(x) maxr * x / max(abs(x), na.rm = T))
     
-    traits <- apply(traits, 2, function(x) maxr * x / max(abs(x), na.rm = T))
-    
-    if(ncol(traits) == 1) {
+    if(nVars == 1) {
         xpos <- 0.5
     } else {
-        xpos <- seq(0+maxr, 1-maxr, length.out = ncol(traits))
+        xpos <- seq(0+maxr+0.02, 1-maxr-0.02, length.out = nVars)
     }
-    tys <- tys # * (1 - (2 * maxr)) + maxr
+    ## tys <- tys * (1 - (2 * maxr)) + maxr
     xrep <- rep(xpos, each = length(tys))
-    ccol <- ifelse(traits < 0, 'black', 'white')
-    nays <- tys[apply(traits, 1, function(x) any(is.na(x)))]
-    naxs <- xpos[apply(traits, 2, function(x) any(is.na(x)))]
-    traits[is.na(traits)] <- 0
+    yrep <- rep(tys, nVars)
+    ccol <- ifelse(tipdata < 0, 'black', 'white')
+    naxs <- matrix(xrep, ncol = nVars)
+    nays <- matrix(yrep, ncol = nVars)
+    dnas <- is.na(tipdata)
+    naxs <- naxs[dnas]
+    nays <- nays[dnas]
+    tipdata[is.na(tipdata)] <- 0
     
-    datalabwidth <- max(stringWidth(colnames(traits)))
     tiplabwidth  <- max(stringWidth(phy@tip.label))
+    datalabwidth <- max(stringWidth(colnames(tipdata))) * 1.2
     
     bublayout <- grid.layout(nrow = 2, ncol = 2,
         widths = unit.c(unit(1, 'null', NULL), tiplabwidth), 
@@ -402,18 +408,18 @@ phylobubbles <- function(XXYY, square = FALSE) {
     ))
     grid.segments(x0 = 0,  x1 = 1, y0 = tys, y1 = tys, gp = gpar(col = 'grey'))
     grid.segments(x0 = xpos,  x1 = xpos, y0 = 0, y1 = 1, gp = gpar(col = 'grey'))
-    if (length(naxs)>0) {
-        grid.text('x', naxs, nays)
+    if (length(naxs) > 0) {
+        grid.points(naxs, nays, pch = 4)
     }
     if(square) {
         # to keep the squares square, yet resize nicely use the square npc
-        sqedge <- unit(unlist(traits), 'snpc')
-        grid.rect(x = xrep, y = tys, 
+        sqedge <- unit(unlist(tipdata), 'snpc')
+        grid.rect(x = xrep, y = yrep, 
             width = sqedge, 
             height = sqedge, 
             gp=gpar(fill = ccol))
     } else {
-        grid.circle(xrep, tys, r = unlist(traits), gp = gpar(fill = ccol))
+        grid.circle(xrep, yrep, r = unlist(tipdata), gp = gpar(fill = ccol))
     }
     upViewport()
     pushViewport(viewport( 
@@ -430,7 +436,7 @@ phylobubbles <- function(XXYY, square = FALSE) {
         layout.pos.col = 1, 
         layout.pos.row = 2
     ))
-    grid.text(colnames(traits), xpos, .8, rot = 90, just = 'right')
+    grid.text(colnames(tipdata), xpos, .65, rot = 90, just = 'right')
     upViewport()
 
     upViewport()
