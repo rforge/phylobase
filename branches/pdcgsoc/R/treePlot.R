@@ -367,13 +367,10 @@ phylobubbles <- function(XXYY, square = FALSE) {
     tys <- XXYY$yy[phy@edge[, 2] <= nTips(phy)]
     
     traits <- tdata(phy,which="tip")
-
+    
     maxr <- ifelse(ncol(traits) > nTips(phy), 1/ncol(traits), 1/nTips(phy))
-
-    tnames <- names(traits)
-    traits <- scale(traits)
+    
     traits <- apply(traits, 2, function(x) maxr * x / max(abs(x), na.rm = T))
-    names(traits) <- tnames
     
     if(ncol(traits) == 1) {
         xpos <- 0.5
