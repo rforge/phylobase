@@ -382,20 +382,25 @@ phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
     ## tys <- tys * (1 - (2 * maxr)) + maxr
     xrep <- rep(xpos, each = length(tys))
     yrep <- rep(tys, nVars)
+     ## color bubbles 
     ccol <- ifelse(tipdata < 0, 'black', 'white')
+    ## generate matrices of every x and y, then subset for datapoints that are NA
     naxs <- matrix(xrep, ncol = nVars)
     nays <- matrix(yrep, ncol = nVars)
     dnas <- is.na(tipdata)
     naxs <- naxs[dnas]
     nays <- nays[dnas]
+    ## set the NA points to zero so that grid.circle doesn't crash
     tipdata[is.na(tipdata)] <- 0
     
+    ## get label widths
     tiplabwidth  <- max(stringWidth(phy@tip.label))
-    datalabwidth <- max(stringWidth(colnames(tipdata))) * 1.2
+    datalabwidth <- max(stringWidth(colnames(tipdata)))
     
+    ## 2x2 layout -- room at the bottom for data labels, and legend
     bublayout <- grid.layout(nrow = 2, ncol = 2,
         widths = unit.c(unit(1, 'null', NULL), tiplabwidth), 
-        heights = unit.c(unit(1, 'null', NULL), datalabwidth))
+        heights = unit.c(unit(1, 'null', NULL), datalabwidth * 1.2))
     pushViewport(viewport(
         x = 0.5, y = 0.5, 
         width = 1, height = 1, 
@@ -407,25 +412,31 @@ phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
         layout.pos.row = 1
     ))
     if(grid) {
+        ## draw light grey grid behind bubbles
         grid.segments(x0 = 0,   x1 = 1, 
                       y0 = tys, y1 = tys, gp = gpar(col = 'grey'))
         grid.segments(x0 = xpos, x1 = xpos, 
                       y0 = 0,    y1 = 1, gp = gpar(col = 'grey'))
     }    
     if (length(naxs) > 0) {
+        ## if ther are missing values plot Xs
         grid.points(naxs, nays, pch = 4)
     }
     if(square) {
-        # to keep the squares square, yet resize nicely use the square npc
+        ## alternative to circles
+        ## to keep the squares square, yet resize nicely use the square npc
         sqedge <- unit(unlist(tipdata), 'snpc')
         grid.rect(x = xrep, y = yrep, 
             width = sqedge, 
             height = sqedge, 
             gp=gpar(fill = ccol))
     } else {
+        ## plot bubbles
         grid.circle(xrep, yrep, r = unlist(tipdata), gp = gpar(fill = ccol))
     }
     upViewport()
+    
+    ## push view ports for tip and data labels
     pushViewport(viewport( 
         name = 'bubble_tip_labels', 
         layout = bublayout, 
@@ -441,7 +452,6 @@ phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
         layout.pos.row = 2
     ))
     grid.text(colnames(tipdata), xpos, .65, rot = 90, just = 'right')
-    upViewport()
 
-    upViewport()
+    upViewport(2)
 }
