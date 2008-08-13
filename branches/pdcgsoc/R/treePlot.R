@@ -6,6 +6,7 @@
                      plot.data = is(phy, 'phylo4d'),
                      rot = 0,
                      tip.plot.fun = 'bubbles',
+                     plot_by_tip = TRUE,
                      edge.color = 'black', 
                      node.color = 'black', # TODO what do with node.color parameter
                      tip.color  = 'black', 
@@ -15,7 +16,7 @@
             )
 {
     if (!isRooted(phy)) stop("treePlot function requires a rooted tree.")
-    width <- height <- 0.9
+    width <- height <- 0.9  ## BMB: do these have to be hard-coded?
     type <- match.arg(type)
     Nedges   <- nEdges(phy)
     Ntips    <- nTips(phy)
@@ -62,6 +63,8 @@
         # TODO should return something useful
         return(invisible())
     } else {
+        tmin <- min(tdata(phy, which = 'tip'), na.rm = TRUE)
+        tmax <- max(tdata(phy, which = 'tip'), na.rm = TRUE)
         if(!is.function(tip.plot.fun)) {
             if(tip.plot.fun == "bubbles") {
                 # use phylobubbles as default
@@ -92,23 +95,24 @@
                             plot) you need install the "gridBase" package')
                 }
                 plot.new()
-                tmin <- min(tdata(phy, which = 'tip'), na.rm = T)
-                tmax <- max(tdata(phy, which = 'tip'), na.rm = T)
-                tip.plot.fun <- function(x) {
+                tmin <- min(tdata(phy, which = 'tip'), na.rm = TRUE)
+                tmax <- max(tdata(phy, which = 'tip'), na.rm = TRUE)
+                tip.plot.fun <- function(x,tmin,tmax,...) {
                     # par(omi = c(0,0,0,0))
-                    par(plt = gridPLT(), new = TRUE)
+                    suppressWarnings(par(plt = gridPLT(), new = TRUE))
                     if(!all(is.na(x))) {
                         # hack, set the plotting region to the grid fig region
                         dens <- density(x, na.rm = TRUE)
                         plot.density(dens, xlim = c(tmin, tmax), axes = FALSE,      
-                            mar = c(0,0,0,0), main = "", xlab = "", ylab = "")
+                                     mar = c(0,0,0,0), main = "", xlab = "", ylab = "", ...)
                     }
                 }
             }
-        }
-        if(is.function(tip.plot.fun)) {
+        } else { ## if (is.function(tip.plot.fun))
+            ## plot_by_tip <- TRUE
+            if (plot_by_tip) {
             datalayout <- grid.layout(ncol = 2,
-                width = unit(c(1, 1/Ntips), c('null', 'null')) 
+                                          width = unit(c(1, 1/Ntips), c('null', 'null')) 
                 )
             # TODO this is done multiple times, 
             pushViewport(viewport(width = width, height = height, 
@@ -133,14 +137,52 @@
                     angle = -rot
                     ))
                     #grid.rect()
-                    tip.plot.fun(t(tdata(phy, which = 'tip')[i, ]))
+                    vals = t(tdata(phy, which = 'tip')[i, ])
+                    if (!all(is.na(vals))) tip.plot.fun(vals,tmin,tmax,...)
                 upViewport()
             }
             pushTree(row = 1, col = 1)
             upViewport()
             upViewport()
-            return(invisible())
+        } else { ## plot by data column
+            ## !plot_by_tip
+            ## stop("not implemented yet")
+            nvars <- length(phy@tip.data) ## FIXME
+            datalayout <- grid.layout(ncol = 2)  ## set default widths equal for this kind of plot
+            ## width = unit(c(1, 1/Ntips), c('null', 'null'))
+            # TODO this is done multiple times, 
+            pushViewport(viewport(width = width, height = height, 
+                                layout = datalayout, angle = rot,
+                                name = 'datalayout'))
+            pushViewport(viewport(
+                yscale = c(-0.5/Ntips, 1 + 0.5/Ntips), 
+                xscale = c(0, 1 + 1/Ntips), 
+                layout.pos.col = 2, 
+                name = 'data_plots'))
+            ## TODO should plots float at tips, or only along edge?
+            hc <- convertY(unit(1/nvars, 'snpc'), 'npc')
+            for(i in 1:nvars) {
+                pushViewport(viewport(
+                    x = i/nvars,   ## xxyy$yy[phy@edge[, 2] == i],
+                    y =  0.5, ## 1 + 1/(2 * Ntips), # xxyy$xx[phy@edge[, 2] == i], 
+                    height = 1, ## hc, 
+                    width = 1/nvars, ## hc, 
+                    # default.units = 'native', 
+                    name = paste('data_plot', i),
+                    just = "center",
+                    angle = -rot
+                    ))
+                    #grid.rect()
+                    vals = tdata(phy)[,i]
+                    if (!all(is.na(vals))) tip.plot.fun(vals,tmin,tmax,...)
+                upViewport()
+            }
+            upViewport()
+            pushTree(row = 1, col = 1)
+            upViewport()
         }
+            return(invisible())
+        } ## if (is.function(tip.plot.fun))
     }
 }
 
@@ -372,7 +414,7 @@ phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
     nVars <- ncol(tipdata) # number of bubble columns
     
     maxr <- ifelse(ncol(tipdata) > nTips(phy), 1/ncol(tipdata), 1/nTips(phy))
-    tipdata <- apply(tipdata, 2, function(x) maxr * x / max(abs(x), na.rm = T))
+    tipdata <- apply(tipdata, 2, function(x) maxr * x / max(abs(x), na.rm = TRUE))
     
     if(nVars == 1) {
         xpos <- 0.5
@@ -394,6 +436,7 @@ phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
     tipdata[is.na(tipdata)] <- 0
     
     ## get label widths
+    ## browser()
     tiplabwidth  <- max(stringWidth(phy@tip.label))
     datalabwidth <- max(stringWidth(colnames(tipdata)))
     
@@ -454,4 +497,24 @@ phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
     grid.text(colnames(tipdata), xpos, .65, rot = 90, just = 'right')
 
     upViewport(2)
+}
+
+gridbasefun <- function(f,naked=TRUE,scale=TRUE) {
+    function(x,tmin,tmax,...) {
+        require(gridBase)
+        op <- par()
+        if (naked) {
+            par(ann=FALSE,mar=rep(0,4))
+            ## this could take a bit of hacking
+            ## to work nicely in general -- too bad
+            ## par(ann=FALSE) doesn't work in general
+            ## Could set main="", xlab="", ylab="", axes=FALSE
+            ## but this will break 
+        }
+        ## this must be the *last* par() call
+        suppressWarnings(par(plt = gridPLT(), new = TRUE)) 
+        if(!all(is.na(x))) {
+            f(x, xlim=c(tmin,tmax), ...)
+        }
+    }
 }
