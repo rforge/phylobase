@@ -71,20 +71,25 @@
                 if(rot != 0) {stop("Rotation of bubble plots not yet implemented")}
                 dlabwdth <- max(stringWidth(colnames(phy@tip.data))) * 1.2
                 phyplotlayout <- grid.layout(nrow = 2, ncol = 2, 
-                    heights = unit.c(unit(1, 'null', NULL), dlabwdth), 
-                    widths = unit(c(1, 1), c('null', 'null'), list(NULL, NULL))
-                    )
+                    heights = unit.c(unit(1, 'null'), dlabwdth), 
+                    widths = unit(c(1, 1), c('null', 'null'), list(NULL, NULL)))
                 pushViewport(viewport(width = width, height = height, 
-                                    layout = phyplotlayout, 
-                                    name = 'phyplotlayout'))
-                    pushViewport(viewport(layout.pos.row = 1:2, 
-                                            layout.pos.col = 2,
-                                            height = unit(1, 'npc', NULL) + 
-                                                convertUnit(dlabwdth, 'npc'),
-                                            name = 'bubbleplots', 
-                                        default.units = 'native'))
-                        phylobubbles(xxyy, ...)
-                    upViewport()
+                            layout = phyplotlayout, name = 'phyplotlayout'))
+                pushViewport(viewport(layout.pos.row = 1:2, layout.pos.col = 2,
+                            height = unit(1, 'npc') +
+                                            convertUnit(dlabwdth, 'npc'),
+                            name = 'bubbleplots', default.units = 'native'))
+                    bubout <- phylobubbles(xxyy, ...)
+                upViewport()
+                pushViewport(viewport(layout.pos.row = 2, layout.pos.col = 1,
+                            name = 'bubblelegend'))
+                    legcir <- seq(bubout$min, bubout$max, length.out = 4)
+                    ## print(convertUnit(bubout$bubscale, 'npc', valueOnly = TRUE))
+                    ## TODO this legend needs data values
+                    legcirS <- legcir * convertUnit(bubout$bubscale, 'inches', valueOnly = TRUE) / bubout$max
+                    grid.circle(seq(.2, .8, length.out = length(legcirS)), 0.5, legcirS) #, default.units = 'inches')
+                    grid.text(as.character(signif(legcir, digits = 2)), seq(.2, .8, length.out = length(legcir)), 0.1)
+                upViewport()
                     pushTree(row = 1, col = 1)
                 upViewport()
                 return(invisible())
@@ -477,16 +482,18 @@ phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
         ## plot bubbles
         grid.circle(xrep, yrep, r = unlist(tipdata), gp = gpar(fill = ccol))
     }
+    # catch a value for scaling other output
+    bubscale <- convertUnit(unit(max(tipdata, na.rm = TRUE), 'npc'), 'inches')
     upViewport()
     
-    ## push view ports for tip and data labels
+    ## push view ports for tip and data labels fixed locations
     pushViewport(viewport( 
         name = 'bubble_tip_labels', 
         layout = bublayout, 
         layout.pos.col = 2, 
         layout.pos.row = 1
     ))
-    grid.text(phy@tip.label, 0.2, tys, just = 'left')
+    grid.text(phy@tip.label, 0.1, tys, just = 'left')
     upViewport()
     pushViewport(viewport( 
         name = 'bubble_data_labels', 
@@ -497,7 +504,18 @@ phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
     grid.text(colnames(tipdata), xpos, .65, rot = 90, just = 'right')
 
     upViewport(2)
+    # to make a nice legend, return the biggest smallest and a scaling factor
+    # translate the scale of the current vp to a fixed value
+    ## ensure the min is not a zero (or NA) that's replaced by a zero
+    ## print(convertUnit(bubscale, 'inches', valueOnly = TRUE))
+    return(list(max = max(tipdata, na.rm = TRUE), 
+                min = min(tipdata[tipdata != 0], na.rm = TRUE),
+                has.na = length(naxs) > 0,
+                bubscale = bubscale))
 }
+
+setGeneric("treePlot", useAsDefault = treePlot)
+setMethod("treePlot", signature = c('phylo4', 'phylo4d'), treePlot)
 
 gridbasefun <- function(f,naked=TRUE,scale=TRUE) {
     function(x,tmin,tmax,...) {
@@ -518,3 +536,4 @@ gridbasefun <- function(f,naked=TRUE,scale=TRUE) {
         }
     }
 }
+
