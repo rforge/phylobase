@@ -1,12 +1,23 @@
-\name{treePlot}
-\alias{treePlot}
-%- Also NEED an '\alias' for EACH other topic documented here.
-\title{ ~~function to do ... ~~ }
+\name{treePlot-methods}
+\docType{methods}
+\alias{treePlot-method}
+\alias{treePlot,phylo4,phylo4d-method}
+\title{ Phylogeny plotting }
 \description{
-  ~~ A concise (1-5 lines) description of what the function does. ~~
+  Plot \code{phylo4} or \code{phylo4d} objects, including associated data.
+}
+\section{Methods}{
+  \describe{
+    \item{phy = "phylo4"}{plots a tree  of class \linkS4class{phylo4}}
+    \item{phy = "phylo4d"}{plots a tree with one or more
+      quantitative traits contained in a \linkS4class{phylo4d} object.}
+  }
 }
 \usage{
-treePlot(phy, type = c("phylogram", "cladogram", "fan"), show.tip.label = TRUE, show.node.label = FALSE, tip.order = NULL, plot.data = is(phy, "phylo4d"), rot = 0, tip.plot.fun = "bubbles", edge.color = "black", node.color = "black", tip.color = "black", edge.width = 1, newpage = TRUE, ...)
+  \S4method{treePlot}{phylo4,phylo4d}(phy, type = c("phylogram", "cladogram", "fan"), show.tip.label = TRUE, 
+  show.node.label = FALSE, tip.order = NULL, plot.data = is(phy, "phylo4d"), 
+  rot = 0, tip.plot.fun = "bubbles", plot_by_tip = TRUE, edge.color = "black", 
+  node.color = "black", tip.color = "black", edge.width = 1, newpage = TRUE, \dots)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -18,6 +29,7 @@ treePlot(phy, type = c("phylogram", "cladogram", "fan"), show.tip.label = TRUE, 
   \item{plot.data}{ Logical indicating whether \code{phylo4d} data should be plotted }
   \item{rot}{ Numeric indicating the rotation of the plot in degrees }
   \item{tip.plot.fun}{ A function used to generate plot at the each tip of the phylogenetic trees }
+  \item{plot_by_tip} {TODO} % TODO what does the plot_by_tip argument do
   \item{edge.color}{ A vector of colors in the order of \code{edges(phy)} }
   \item{node.color}{ A vector of colors indicating the colors of the node labels }
   \item{tip.color}{ A vector of colors indicating the colors of the tip labels }
@@ -31,4 +43,6 @@ treePlot(phy, type = c("phylogram", "cladogram", "fan"), show.tip.label = TRUE, 
 \author{Peter Cowan \email{pdc@berkeley.edu}}
 
 \seealso{ \code{\link{phylobubbles}}  }
+
+
 \keyword{methods}

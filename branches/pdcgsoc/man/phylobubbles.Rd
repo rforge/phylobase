@@ -22,7 +22,7 @@ phylobubbles(XXYY, square = FALSE, grid = TRUE)
 
 \author{Peter Cowan \email{pdc@berkeley.edu}}
 
-\seealso{ \code{\link{phyloXXYY}}, \code{\link{treePlot}} }
+\seealso{ \code{\link{phyloXXYY}}, \code{treePlot} }
 \examples{
 ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,

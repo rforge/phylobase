@@ -29,11 +29,26 @@ Returns no values, function invoked for the plotting side effect.}
 
 \author{Peter Cowan \email{pdc@berkeley.edu}}
 
-\seealso{ \code{\link{treePlot}}, \code{\link{phyloXXYY}} }
+\seealso{ \code{treePlot}, \code{\link{phyloXXYY}} }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+
+data(geospiza)
+xxyy <- phyloXXYY(geospiza)
+tree.plot(xxyy, type = 'phylogram', 
+  show.tip.label = TRUE, show.node.label = TRUE,
+  edge.color = 'black', node.color = 'orange', tip.color = 'blue',
+  edge.width = 1, rot = 0
+)
+
+grid.newpage()
+pushViewport(viewport(w = 0.8, h = 0.8))
+tree.plot(xxyy, type = 'phylogram', 
+  show.tip.label = TRUE, show.node.label = TRUE,
+  edge.color = 'black', node.color = 'orange', tip.color = 'blue',
+  edge.width = 1, rot = 0
+)
+popViewport()
+
 }
 
 \keyword{methods}

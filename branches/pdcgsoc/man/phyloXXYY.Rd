@@ -16,7 +16,9 @@ phyloXXYY(phy, tip.order = NULL)
 The y coordinates of the tips are evenly spaced from 0 to 1 in pruningwise order.  Ancestor y nodes are given the mean value of immediate descendants.  The root is given the x coordinate 0 and descendant nodes are placed according to the cumulative branch length from the root, with a maximum x value of 1.
 }
 \value{
-  \item{xxyy}{A list with three items: \code{yy}, the y locations, \code{xx}, the x locations, \code{traverse}, the tree traversal order}
+  \item{yy}{Internal node and tip y coordinates}
+  \item{xx}{Internal node and tip x coordinates}
+  \item{traverse}{The tree traversal order}
   \item{phy}{A \code{phylo4} or \code{phylo4d} object}
   \item{phy.orig}{The original \code{phylo4} or \code{phylo4d} object}
 }
@@ -24,10 +26,12 @@ The y coordinates of the tips are evenly spaced from 0 to 1 in pruningwise order
 % \references{ ~put references to the literature/web site here ~ }
 \author{Peter Cowan \email{pdc@berkeley.edu}}
 
-\seealso{\code{\link{segs}}, \code{\link{treePlot}}, \code{\link{tree.plot}}}
+\seealso{\code{\link{segs}}, \code{treePlot}, \code{\link{tree.plot}}}
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+
+data(geospiza)
+coor <- phyloXXYY(geospiza)
+plot(coor$xx, coor$yy, pch = 20)
+
 }
 \keyword{methods}

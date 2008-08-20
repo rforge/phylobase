@@ -5,7 +5,7 @@
 \description{
 Calculates the line segments necessary to draw a phylogenetic tree.
 }
-\usage
+\usage{
 segs(XXYY)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -25,7 +25,7 @@ A list containing:
 }
 \author{Peter Cowan \email{pdc@berkeley.edu}}
 
-\seealso{ \code{\line{phyloXXYY}}, \code{\line{treePlot}}, \code{\line{tree.plot}} }
+\seealso{ \code{\link{phyloXXYY}}, \code{treePlot}, \code{\link{tree.plot}} }
 
 \examples{
 ##---- Should be DIRECTLY executable !! ----
