@@ -6,31 +6,33 @@
                      plot.data = is(phy, 'phylo4d'),
                      rot = 0,
                      tip.plot.fun = 'bubbles',
-                     plot_by_tip = TRUE,
+                     plot.at.tip = TRUE,
                      edge.color = 'black', 
                      node.color = 'black', # TODO what do with node.color parameter
                      tip.color  = 'black', 
-                     edge.width = 1,
+                     edge.width = 1, # TODO line-type modification hack
                      newpage = TRUE,
+                     margin = 0.1, # here margin is a precentage of the area
                      ...
             )
 {
     if (!isRooted(phy)) stop("treePlot function requires a rooted tree.")
-    width <- height <- 0.9  ## BMB: do these have to be hard-coded?
-    type <- match.arg(type)
-    Nedges   <- nEdges(phy)
-    Ntips    <- nTips(phy)
-    # TODO remove the false cladogram option?
+    width  <- height <- (1 - margin)  ## TODO: do these have to be hard-coded?
+    type   <- match.arg(type)
+    Nedges <- nEdges(phy)
+    Ntips  <- nTips(phy)
+    ## TODO remove the false cladogram option?
     if(is.null(edgeLength(phy)) || type == 'cladogram') {
         phy@edge.length <- rep(1, Nedges)
     }
-    xxyy <- phyloXXYY(phy, tip.order)
-    phy <- xxyy$phy
+    xxyy   <- phyloXXYY(phy, tip.order)
+    phy    <- xxyy$phy
     tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
     if(type == 'cladogram') {
         xxyy$xx[phy@edge[, 2] <= Ntips] <- 1
     }
     
+    ## general function for pushing tree subplots
     pushTree <- function(row, col) {
             pushViewport(viewport(layout.pos.row = row, 
                                   layout.pos.col = col,
@@ -114,8 +116,8 @@
                 }
             }
         } else { ## if (is.function(tip.plot.fun))
-            ## plot_by_tip <- TRUE
-            if (plot_by_tip) {
+            ## plot.at.tip <- TRUE
+            if (plot.at.tip) {
             datalayout <- grid.layout(ncol = 2,
                                           width = unit(c(1, 1/Ntips), c('null', 'null')) 
                 )
@@ -150,7 +152,7 @@
             upViewport()
             upViewport()
         } else { ## plot by data column
-            ## !plot_by_tip
+            ## !plot.at.tip
             ## stop("not implemented yet")
             nvars <- length(phy@tip.data) ## FIXME
             datalayout <- grid.layout(ncol = 2)  ## set default widths equal for this kind of plot
@@ -179,7 +181,7 @@
                     ))
                     #grid.rect()
                     vals = tdata(phy)[,i]
-                    if (!all(is.na(vals))) tip.plot.fun(vals,tmin,tmax,...)
+                    if (!all(is.na(vals))) tip.plot.fun(vals, tmin, tmax, ...)
                 upViewport()
             }
             upViewport()
@@ -222,15 +224,16 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
 
     if(show.tip.label) {
         ## calculate several lab dimesisions
-        ## labw is a vector of string widths
-        ## adjlabw is the max width for adjusting the size of viewports
-        ## laboff, a vector of half string widths for 
+        ## labw    -- a vector of string widths
+        ## adjlabw -- the max width for adjusting the size of viewports
+        ## laboff  -- a vector of half string widths for 
         ## offsetting center justified labels, handy for vp rotation 
         labw    <- stringWidth(phy@tip.label)
         adjlabw <- max(labw) + unit(0.02, 'npc')
-        laboff  <- convertUnit(labw, 'npc', valueOnly = TRUE) * .5
+        ## print(foo <<- adjlabw)
+        laboff  <- labw * 0.5
         treelayout <- grid.layout(nrow = 1, ncol = 2,
-            widths = unit.c(unit(1, 'null', NULL), adjlabw)
+            widths = unit.c(unit(1, 'null', NULL), convertUnit(adjlabw, 'inches'))
             )
         tindex <- phy@edge[phy@edge[, 2] <= Ntips, 2]
         if(length(tip.color) != Ntips) {
@@ -247,10 +250,10 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
         width = 1, height = 1, 
         layout = treelayout, name = 'treelayout'))
     pushViewport(viewport(
-        layout = treelayout, layout.pos.col = 1, 
+        layout.pos.col = 1, 
         name = 'tree'))
     if (type == "fan") {
-        dseg <- grid.segments( # draws vertical lines
+        dseg <- grid.segments( # draws diag lines
             x0 = segs$v0x, y0 = segs$v0y, 
             x1 = segs$h1x, y1 = segs$h1y, 
             name = "diag", gp = gpar(col = edge.color, lwd = edge.width))     
@@ -259,20 +262,19 @@ tree.plot <- function(xxyy, type, show.tip.label, show.node.label, edge.color,
             x0 = segs$v0x, y0 = segs$v0y, 
             x1 = segs$v1x, y1 = segs$v1y, 
             name = "vert", gp = gpar(col = edge.color, lwd = edge.width)) 
-        hseg <- grid.segments(  # draws horizontal lines
+        hseg <- grid.segments( # draws horizontal lines
             x0 = segs$h0x, y0 = segs$h0y, 
             x1 = segs$h1x, y1 = segs$h1y, 
             name = "horz", gp = gpar(col = edge.color, lwd = edge.width))
     }
     upViewport()
     if(show.tip.label) {
-        pushViewport(viewport(layout = treelayout, layout.pos.col = 1:2,
-            xscale = c(0, 1 + convertUnit(adjlabw, 'native', valueOnly = TRUE)),
+        pushViewport(viewport(layout.pos.col = 2,
             name = 'tiplabelvp'))
         labtext <- grid.text(
             phy@tip.label[tindex], 
-            x = xxyy$xx[phy@edge[, 2] %in% tindex] + laboff[tindex], rot = lrot,
-            y = xxyy$yy[phy@edge[, 2] %in% tindex], 
+            x = convertUnit(laboff[tindex], 'native', valueOnly = TRUE) + 0.02,
+            y = xxyy$yy[phy@edge[, 2] %in% tindex], rot = lrot,
             default.units = 'native', name = 'tiplabels',
             just = 'center', gp = gpar(col = tip.color[tindex])
         )
@@ -410,6 +412,10 @@ segs <- function(XXYY) {
 phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
     ## TODO remove data transformation from phylobubbles
     ## TODO add legend command
+    ## tys   -- tip y coordinates
+    ## nVars -- number of traits/characters
+    ## maxr  -- maximum circle radius, based on nVars or nTips
+    
     phy <- XXYY$phy
     
     # tip y coordinates
@@ -418,20 +424,24 @@ phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
     tipdata <- tdata(phy, which = "tip")
     nVars <- ncol(tipdata) # number of bubble columns
     
-    maxr <- ifelse(ncol(tipdata) > nTips(phy), 1/ncol(tipdata), 1/nTips(phy))
-    tipdata <- apply(tipdata, 2, function(x) maxr * x / max(abs(x), na.rm = TRUE))
+    maxr <- ifelse(ncol(tipdata) > nTips(phy), 1 / ncol(tipdata), 1 / nTips(phy))
+    tipdata <- apply(tipdata, 2, 
+                    function(x) (maxr * x) / max(abs(x), na.rm = TRUE))
     
     if(nVars == 1) {
         xpos <- 0.5
     } else {
-        xpos <- seq(0+maxr+0.02, 1-maxr-0.02, length.out = nVars)
+        xpos <- seq(0 + maxr + 0.02, 1 - maxr - 0.02, length.out = nVars)
     }
-    ## tys <- tys * (1 - (2 * maxr)) + maxr
+
+    ## rep coordinates for filling a matrix columnwise
     xrep <- rep(xpos, each = length(tys))
     yrep <- rep(tys, nVars)
-     ## color bubbles 
+    ## color bubbles 
     ccol <- ifelse(tipdata < 0, 'black', 'white')
-    ## generate matrices of every x and y, then subset for datapoints that are NA
+    
+    ## generate matrices of every x and y by filling the repd value columnwise
+    ## then subset for datapoints that are NA
     naxs <- matrix(xrep, ncol = nVars)
     nays <- matrix(yrep, ncol = nVars)
     dnas <- is.na(tipdata)
@@ -441,18 +451,18 @@ phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
     tipdata[is.na(tipdata)] <- 0
     
     ## get label widths
-    ## browser()
     tiplabwidth  <- max(stringWidth(phy@tip.label))
     datalabwidth <- max(stringWidth(colnames(tipdata)))
     
     ## 2x2 layout -- room at the bottom for data labels, and legend
     bublayout <- grid.layout(nrow = 2, ncol = 2,
-        widths = unit.c(unit(1, 'null', NULL), tiplabwidth), 
+        widths  = unit.c(unit(1, 'null', NULL), tiplabwidth), 
         heights = unit.c(unit(1, 'null', NULL), datalabwidth * 1.2))
     pushViewport(viewport(
         x = 0.5, y = 0.5, 
-        width = 1, height = 1, 
-        layout = bublayout, name = 'bublayout'))
+        width = 0.95, height = 1, 
+        layout = bublayout, name = 'bublayout'
+    ))
     pushViewport(viewport( 
         name = 'bubble_plots', 
         layout = bublayout, 
@@ -517,12 +527,12 @@ phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
 setGeneric("treePlot", useAsDefault = treePlot)
 setMethod("treePlot", signature = c('phylo4', 'phylo4d'), treePlot)
 
-gridbasefun <- function(f,naked=TRUE,scale=TRUE) {
-    function(x,tmin,tmax,...) {
+gridbasefun <- function(f, naked = TRUE, scale = TRUE) {
+    function(x, tmin, tmax, ...) {
         require(gridBase)
         op <- par()
         if (naked) {
-            par(ann=FALSE,mar=rep(0,4))
+            par(ann = FALSE, mar = rep(0, 4))
             ## this could take a bit of hacking
             ## to work nicely in general -- too bad
             ## par(ann=FALSE) doesn't work in general
@@ -532,7 +542,7 @@ gridbasefun <- function(f,naked=TRUE,scale=TRUE) {
         ## this must be the *last* par() call
         suppressWarnings(par(plt = gridPLT(), new = TRUE)) 
         if(!all(is.na(x))) {
-            f(x, xlim=c(tmin,tmax), ...)
+            f(x, xlim = c(tmin, tmax), ...)
         }
     }
 }
