@@ -16,6 +16,8 @@
                      ...
             )
 {
+    ## TODO three dimensional histogram as example, compute values on full dataset
+    ## then generate phylo4d object with summary data and plot
     if (!isRooted(phy)) stop("treePlot function requires a rooted tree.")
     width  <- height <- (1 - margin)  ## TODO: do these have to be hard-coded?
     type   <- match.arg(type)
@@ -87,10 +89,12 @@
                             name = 'bubblelegend'))
                     legcir <- seq(bubout$min, bubout$max, length.out = 4)
                     ## print(convertUnit(bubout$bubscale, 'npc', valueOnly = TRUE))
-                    ## TODO this legend needs data values
+                    ## TODO legend currently does not resize properly
                     legcirS <- legcir * convertUnit(bubout$bubscale, 'inches', valueOnly = TRUE) / bubout$max
-                    grid.circle(seq(.2, .8, length.out = length(legcirS)), 0.5, legcirS) #, default.units = 'inches')
-                    grid.text(as.character(signif(legcir, digits = 2)), seq(.2, .8, length.out = length(legcir)), 0.1)
+                    ccol <- ifelse(legcirS < 0, 'black', 'white')
+                    legcirS <- unit(legcirS, 'npc')
+                    grid.circle(seq(.2, .8, length.out = length(legcirS)), 0.5, legcirS, gp = gpar(fill = ccol), default.units = 'npc')
+                    grid.text(as.character(signif(legcir, digits = 2)), seq(.2, .8, length.out = length(legcir)), 0.1, gp = gpar(cex = 0.75))
                 upViewport()
                     pushTree(row = 1, col = 1)
                 upViewport()
@@ -410,7 +414,6 @@ segs <- function(XXYY) {
 }
 
 phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
-    ## TODO remove data transformation from phylobubbles
     ## TODO add legend command
     ## tys   -- tip y coordinates
     ## nVars -- number of traits/characters
