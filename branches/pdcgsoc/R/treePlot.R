@@ -18,6 +18,7 @@
 {
     ## TODO three dimensional histogram as example, compute values on full dataset
     ## then generate phylo4d object with summary data and plot
+    if (!all(is(phy, 'phylo4'), is(phy, 'phylo4d'))) stop('treePlot requires a phylo4 or phylo4d object')
     if (!isRooted(phy)) stop("treePlot function requires a rooted tree.")
     width  <- height <- (1 - margin)  ## TODO: do these have to be hard-coded?
     type   <- match.arg(type)
@@ -530,23 +531,23 @@ phylobubbles <- function(XXYY, square = FALSE, grid = TRUE) {
 setGeneric("treePlot", useAsDefault = treePlot)
 setMethod("treePlot", signature = c('phylo4', 'phylo4d'), treePlot)
 
-gridbasefun <- function(f, naked = TRUE, scale = TRUE) {
-    function(x, tmin, tmax, ...) {
-        require(gridBase)
-        op <- par()
-        if (naked) {
-            par(ann = FALSE, mar = rep(0, 4))
-            ## this could take a bit of hacking
-            ## to work nicely in general -- too bad
-            ## par(ann=FALSE) doesn't work in general
-            ## Could set main="", xlab="", ylab="", axes=FALSE
-            ## but this will break 
-        }
-        ## this must be the *last* par() call
-        suppressWarnings(par(plt = gridPLT(), new = TRUE)) 
-        if(!all(is.na(x))) {
-            f(x, xlim = c(tmin, tmax), ...)
-        }
-    }
-}
-
+# gridbasefun <- function(f, naked = TRUE, scale = TRUE) {
+#     function(x, tmin, tmax, ...) {
+#         require(gridBase)
+#         op <- par()
+#         if (naked) {
+#             par(ann = FALSE, mar = rep(0, 4))
+#             ## this could take a bit of hacking
+#             ## to work nicely in general -- too bad
+#             ## par(ann=FALSE) doesn't work in general
+#             ## Could set main="", xlab="", ylab="", axes=FALSE
+#             ## but this will break 
+#         }
+#         ## this must be the *last* par() call
+#         suppressWarnings(par(plt = gridPLT(), new = TRUE)) 
+#         if(!all(is.na(x))) {
+#             f(x, xlim = c(tmin, tmax), ...)
+#         }
+#     }
+# }
+# 
