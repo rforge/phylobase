@@ -103,3 +103,32 @@ E <- matrix(c(
    NA,  8), ncol=2,byrow=TRUE)
 
 P2 <- phylo4(E)
+
+
+z <- as(tree.owls,"phylo4")
+
+library(phylobase)
+example("read.tree")
+z <- as(tree.owls,"phylo4")
+nodeLabels(z) <- as.character(sort(nodeId(z)))
+print(z)  ## note node labels
+## the node types are matched up correctly
+##	or try this (I don't know if it should work or not):
+z <- as(tree.owls,"phylo4")
+z@edge[3:4,] <- z@edge[4:3,]
+## z@tip.label[1:2] <- z@tip.label[2:1]  ## DON'T REARRANGE
+## or
+set.seed(1001)
+z <- as(tree.owls,"phylo4")
+nodeLabels(z) <- as.character(sort(nodeId(z)))
+s <- sample(7)
+z@edge <- z@edge[s,]
+z@edge.length <- z@edge.length[s]
+z
+
+data(geospiza)
+g <- geospiza
+nodeLabels(g) <- as.character(sort(nodeId(g)))
+g <- reorder(g)
+g <- reorder(g,"postorder")
+head(g)
