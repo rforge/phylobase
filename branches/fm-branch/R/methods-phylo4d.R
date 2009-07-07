@@ -1,0 +1,203 @@
+setMethod("print", "phylo4d", printphylo4)
+
+setMethod("show", "phylo4d", function(object) printphylo4(object))
+
+setMethod("tdata", "phylo4d", function(x, which = c("tip",
+    "internal", "allnode"), label.type=c("row.names","column"), ...) {
+    which <- match.arg(which)
+    label.type <- match.arg(label.type)
+
+    ## FIXME: should have no labels in this case?
+    if (!hasNodeLabels(x) && which=="internal" && missing(label.type)) { }
+
+    if (which == "tip") {
+        if (all(dim(x@tip.data)==0)) {
+            return(x@tip.data)
+        }
+        tdata <- x@tip.data
+        data.names <- tipLabels(x)
+        if ( identical(label.type,"row.names") ) {
+            if ( identical(data.names,unique(data.names)) ||
+                !(any(is.na(data.names))) ) {
+              row.names(tdata) <- data.names
+            }
+            else {
+                warning("Non-unique or missing labels found, ",
+                        "labels cannot be coerced to tdata row.names. ",
+                        "Use the label.type argument to include labels ",
+                        "as first column of data.")
+            }
+        }
+        if (identical(label.type,"column")) {
+            tdata <- data.frame(label=data.names,tdata)
+        }
+        return(tdata)
+    }
+
+    if (which == "internal") {
+        if (all(dim(x@node.data)==0)) {
+            return(x@node.data)
+        }
+        tdata <- x@node.data
+        if(hasNodeLabels(x))
+            data.names <- nodeLabels(x)
+        else
+            data.names <- nodeId(x, "internal")
+
+        if ( identical(label.type,"row.names") ) {
+          if ( length(data.names)>0 &&
+              !any(duplicated(data.names)) &&
+              !(any(is.na(data.names)))) {
+            row.names(tdata) <- data.names
+          } else {
+            warning("Non-unique or missing labels found, ",
+                    "labels cannot be coerced to tdata row.names. ",
+                    "Use the label.type argument to include labels ",
+                    "as first column of data.")
+          }
+        }
+        if (identical(label.type,"column")) {
+          if (!hasNodeLabels(x)) data.names <- rep("",nNodes(x))
+          tdata <- data.frame(label=data.names,tdata)
+        }
+        return(tdata)
+    }
+
+    if (which == "allnode") {
+
+        if (all(dim(x@node.data)==0)) { ## empty data
+          if (!hasNodeLabels(x)) {
+              nd <- character(nNodes(x))
+              is.na(nd) <- TRUE
+              nodedata <- data.frame(label=nd)
+          } else
+          nodedata <- data.frame(label=nodeLabels(x))
+        }
+        else {
+          nodedata <- tdata(x, "internal", label.type="column")
+        }
+        if (all(dim(x@tip.data)==0)) {
+          tipdata <- data.frame(label=x@tip.label)
+        }
+        else {
+            tipdata <- tdata(x, "tip", label.type="column")
+        }
+
+        if(hasNodeLabels(x)) {
+            data.names <- c(as.character(tipdata$label),
+                            as.character(nodedata$label))
+        }
+        else {
+            data.names <- c(as.character(tipdata$label),
+                            as.character(nodeId(x, "internal")))
+        }
+        tipdata$label <- sort(nodeId(x,"tip"))
+        nodedata$label <- sort(nodeId(x,"internal"))
+        ## FIXME - kludgy merge and subsequent cleanup - make robust
+        tdata <- merge(tipdata, nodedata, all=TRUE,sort=FALSE)[,-1,drop=FALSE]
+        tdata <- data.frame(label=data.names,tdata)
+
+        if ( identical(label.type,"row.names") ) {
+            if ( identical(data.names,unique(data.names)) ||
+                !(any(is.na(data.names))) ) {
+                tdata <- data.frame(tdata[,-1,drop=FALSE])
+                row.names(tdata) <- data.names
+            }
+            else {
+                stop("Non-unique or missing labels found, labels cannot be
+                    coerced to tdata row.names. Use the label.type argument to
+                    include labels as first column of data.")
+            }
+        }
+        return(tdata)
+    }
+})
+
+setReplaceMethod("tdata", "phylo4d", function(object, which = c("tip",
+    "internal", "allnode"), ..., value) {
+    which <- match.arg(which)
+    if (which == "allnode") {
+        namesmatch <- all(colnames(object@tip.data) == colnames(object@node.data))
+        classmatch <- all(sapply(object@tip.data, class) == sapply(object@node.data,
+            class))
+        if (!(classmatch && namesmatch))
+            stop("Node and tip columns do not match;",
+                 "you should access tip and node data separately")
+    }
+    if(is.matrix(value)) value <- as.data.frame(value)
+    if(!is.data.frame(value))
+        stop("For now, only data.frame or matrix can be provided")
+    switch(which,
+           tip = object@tip.data <- value,
+           internal = object@node.data <- value,
+           allnode = stop("for now, must set tip and node data separately"))
+    if(checkData(object, ...)) object <- attachData(object, ...)
+    object
+})
+
+
+## Alternative phylo4d summary method, using phylo4 summary
+## Marguerite Butler & Peter Cowan
+setMethod("summary", "phylo4d", function(object) {
+    x <- object
+    summary(as(x, "phylo4"))
+    tips <- tdata(object, "tip")
+    nodes <- tdata(object, "internal")
+    cat("\nComparative data:\n")
+    if (nrow(tips) > 0) {
+        cat("\nTips: data.frame with", nTips(object), "taxa and",
+            ncol(tips), "variable(s) \n\n")
+        print(summary(tips))
+    }
+    else {
+        cat("\nObject contains no tip data.")
+    }
+    if (nrow(nodes) > 0) {
+        cat("\nNodes: data.frame with", nNodes(object), "internal nodes and",
+            ncol(nodes), "variables \n\n")
+        print(summary(nodes))
+    }
+    else {
+        cat("\nObject contains no node data.\n")
+    }
+})
+
+setMethod("hasNodeData", "phylo4d", function(x) {
+    nrow(x@node.data) > 0
+})
+
+setReplaceMethod("nodeLabels", "phylo4d", function(object, ...,
+    value) {
+    object@node.label <- value
+    #rownames(object@node.data) <- value
+    object
+})
+
+setReplaceMethod("labels", "phylo4d", function(object, ..., value) {
+    object@tip.label <- value
+    #rownames(object@tip.data) <- value
+    object
+})
+
+## FIXME: doesn't deal with missing node data
+##   (don't even know how that should be done in this case)
+setMethod("na.omit", "phylo4d", function(object, ...) {
+    tipdata <- tdata(object, "tip")
+    na.index <- which(!complete.cases(tipdata))
+    prune(object, tip = na.index)
+})
+
+setMethod("names", signature(x = "phylo4d"), function(x) {
+    temp <- rev(names(attributes(x)))[-1]
+    return(rev(temp))
+})
+
+setMethod("head",signature(x = 'phylo4d'),
+          function(x,n=20) {
+            head(as(x,"data.frame"),n=n)
+          })
+
+setMethod("tail",signature(x = 'phylo4d'),
+          function(x,n=20) {
+            tail(as(x,"data.frame"),n=n)
+          })
