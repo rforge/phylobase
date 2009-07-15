@@ -90,7 +90,9 @@ setMethod("phylo4", "matrix",
     edge <- x
     mode(edge) <- "integer"
     #if(any(is.na(edge))) stop("NA are not allowed in edge matrix")
-    if(ncol(edge) > 2) warning("the edge matrix has more than two columns")
+    if(ncol(edge) > 2)
+        warning("The edge matrix has more than two columns, ",
+                "only the first two columns are considered.")
     edge <- as.matrix(edge[, 1:2])
     colnames(edge) <- c("ancestor", "descendant")
 

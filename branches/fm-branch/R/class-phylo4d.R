@@ -26,11 +26,9 @@ setClass("phylo4d",
 ## generic
 setGeneric("phylo4d", function(x, ...) { standardGeneric("phylo4d")} )
 
-## first arg is a phylo4
-### phylo4d class rewrite
-setMethod("phylo4d", "phylo4",
-          function(x, tip.data=NULL, node.data=NULL, all.data=NULL,
-                   match.data=TRUE, merge.data=TRUE, ...) {
+## Core part that takes care of the data
+.phylo4Data <-  function(x, tip.data=NULL, node.data=NULL, all.data=NULL,
+                         match.data=TRUE, merge.data=TRUE, ...) {
 
     ## Make sure that data provided are a data frame
     classData <- function(someData) {
@@ -53,14 +51,6 @@ setMethod("phylo4d", "phylo4",
     tip.data <- classData(tip.data)
     node.data <- classData(node.data)
 
-    ## Creating new phylo4d object
-    res <- new("phylo4d")
-    res@edge <- x@edge
-    res@edge.length <- x@edge.length
-    res@Nnode <- x@Nnode
-    res@tip.label <- x@tip.label
-    res@node.label <- x@node.label
-    res@edge.label <- x@edge.label
 
     ## Replacing node labels by node numbers and formatting the data to make sure
     ## they have the correct dimensions
@@ -72,12 +62,11 @@ setMethod("phylo4d", "phylo4",
         tip.data <- formatData(x, tip.data, which="tip",
                                match.data=match.data, ...)
 
-    if(!is.null(node.data)) {
+    if(!is.null(node.data))
         node.data <- formatData(x, node.data, which="internal",
                                 match.data=match.data, ...)
-    }
 
-    ## Merging datasets
+    ## Merging dataset
     if(!is.null(all.data)) {
         tmpData <- all.data
         if(!is.null(tip.data)) {
@@ -103,14 +92,14 @@ setMethod("phylo4d", "phylo4",
         }
 
         if(match.data) {
-            res@tip.data <- tmpData[rownames(tmpData) %in% nodeId(x, "tip") ,,
+            tip.data <- tmpData[rownames(tmpData) %in% nodeId(x, "tip") ,,
                                     drop = FALSE]
-            res@node.data <- tmpData[rownames(tmpData) %in% nodeId(x, "internal") ,,
+            node.data <- tmpData[rownames(tmpData) %in% nodeId(x, "internal") ,,
                                      drop = FALSE]
         }
         else {
-            res@tip.data <- tmpData[1:nTips(x) ,, drop=FALSE]
-            res@node.data <- tmpData[-(1:nTips(x)) ,, drop=FALSE]
+            tip.data <- tmpData[1:nTips(x) ,, drop=FALSE]
+            node.data <- tmpData[-(1:nTips(x)) ,, drop=FALSE]
         }
 
     }
@@ -119,9 +108,9 @@ setMethod("phylo4d", "phylo4",
         if(!is.null(tip.data) && !is.null(node.data)) {
             if(identical(colnames(tip.data), colnames(node.data)) && merge.data) {
                 tmpAllData <- rbind(tip.data, node.data)
-                res@tip.data <- tmpAllData[rownames(tmpAllData) %in%
+                tip.data <- tmpAllData[rownames(tmpAllData) %in%
                                            nodeId(x, "tip") ,, drop=FALSE]
-                res@node.data <- tmpAllData[rownames(tmpAllData) %in%
+                node.data <- tmpAllData[rownames(tmpAllData) %in%
                                             nodeId(x, "internal") ,, drop=FALSE]
             }
             else {
@@ -138,14 +127,14 @@ setMethod("phylo4d", "phylo4",
                 tmpData <- cbind(tmpTipData, tmpNodeData)
 
                 if(match.data) {
-                    res@tip.data <- tmpData[rownames(tmpData) %in%
+                    tip.data <- tmpData[rownames(tmpData) %in%
                                             nodeId(x, "tip") ,, drop=FALSE]
-                    res@node.data <- tmpData[rownames(tmpData) %in%
+                    node.data <- tmpData[rownames(tmpData) %in%
                                              nodeId(x, "internal") ,, drop=FALSE]
                 }
                 else {
-                    res@tip.data <- tmpData[1:nTips(x) ,, drop=FALSE]
-                    res@node.data <- tmpData[-(1:nTips(x)) ,, drop=FALSE]
+                    tip.data <- tmpData[1:nTips(x) ,, drop=FALSE]
+                    node.data <- tmpData[-(1:nTips(x)) ,, drop=FALSE]
                 }
             }
         }
@@ -154,10 +143,36 @@ setMethod("phylo4d", "phylo4",
             if(is.null(tip.data)) tip.data <- data.frame(NULL)
             if(is.null(node.data)) node.data <- data.frame(NULL)
 
-            res@tip.data <- tip.data
-            res@node.data <- node.data
+            tip.data <- tip.data
+            node.data <- node.data
         }
     }
+
+    return(list(tip.data=tip.data, node.data=node.data))
+}
+
+
+## first arg is a phylo4
+### phylo4d class rewrite
+setMethod("phylo4d", "phylo4",
+          function(x, tip.data=NULL, node.data=NULL, all.data=NULL,
+                   match.data=TRUE, merge.data=TRUE, ...) {
+
+    ## Creating new phylo4d object
+    res <- new("phylo4d")
+    res@edge <- x@edge
+    res@edge.length <- x@edge.length
+    res@Nnode <- x@Nnode
+    res@tip.label <- x@tip.label
+    res@node.label <- x@node.label
+    res@edge.label <- x@edge.label
+
+    ## taking care of the data
+    tmpData <- .phylo4Data(x, tip.data, node.data, all.data, match.data,
+                           merge.data, ...)
+
+    res@tip.data <- tmpData$tip.data
+    res@node.data <- tmpData$node.data
 
     return(res)
 })
