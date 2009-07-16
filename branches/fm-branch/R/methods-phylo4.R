@@ -144,17 +144,32 @@ setMethod("hasEdgeLength","phylo4", function(x) {
     length(x@edge.length)>0
 })
 
-setMethod("edgeLength", "phylo4", function(x,which) {
+setMethod("edgeLength", "phylo4", function(x, which) {
     if (!hasEdgeLength(x))
         NULL
     else {
       if (missing(which))
           return(x@edge.length)
       else {
-          n <- getNode(x,which)
+          n <- getNode(x, which)
           return(x@edge.length[match(n, x@edge[,2])])
       }
     }
+})
+
+setReplaceMethod("edgeLength", "phylo4", function(x, which, ..., value) {
+    ## TODO: check lengths of x and which, and that value is numerical (do this in
+    ## checkTree)
+    if(!hasEdgeLength(x))
+        ## FIXME: allow user to create edge length this way
+        stop("No edges on this tree.")
+    else {
+        n <- getNode(x, which)
+        nmEdge <- sapply(names(x@edge.length), function(foo)
+                         unlist(strsplit(foo, "-"))[2])
+        x@edge.length[match(n, nmEdge)] <- value
+    }
+    x
 })
 
 setMethod("sumEdgeLength", "phylo4", function(phy, node) {

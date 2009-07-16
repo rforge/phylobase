@@ -106,6 +106,10 @@ setGeneric("tdata<-", function(object, ..., value) {
     standardGeneric("tdata<-")
 })
 
+setGeneric("addData", function(x, ...) {
+    standardGeneric("addData")
+})
+
 setGeneric("hasNodeData", function(x) {
     standardGeneric("hasNodeData")
 })
