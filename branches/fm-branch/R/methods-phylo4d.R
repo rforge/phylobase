@@ -122,22 +122,17 @@ setReplaceMethod("tdata", "phylo4d",
                  function(object, which = c("tip", "internal", "allnode"), ...,
                           value) {
     which <- match.arg(which)
-    if (which == "allnode") {
-        namesmatch <- all(colnames(object@tip.data) == colnames(object@node.data))
-        classmatch <- all(sapply(object@tip.data, class) == sapply(object@node.data,
-            class))
-        if (!(classmatch && namesmatch))
-            stop("Node and tip columns do not match;",
-                 "you should access tip and node data separately")
-    }
-    if(is.matrix(value)) value <- as.data.frame(value)
-    if(!is.data.frame(value))
-        stop("For now, only data.frame or matrix can be provided")
-    switch(which,
-           tip = object@tip.data <- value,
-           internal = object@node.data <- value,
-           allnode = stop("for now, must set tip and node data separately"))
-    if(checkData(object, ...)) object <- attachData(object, ...)
+
+    tmpData <- switch(which,
+                      tip = .phylo4Data(object, tip.data=value, ...),
+                      internal = .phylo4Data(object, node.data=value, ...),
+                      allnode = .phylo4Data(object, all.data=value, ...))
+
+    if(all(dim(tmpData$tip.data)))
+        object@tip.data <- tmpData$tip.data
+    if(all(dim(tmpData$node.data)))
+        object@node.data <- tmpData$node.data
+
     object
 })
 
@@ -147,21 +142,38 @@ setMethod("addData", "phylo4d", function(x, tip.data=NULL, node.data=NULL,
                                          ...) {
     pos <- match.arg(pos)
 
-
-    tmpData <- .phylo4Data(x, tip.data, node.data, all.data, merge.data,
-                           match.data=TRUE, ...)
+    tmpData <- .phylo4Data(x=x, tip.data=tip.data, node.data=node.data,
+                           all.data=all.data, merge.data=merge.data,
+                           match.data=match.data, ...)
 
     if(identical(pos, "before")) {
-        if(!all(dim(tmpData$tip.data) == 0))
-            x@tip.data <- cbind(tmpData$tip.data, x@tip.data)
-        if(!all(dim(tmpData$node.data) == 0))
-            x@node.data <- cbind(tmpData$node.data, x@node.data)
+        if(!all(dim(tmpData$tip.data) == 0)) {
+            if(all(dim(x@tip.data) > 0))
+                x@tip.data <- cbind(tmpData$tip.data, x@tip.data)
+            else
+                x@tip.data <- tmpData$tip.data
+        }
+        if(!all(dim(tmpData$node.data) == 0)) {
+            if(all(dim(x@tip.data) > 0))
+                x@node.data <- cbind(tmpData$node.data, x@node.data)
+            else
+                x@node.data <- tmpData$node.data
+        }
     }
     else {
-        if(!all(dim(tmpData$tip.data) == 0))
-            x@tip.data <- cbind(x@tip.data, tmpData$tip.data)
-        if(!all(dim(tmpData$node.data) == 0))
-            x@node.data <- cbind(x@node.data, tmpData$node.data)
+        if(!all(dim(tmpData$tip.data) == 0)) {
+            if(all(dim(x@tip.data) > 0))
+                x@tip.data <- cbind(x@tip.data, tmpData$tip.data)
+            else
+                x@tip.data <- tmpData$tip.data
+        }
+
+        if(!all(dim(tmpData$node.data) == 0)) {
+            if(all(dim(x@node.data) > 0))
+                x@node.data <- cbind(x@node.data, tmpData$node.data)
+            else
+                x@node.data <- tmpData$node.data
+        }
     }
 
     x

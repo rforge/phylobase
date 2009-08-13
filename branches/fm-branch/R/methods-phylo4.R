@@ -15,7 +15,8 @@
 ###  3.3. edgeOrder()
 ###  3.4. hasEdgeLength()
 ###  3.5. edgeLength()
-###  3.6. sumEdgeLength()
+###  3.6. edgeLength() <-
+###  3.7. sumEdgeLength()
 
 ### 4. Root accessors
 ###  4.1. isRooted()
@@ -141,7 +142,7 @@ setMethod("edgeOrder", "phylo4", function(x, ...) {
 })
 
 setMethod("hasEdgeLength","phylo4", function(x) {
-    length(x@edge.length)>0
+    !all(is.na(x@edge.length))
 })
 
 setMethod("edgeLength", "phylo4", function(x, which) {
@@ -157,18 +158,15 @@ setMethod("edgeLength", "phylo4", function(x, which) {
     }
 })
 
-setReplaceMethod("edgeLength", "phylo4", function(x, which, ..., value) {
-    ## TODO: check lengths of x and which, and that value is numerical (do this in
-    ## checkTree)
-    if(!hasEdgeLength(x))
-        ## FIXME: allow user to create edge length this way
-        stop("No edges on this tree.")
-    else {
-        n <- getNode(x, which)
-        nmEdge <- sapply(names(x@edge.length), function(foo)
-                         unlist(strsplit(foo, "-"))[2])
-        x@edge.length[match(n, nmEdge)] <- value
+setReplaceMethod("edgeLength", "phylo4", function(x, use.names=TRUE, ..., value) {
+    if(use.names && !is.null(names(value))) {
+        if(!all(names(value) %in% names(x@edge.length)))
+            stop("Names provided don't match internal edge labels")
+        x@edge.length[match(names(value), names(x@edge.length))] <- value
     }
+    else
+        x@edge.length[1:nEdges(x)] <- value
+    if(is.character(checkval <- checkPhylo4(x))) stop(checkval)
     x
 })
 
@@ -230,7 +228,8 @@ setMethod("labels", "phylo4", function(object, which = c("tip",
 
 setReplaceMethod("labels",
                  signature(object="phylo4", value="character"),
-   function(object, which = c("tip", "internal", "allnode"), ..., value) {
+   function(object, which = c("tip", "internal", "allnode"),
+            use.names=FALSE, ..., value) {
 
        which <- match.arg(which)
 
@@ -238,25 +237,40 @@ setReplaceMethod("labels",
               ## If 'tip'
               tip = {
                   object@tip.label <- .createLabels(value, nTips(object),
-                                                    nNodes(object),
+                                                    nNodes(object), use.names,
                                                     which="tip")
                   object
               },
               ## If 'internal'
               internal = {
                   object@node.label <- .createLabels(value, nTips(object),
-                                                     nNodes(object),
+                                                     nNodes(object), use.names,
                                                      which="internal")
                   object
               },
               ## If 'allnode'
               allnode = {
-                  object@tip.label <- .createLabels(value, nTips(object),
-                                                    nNodes(object),
-                                                    which="tip")
-                  object@node.label <- .createLabels(value, nTips(object),
-                                                     nNodes(object),
-                                                     which="internal")
+                  if(use.names) {
+                      tipVal <- value[names(value) %in% nodeId(object, "tip")]
+                      nodVal <- value[names(value) %in% nodeId(object, "internal")]
+                      object@tip.label <- .createLabels(tipVal, nTips(object),
+                                                        nNodes(object), use.names,
+                                                        which="tip")
+                      object@node.label <- .createLabels(nodVal, nTips(object),
+                                                         nNodes(object), use.names,
+                                                         which="internal")
+                  }
+                  else {
+                      ntips <- nTips(object)
+                      nedges <- nTips(object) + nNodes(object)
+                      object@tip.label <- .createLabels(value[1:ntips], nTips(object),
+                                                        nNodes(object), use.names,
+                                                        which="tip")
+                      object@node.label <- .createLabels(value[(ntips+1):nedges],
+                                                         nTips(object),
+                                                         nNodes(object), use.names,
+                                                         which="internal")
+                  }
                   object
               })
 
@@ -269,13 +283,7 @@ setReplaceMethod("labels",
 
 ### Node Labels
 setMethod("hasNodeLabels", "phylo4", function(x) {
-    if(length(x@node.label) == 0) {
-        warning("You are using an old version of a phylo4 object.")
-        FALSE
-    }
-    else {
-        !all(is.na(x@node.label))
-    }
+    !all(is.na(x@node.label))
 })
 
 setMethod("nodeLabels", "phylo4", function(object) {
@@ -312,6 +320,7 @@ setMethod("edgeLabels", signature(x = "phylo4"), function(x) {
 setReplaceMethod("edgeLabels", signature(object="phylo4", value="character"),
   function(object, ..., value) {
       object@edge.label <- value
+      if(is.character(checkval <- checkPhylo4(object))) stop(checkval)
       object
   })
 

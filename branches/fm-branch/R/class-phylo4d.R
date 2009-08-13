@@ -27,8 +27,8 @@ setClass("phylo4d",
 setGeneric("phylo4d", function(x, ...) { standardGeneric("phylo4d")} )
 
 ## Core part that takes care of the data
-.phylo4Data <-  function(x, tip.data=NULL, node.data=NULL, all.data=NULL,
-                         match.data=TRUE, merge.data=TRUE, ...) {
+.phylo4Data <- function(x, tip.data=NULL, node.data=NULL, all.data=NULL,
+                        match.data=TRUE, merge.data=TRUE, ...) {
 
     ## Make sure that data provided are a data frame
     classData <- function(someData) {
@@ -36,7 +36,7 @@ setGeneric("phylo4d", function(x, ...) { standardGeneric("phylo4d")} )
             if(is.vector(someData))
                 someData <- as.data.frame(someData)
             if(!is.data.frame(someData)) {
-                nmSomedata <- deparseSubstitute(someData)
+                nmSomeData <- substitute(someData)
                 stop(paste(nmSomeData, "must be a vector or a data frame"))
             }
             someData
@@ -51,18 +51,17 @@ setGeneric("phylo4d", function(x, ...) { standardGeneric("phylo4d")} )
     tip.data <- classData(tip.data)
     node.data <- classData(node.data)
 
-
     ## Replacing node labels by node numbers and formatting the data to make sure
     ## they have the correct dimensions
-    if(!is.null(all.data))
+    if(!is.null(all.data) && all(dim(all.data) > 0))
         all.data <- formatData(x, all.data, which="all",
                                match.data=match.data, ...)
 
-    if(!is.null(tip.data))
+    if(!is.null(tip.data) && all(dim(tip.data) > 0))
         tip.data <- formatData(x, tip.data, which="tip",
                                match.data=match.data, ...)
 
-    if(!is.null(node.data))
+    if(!is.null(node.data) && all(dim(node.data) > 0))
         node.data <- formatData(x, node.data, which="internal",
                                 match.data=match.data, ...)
 

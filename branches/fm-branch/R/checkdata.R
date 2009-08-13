@@ -113,6 +113,13 @@ checkTree <- function(object,warn="retic",err=NULL) {
         }
     }
 
+    ## make sure that edgeLength has correct length and is numerical
+    if(hasEdgeLength(object)) {
+        if(length(object@edge.length) != nedges)
+            stop("The number of edge lengths is different from the number of edges.")
+        if(!is.numeric(object@edge.length)) stop("Edge lengths are not numeric.")
+    }
+
     ## make sure that tip and node labels are unique
     lb <- labels(object, "allnode")
     lb <- lb[nchar(lb) > 0]
@@ -172,7 +179,7 @@ formatData <- function(phy, dt, which=c("tip", "internal", "all"),
             else getNode(phy, nd, missing="OK")
         })
         ndDt <- unlist(ndDt)
-      
+
         ## Make sure that data are matched to appropriate nodes
         if(which != "all") {
             switch(which,
@@ -217,6 +224,9 @@ formatData <- function(phy, dt, which=c("tip", "internal", "all"),
         tmpDt[match(rownames(dt), rownames(tmpDt)), ] <- dt
     }
     else {
+        ## Remove rownames in data provided
+        rownames(dt) <- NULL
+
         ## Check differences between dataset and tree
         diffNr <- nrow(dt) - nr
         if(diffNr > 0 && extra.data != "OK") {
@@ -235,51 +245,4 @@ formatData <- function(phy, dt, which=c("tip", "internal", "all"),
     }
 
     tmpDt
-}
-
-
-attachData <- function(object,
-                        label.type=c("row.names","column"),
-                        label.column=1,
-                        use.tip.names=TRUE,
-                        use.node.names=FALSE,
-                        ...)
-{
-
-    ## assumes data have already been checked by checkData!
-    ## name matching default: use row.names of data frame
-    label.type = match.arg(label.type)
-    if (identical(label.type, "row.names")) {
-        tip.names <- row.names(object@tip.data)
-        node.names <- row.names(object@node.data)
-    }
-    else {
-        tip.names <- object@tip.data[,label.column]
-        node.names <- object@node.data[,label.column]
-    }
-
-
-    ## for each set of data, take appropriate actions
-
-    ## tip data operations:
-    ## if tip.data exist
-    if (!all(dim(object@tip.data)==0)) {
-        ## if we want to use tip.names
-        if (use.tip.names) {
-            object@tip.data <- object@tip.data[match(object@tip.label,tip.names),,drop=FALSE]
-        }
-        #tip.names <- object@tip.label
-    }
-
-    ## node data operations
-    if (!all(dim(object@node.data)==0)) {
-        ## if we want to use tip.names
-        if (use.node.names) {
-            object@node.data <- object@node.data[match(object@node.label,node.names),,drop=FALSE]
-        }
-        #node.names <- object@node.label
-    }
-
-    return(object)
-
 }

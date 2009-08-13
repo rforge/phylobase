@@ -273,3 +273,48 @@ checkData <- function(object,
           }
     }
 }
+
+
+attachData <- function(object,
+                        label.type=c("row.names","column"),
+                        label.column=1,
+                        use.tip.names=TRUE,
+                        use.node.names=FALSE,
+                        ...)
+{
+
+    ## assumes data have already been checked by checkData!
+    ## name matching default: use row.names of data frame
+    label.type = match.arg(label.type)
+    if (identical(label.type, "row.names")) {
+        tip.names <- row.names(object@tip.data)
+        node.names <- row.names(object@node.data)
+    }
+    else {
+        tip.names <- object@tip.data[,label.column]
+        node.names <- object@node.data[,label.column]
+    }
+
+
+    ## for each set of data, take appropriate actions
+
+    ## tip data operations:
+    ## if tip.data exist
+    if (!all(dim(object@tip.data)==0)) {
+        ## if we want to use tip.names
+        if (use.tip.names) {
+            object@tip.data <- object@tip.data[match(object@tip.label,tip.names),,drop=FALSE]
+        }
+    }
+
+    ## node data operations
+    if (!all(dim(object@node.data)==0)) {
+        ## if we want to use tip.names
+        if (use.node.names) {
+            object@node.data <- object@node.data[match(object@node.label,node.names),,drop=FALSE]
+        }
+    }
+
+    return(object)
+
+}

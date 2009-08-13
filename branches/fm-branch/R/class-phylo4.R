@@ -23,7 +23,7 @@ setClass("phylo4",
 #####################
 
 .createLabels <- function(value, ntips, nnodes, use.names = TRUE,
-                         which = c("tip", "internal")) {
+                          which = c("tip", "internal", "allnode")) {
 
     which <- match.arg(which)
 
@@ -33,27 +33,25 @@ setClass("phylo4",
     ## create NA character vector of node labels
     res <- character(lgthRes)
     is.na(res) <- TRUE
+
+    ## create internal names
     names(res) <- switch(which,
                          tip = 1:ntips,
                          internal = seq(from=ntips+1, length=lgthRes),
                          allnode = 1:(ntips+nnodes))
 
 
-    ## if value is NULL
-    if(is.null(value) || all(is.na(value))) {
+    ## if no values are provided
+    if(missing(value) || is.null(value) || all(is.na(value))) {
         ## tip labels can't be NULL
         if(!identical(which, "internal")) {
             tipLbl <- .genlab("T", ntips)
             res[1:ntips] <- tipLbl
         }
     }
+
     ## if labels are provided
     else {
-        ## check that not only numbers
-        ##if(length(grep("[a-zA-Z]", value)) == 0)
-        ##    stop("Labels need to contain characters. ",
-        ##         "They can't just be numerical values")
-
         ## check that lengths match
         if(length(value) != lgthRes)
             stop("Number of labels does not match number of nodes.")
@@ -62,6 +60,28 @@ setClass("phylo4",
         if(use.names && !is.null(names(value))) {
             if(!all(names(value) %in% names(res)))
                 stop("Names provided don't match internal labels names.")
+            res[match(names(value), names(res))] <- value
+        }
+        else
+            res[1:lgthRes] <- value
+    }
+
+    res
+}
+
+
+.createEdge <- function(value, edgeMat, type=c("lengths", "labels"), use.names=TRUE) {
+    type <- match.arg(type)
+
+    lgthRes <- nrow(edgeMat)
+    res <- switch(type, lengths=numeric(lgthRes), labels=character(lgthRes))
+    is.na(res) <- TRUE
+    names(res) <- paste(edgeMat[,1], edgeMat[,2], sep="-")
+
+    if(!(missing(value) || is.null(value) || all(is.na(value)))) {
+        if(use.names && !is.null(names(value))) {
+            if(!all(names(value) %in% names(res)))
+                stop("Names provided don't match internal edge labels names.")
             res[match(names(value), names(res))] <- value
         }
         else
@@ -96,37 +116,23 @@ setMethod("phylo4", "matrix",
     edge <- as.matrix(edge[, 1:2])
     colnames(edge) <- c("ancestor", "descendant")
 
-    ## edge.length
-    if(!is.null(edge.length)) {
-        if(!is.numeric(edge.length)) stop("edge.length is not numeric")
-        edge.length <- edge.length
-    } else {
-        edge.length <- numeric(0)
-    }
-
-    if(length(edge.length) > 0) {
-        if(length(edge.length) != nrow(edge))
-            stop("The number of edge lengths is different from the number of edges.")
-        ## FM - 2009-04-19
-        ## edge.length is named according to the nodes the edge links together
-        ## (ancestor-descendant). This should allow more robust edge/edge.length
-        ## association and limit the problems associated with reordering trees.
-        names(edge.length) <- paste(edge[,1], edge[,2], sep="-")
-    }
-
     ## number of tips and number of nodes
     ntips <- sum(tabulate(na.omit(edge[, 1])) == 0)
     nnodes <- length(unique(na.omit(c(edge)))) - ntips
+
+    ## edge.length
+    edge.length <- .createEdge(value=edge.length, edgeMat=edge, type="lengths", use.names=FALSE)
+
+    ## edge.label
+    edge.label <- .createEdge(value=edge.label, edgeMat=edge, type="labels", use.names=FALSE)
 
     ## tip.label
     tip.label <- .createLabels(value=tip.label, ntips=ntips, nnodes=nnodes,
                                which="tip")
 
-    ## edge.label
-    if(is.null(edge.label)) {
-      edge.label <- character(0)
-    } else if (length(edge.label)>0 && length(edge.label) != nrow(edge))
-      stop("number of edge labels is not consistent with the number of edges")
+    ## node.label
+    node.label <- .createLabels(node.label, ntips=ntips, nnodes=nnodes,
+                                which="internal")
 
     ## fill in the result
     res <- new("phylo4")
@@ -134,8 +140,7 @@ setMethod("phylo4", "matrix",
     res@edge.length <- edge.length
     res@Nnode <- nnodes
     res@tip.label <- tip.label
-    res@node.label <- .createLabels(node.label, ntips=ntips, nnodes=nnodes,
-                                    which="internal")
+    res@node.label <- node.label
     res@edge.label <- edge.label
     res@order <- order
 
