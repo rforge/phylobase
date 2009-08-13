@@ -179,10 +179,11 @@ Now we'll take the \emph{Geospiza} data from \verb+geospiza_raw$data+ and merge 
 g2 <- phylo4d(g1, geospiza_raw$data)
 @
 
-gives
+\textbf{no longer an error: now gives
+  a warning and a tree with missing values etc. FIX ME!}
+
 <<geomergeerr1,echo=FALSE>>=
-err1 <- try(g2 <- phylo4d(g1, geospiza_raw$data), silent=TRUE)
-cat(as.character(err1))
+phylo4d(g1, geospiza_raw$data)
 @
 
 We have two problems --- the first is that we forgot to lowercase the labels on the data to match the tip labels:
@@ -194,8 +195,10 @@ row.names(gdata) <- tolower(row.names(gdata))
 
 To deal with the second problem (missing data for \emph{G. olivacea}), we have a few choices. The easiest is to use \code{missing.tip.data="OK"} to allow R to create the new object:
 
-<<geomerge2>>=
-g2 <- phylo4d(g1, gdata,missing.tip.data="OK")
+\textbf{FIXME: missing.tip.data="OK" no longer used}
+<<geomerge2,keep.source=TRUE>>=
+##g2 <- phylo4d(g1, gdata,missing.tip.data="OK")
+g2 <- phylo4d(g1, gdata)
 @
 
 (setting \code{missing.tip.data} to \code{"warn"} would create the new object but print a warning).
