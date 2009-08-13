@@ -149,7 +149,7 @@ checkTree <- function(object,warn="retic",err=NULL) {
 
 formatData <- function(phy, dt, which=c("tip", "internal", "all"),
                        match.data=TRUE, label.type=c("rownames", "column"),
-                       label.column=1, missing.data=c("warn", "OK", "fail"),
+                       label.column=1, missing.data=c("fail", "warn", "OK"),
                        extra.data=c("warn", "OK", "fail")
                        ) {
 
