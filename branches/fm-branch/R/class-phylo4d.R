@@ -197,21 +197,22 @@ setMethod("phylo4d", c("phylo"),
         # FIXME? use.node.names=TRUE won't work with this option b/c
         # node labels are dropped; assumes node.data (if any), phylo
         # node.label, and phylo4 internal nodes are in the same order?
+
         nlab.data <- x$node.label
         x$node.label <- NULL
         nlab.data[!nzchar(nlab.data)] <- NA
 
         nlab.data <- data.frame(labelValues=as.numeric(nlab.data))
-        if (is.null(node.data)) {
-            node.data <- nlab.data
-        } else {
-            node.data <- cbind(nlab.data, node.data)
-        }
+
         tree <- phylo4(x, check.node.labels="drop")
-    } else {
-        tree <- phylo4(x, check.node.labels=check.node.labels)
+        res <- phylo4d(tree, tip.data, node.data, all.data, ...)
+        res <- addData(res, node.data=nlab.data, pos="before", match.data=FALSE)
     }
-    res <- phylo4d(tree, tip.data, node.data, all.data, ...)
+    else {
+        tree <- phylo4(x, check.node.labels=check.node.labels)
+        res <- phylo4d(tree, tip.data, node.data, all.data, ...)
+    }
+
     return(res)
 })
 
