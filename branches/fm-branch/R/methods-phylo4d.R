@@ -138,7 +138,7 @@ setReplaceMethod("tdata", "phylo4d",
 
 setMethod("addData", "phylo4d", function(x, tip.data=NULL, node.data=NULL,
                                          all.data=NULL, pos=c("after", "before"),
-                                         merge.data=TRUE, match.data,
+                                         merge.data=TRUE, match.data=TRUE,
                                          ...) {
     pos <- match.arg(pos)
 
