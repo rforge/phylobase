@@ -33,8 +33,6 @@ getNode <- function(phy, node, missing=c("warn","OK","fail")) {
     ## node labels
     nmNd <- labels(phy, "allnode")[irval]
     names(rval) <- nmNd
-    ## if node doesn't exist put node called as its name
-    names(rval)[is.na(nmNd)] <- node[is.na(nmNd)]
 
     ## deal with nodes that don't match
     if (any(is.na(rval))) {
