@@ -69,6 +69,10 @@ setAs("multiPhylo", "multiPhylo4", function(from, to) {
 ## })
 
 setAs("phylo4", "phylo", function(from, to) {
+
+    if(is.character(checkval <- checkPhylo4(from)))
+        stop(checkval)
+    
     if (inherits(from, "phylo4d"))
         warning("losing data while coercing phylo4d to phylo")
     brlen <- unname(from@edge.length)
@@ -172,6 +176,9 @@ setAs(from = "phylo4", to = "data.frame", def = function(from) {
 })
 
 setAs(from = "phylo4d", to = "data.frame", function(from) {
+
+    if(is.character(checkval <- checkPhylo4(from)))
+        stop(checkval)
 
     tree <- extractTree(from)
     ## Convert to data.frame
