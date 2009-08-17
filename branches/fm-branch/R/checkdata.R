@@ -199,10 +199,20 @@ formatData <- function(phy, dt, which=c("tip", "internal", "all"),
 
         ## Check differences
         extra <- names(ndDt[is.na(ndDt)])
-        mssng <- labels(phy, which)[! labels(phy, which) %in% names(ndDt)]
+        mssng <- nodeId(phy, which)[! nodeId(phy, which) %in% ndDt]
 
         if(length(mssng) > 0 && missing.data != "OK") {
             msg <- "The following nodes are not found in the dataset: "
+
+            ## provides label if it exists and node number otherwise
+            mssng <- sapply(mssng, function(m) {
+                m <- getNode(phy, m)
+                if (is.na(names(m)) || is.null(names(m)))
+                    m
+                else
+                    names(m)
+            })
+
             msg <- paste(msg, paste(mssng, collapse=", "))
             switch(missing.data,
                    warn = warning(msg),
