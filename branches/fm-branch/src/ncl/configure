@@ -5505,7 +5505,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_header_stdc=no
 fi
-rm -rf conftest*
+rm -f conftest*
 
 fi
 
@@ -5526,7 +5526,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_header_stdc=no
 fi
-rm -rf conftest*
+rm -f conftest*
 
 fi
 
@@ -6510,7 +6510,7 @@ for ac_symprfx in "" "_"; do
   # Check to see that the pipe works correctly.
   pipe_works=no
 
-  rm -rf conftest*
+  rm -f conftest*
   cat > conftest.$ac_ext <<EOF
 #ifdef __cplusplus
 extern "C" {
@@ -6607,7 +6607,7 @@ EOF
     echo "$progname: failed program was:" >&5
     cat conftest.$ac_ext >&5
   fi
-  rm -rf conftest* conftst*
+  rm -f conftest* conftst*
 
   # Do not use the global_symbol_pipe unless it works.
   if test "$pipe_works" = yes; then
@@ -6681,7 +6681,7 @@ delay_variable_subst='s/\\\\\\\\\\\$/\\\\\\$/g'
 no_glob_subst='s/\*/\\\*/g'
 
 # Constants:
-rm="rm -rf"
+rm="rm -f"
 
 # Global variables:
 default_ofile=libtool
@@ -20560,7 +20560,6 @@ echo "$as_me: *** NOTE: debugging is enabled; optimization is suppressed!" >&6;}
 			CXXFLAGS_WARNINGS="$CXXFLAGS_WARNINGS"
 			CXXFLAGS_OPTIM_SPEED="-O3 -ffast-math"
 			CXXFLAGS_OPTIM_SIZE="-Os -ffast-math"
-			CXXFLAGS_USE_FPIC="-fPIC" ## T Jombart/phylobase hack 
 		fi
 		case "$build_os" in
 			darwin*) CXXFLAGS_WARNINGS="$CXXFLAGS_WARNINGS -Wno-long-double";;
@@ -20570,8 +20569,8 @@ echo "$as_me: *** NOTE: debugging is enabled; optimization is suppressed!" >&6;}
 	if test "x$CXXFLAGS_OPTIM_SIZE" = "x"; then
 		CXXFLAGS_OPTIM_SIZE=$CXXFLAGS_OPTIM_SPEED
 	fi
- ## T Jombart/phylobase hack: add CXXFLAGS_USE_FPIC
-	CXXFLAGS="$CXXFLAGS $CXXFLAGS_OPTIM_SPEED $CXXFLAGS_WARNINGS $CXXFLAGS_USE_FPIC"
+
+	CXXFLAGS="$CXXFLAGS $CXXFLAGS_OPTIM_SPEED $CXXFLAGS_WARNINGS"
 
 
 
@@ -20648,7 +20647,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_header_stdc=no
 fi
-rm -rf conftest*
+rm -f conftest*
 
 fi
 
@@ -20669,7 +20668,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_header_stdc=no
 fi
-rm -rf conftest*
+rm -f conftest*
 
 fi
 
@@ -21678,6 +21677,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 # endif
 #endif
 
+#include <limits.h>
 #include <stdlib.h>
 
 #ifdef HAVE_UNISTD_H
@@ -21824,14 +21824,17 @@ main ()
   /* This test makes some buggy mktime implementations loop.
      Give up after 60 seconds; a mktime slower than that
      isn't worth using anyway.  */
-  alarm (5);
+  alarm (60);
 
-  for (time_t_max = 1; 0 < time_t_max; time_t_max *= 2)
-    continue;
-  time_t_max--;
-  if ((time_t) -1 < 0)
-    for (time_t_min = -1; (time_t) (time_t_min * 2) < 0; time_t_min *= 2)
-      continue;
+  for (;;)
+    {
+      t = (time_t_max << 1) + 1;
+      if (t <= time_t_max)
+	break;
+      time_t_max = t;
+    }
+  time_t_min = - ((time_t) ~ (time_t) 0 == (time_t) -1) - time_t_max;
+
   delta = time_t_max / 997; /* a suitable prime number */
   for (i = 0; i < N_STRINGS; i++)
     {
@@ -21846,10 +21849,12 @@ main ()
 	     && mktime_test ((time_t) (60 * 60 * 24))))
 	return 1;
 
-      for (j = 1; 0 < j; j *= 2)
+      for (j = 1; ; j <<= 1)
 	if (! bigtime_test (j))
 	  return 1;
-      if (! bigtime_test (j - 1))
+	else if (INT_MAX / 2 < j)
+	  break;
+      if (! bigtime_test (INT_MAX))
 	return 1;
     }
   return ! (irix_6_4_bug () && spring_forward_gap () && year_2050_test ());
@@ -22406,8 +22411,7 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-#ac_config_files="$ac_config_files Makefile example/Makefile example/ncltest/Makefile example/nclsimplest/Makefile example/basiccmdline/Makefile example/normalizer/Makefile ncl/Makefile test/Makefile"
-ac_config_files="$ac_config_files Makefile ncl/Makefile"
+ac_config_files="$ac_config_files Makefile example/Makefile example/ncltest/Makefile example/nclsimplest/Makefile example/basiccmdline/Makefile example/normalizer/Makefile ncl/Makefile test/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
