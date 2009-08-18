@@ -77,12 +77,12 @@ AC_PROG_MAKE_SET
 
 AC_CONFIG_FILES([					\
 	Makefile 						\
-	# example/Makefile				\
-	# example/ncltest/Makefile		\
-	# example/nclsimplest/Makefile	\
-	# example/basiccmdline/Makefile	\
-	# example/normalizer/Makefile		\
+	example/Makefile				\
+	example/ncltest/Makefile		\
+	example/nclsimplest/Makefile	\
+	example/basiccmdline/Makefile	\
+	example/normalizer/Makefile		\
 	ncl/Makefile					\
-	# test/Makefile
+	test/Makefile
 	])
 AC_OUTPUT
