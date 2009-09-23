@@ -9,7 +9,6 @@
 
 getNode <- function(phy, node, missing=c("warn","OK","fail")) {
     missing <- match.arg(missing)
-    browser()
     if (is.numeric(node) && all(floor(node) == node, na.rm=TRUE)) {
         node <- as.integer(node)
     }
@@ -27,16 +26,16 @@ getNode <- function(phy, node, missing=c("warn","OK","fail")) {
 
     ## node numbers
     rval <- names(labels(phy, "all"))[irval]
-    rval <- as.integer(rval)
-    browser()
-    rval[node == 0]   <- "0" # root ancestor gets special treatment
+
+    rval[node == 0]   <- 0 # root ancestor gets special treatment
     rval[is.na(node)] <- NA # return NA for any NA_character_ inputs
+    rval <- as.integer(rval)
 
     ## node labels
     nmNd <- labels(phy, "all")[irval]
 
     names(rval) <- nmNd
-    names(rval)[rval == "0"] <- "0" # root ancestor gets special treatment
+    names(rval)[rval == 0] <- "0" # root ancestor gets special treatment
 
     ## deal with nodes that don't match
     if (any(is.na(rval))) {
