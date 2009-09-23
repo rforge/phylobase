@@ -12,7 +12,7 @@ setAs("phylo", "phylo4", function(from, to) {
         }
         root.node <- as.numeric(setdiff(unique(from$edge[,1]), unique(from$edge[,2])))
 
-        from$edge <- rbind(from$edge[tip.idx,],c(NA,root.node),from$edge[int.idx,])
+        from$edge <- rbind(from$edge[tip.idx,],c(0,root.node),from$edge[int.idx,])
         if (!is.null(from$edge.length)) {
             if (is.null(from$root.edge)) {
                 from$edge.length <- c(from$edge.length[tip.idx],as.numeric(NA),from$edge.length[int.idx])
