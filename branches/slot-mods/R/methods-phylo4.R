@@ -265,7 +265,7 @@ setMethod("labels", signature(object="phylo4"),
 setReplaceMethod("labels",
                  signature(x="phylo4", type="ANY",
                            use.names="ANY", value="character"),
-   function(x, type = c("tip", "internal", "allnode"),
+   function(x, type = c("all", "tip", "internal"),
             use.names, ..., value) {
 
        ## Default options

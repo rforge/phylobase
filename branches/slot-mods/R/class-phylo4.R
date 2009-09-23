@@ -21,12 +21,12 @@ setClass("phylo4",
 #####################
 
 .createLabels <- function(value, ntips, nnodes, use.names = TRUE,
-                          type = c("tip", "internal", "allnode")) {
+                          type = c("all", "tip", "internal")) {
 
     type <- match.arg(type)
 
     ## set up final length of object to return
-    lgthRes <- switch(type, tip=ntips, internal=nnodes, allnode=ntips+nnodes)
+    lgthRes <- switch(type, tip=ntips, internal=nnodes, all=ntips+nnodes)
 
     ## create NA character vector of node labels
     res <- character(lgthRes)
@@ -36,7 +36,7 @@ setClass("phylo4",
     names(res) <- switch(type,
                          tip = 1:ntips,
                          internal = seq(from=ntips+1, length=lgthRes),
-                         allnode = 1:(ntips+nnodes))
+                         all = 1:(ntips+nnodes))
 
 
     ## if no values are provided
