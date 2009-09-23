@@ -49,7 +49,7 @@ setMethod("subset", "phylo4", function(x, tips.include=NULL,
         dropped <- setdiff(all.tips, kept)
         unknown <- numeric(0)
     } else {
-        kept <- x@tip.label
+        kept <- getNode(x, nodeId(x, "tip"))
         dropped <- numeric(0)
         unknown <- numeric(0)
     }

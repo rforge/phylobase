@@ -1,8 +1,7 @@
 setClass("phylo4",
          representation(edge = "matrix",
                         edge.length = "numeric",
-                        node.label = "character",
-                        tip.label = "character",
+                        label = "character",
                         edge.label = "character",
                         order = "character",
                         annote = "list"),
@@ -10,8 +9,7 @@ setClass("phylo4",
                         edge = matrix(nrow = 0, ncol = 2,
                             dimname = list(NULL, c("ancestor", "descendant"))),
                         edge.length = numeric(0),
-                        tip.label = character(0),
-                        node.label = character(0),
+                        label = character(0),
                         edge.label = character(0),
                         order = "unknown",
                         annote = list()
@@ -138,8 +136,7 @@ setMethod("phylo4", "matrix",
     res <- new("phylo4")
     res@edge <- edge
     res@edge.length <- edge.length
-    res@tip.label <- tip.label
-    res@node.label <- node.label
+    res@label <- c(tip.label, node.label)
     res@edge.label <- edge.label
     res@order <- order
     res@annote <- annote

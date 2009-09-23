@@ -31,7 +31,9 @@ formatData <- function(phy, dt, type=c("tip", "internal", "all"),
             else getNode(phy, nd, missing="OK")
         })
         ndDt <- unlist(ndDt)
-
+#        ndDt <- ifelse(nchar(gsub("[0-9]", "", ndNames))==0,
+#            getNode(phy, as.integer(ndNames), missing="OK"),
+#            getNode(phy, ndNames, missing="OK"))
         ## Make sure that data are matched to appropriate nodes
         if(type != "all") {
             switch(type,

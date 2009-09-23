@@ -30,8 +30,7 @@ phyd <- phylo4d(phy, tip.data=tipDt, node.data=nodDt, all.data=allDt,
 # create altered version such that each slot is out of order with
 # respect to all others; methods should be able to handle this
 phyd.alt <- phyd
-phyd.alt@tip.label <- rev(phyd@tip.label)
-phyd.alt@node.label <- rev(phyd@node.label)
+phyd.alt@label <- rev(phyd@label)
 phyd.alt@edge <- phyd@edge[c(6:9, 1:5), ]
 phyd.alt@edge.length <- phyd@edge.length[c(7:9, 1:6)]
 phyd.alt@edge.label <- phyd@edge.label[c(8:9, 1:7)]
