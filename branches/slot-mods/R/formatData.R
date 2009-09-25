@@ -5,6 +5,25 @@ formatData <- function(phy, dt, type=c("tip", "internal", "all"),
                        extra.data=c("warn", "OK", "fail")
                        ) {
 
+    ## coerce vector data to data.frame
+    if (is.vector(dt)) {
+        dt <- as.data.frame(dt)
+    }
+    ## if null, return empty data frame with node numbers as row names
+    if (is.null(dt)) {
+        return(data.frame(row.names=nodeId(phy, type)))
+    }
+    ## before proceeding, make sure that data provided are a data frame
+    if (!is.data.frame(dt)) {
+        nmSomeData <- substitute(dt)
+        stop(paste(nmSomeData, "must be a vector or a data frame"))
+    }
+    ## if null or lacking rows or columns, return a placeholder data
+    ## frame with node numbers as row names
+    if (any(dim(dt)==0)) {
+        return(data.frame(row.names=nodeId(phy, type)))
+    }
+        
     type <- match.arg(type)
     label.type <- match.arg(label.type)
     stopifnot(label.column %in% 1:ncol(dt))
@@ -40,13 +59,13 @@ formatData <- function(phy, dt, type=c("tip", "internal", "all"),
                    tip = {
                      ## BMB: don't bother trying to match NAs
                        if(any(na.omit(names(ndDt)) %in% labels(phy, "internal")))
-                           stop("You are trying to match tip data to internal ",
+                           stop("Your tip data are being matched to internal ",
                                 "nodes. Make sure that your data identifiers ",
                                 "are correct.")
                    },
                    internal = {
                        if(any(na.omit(names(ndDt)) %in% labels(phy, "tip")))
-                           stop("You are trying to match node data to tip ",
+                           stop("Your node data are being matched to tip ",
                                 "nodes. Make sure that your data identifiers ",
                                 "are correct.")
                    })

@@ -97,19 +97,19 @@ setMethod("[", signature(x="phylo4", i="missing", j="missing",
 setMethod("[", signature(x="phylo4d", i="ANY", j="character",
     drop="missing"), function(x, i, j, ..., drop) {
     if (!missing(i)) x <- x[i]
-    tdata(x, type="allnode") <- tdata(x, type="allnode")[j]
+    tdata(x, type="all") <- tdata(x, type="all")[j]
     return(x)
 })
 setMethod("[", signature(x="phylo4d", i="ANY", j="numeric",
     drop="missing"), function(x, i, j, ..., drop) {
     if (!missing(i)) x <- x[i]
-    tdata(x, type="allnode") <- tdata(x, type="allnode")[j]
+    tdata(x, type="all") <- tdata(x, type="all")[j]
     return(x)
 })
 setMethod("[", signature(x="phylo4d", i="ANY", j="logical",
     drop="missing"), function(x, i, j, ..., drop) {
     if (!missing(i)) x <- x[i]
-    tdata(x, type="allnode") <- tdata(x, type="allnode")[j]
+    tdata(x, type="all") <- tdata(x, type="all")[j]
     return(x)
 })
 ## borrow from Matrix package approach of trapping invalid usage

@@ -34,8 +34,7 @@ tdata(phyd.alt, "all") <- allDt
 nid.tip.r <- c(2,5,4,3,1)
 nid.int.r <- c(8,7,9,6)
 nid.all.r <- c(nid.tip.r, nid.int.r)
-phyd.alt@tip.data <- phyd.alt@tip.data[rank(nid.tip.r), ]
-phyd.alt@node.data <- phyd.alt@node.data[rank(nid.int.r), ]
+phyd.alt@data <- phyd.alt@data[rank(nid.all.r), ]
 
 #-----------------------------------------------------------------------
 

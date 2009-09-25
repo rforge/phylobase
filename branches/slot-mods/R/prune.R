@@ -124,7 +124,7 @@ setMethod("prune", "phylo4d", function(x, tips.exclude,
     tree <- extractTree(x)
     phytr <- prune(tree, tips.exclude, trim.internal)
 
-    ## create temporary phylo4 object with unique labels
+    ## create temporary phylo4 object with complete and unique labels
     tmpLbl <- .genlab("n", nTips(x)+nNodes(x))
     tmpPhy <- tree
     labels(tmpPhy, "all") <- tmpLbl
@@ -133,27 +133,14 @@ setMethod("prune", "phylo4d", function(x, tips.exclude,
     ## get node numbers to keep
     oldLbl <- labels(tmpPhy, "all")
     newLbl <- labels(tmpPhytr, "all")
-    toKeep <- as.numeric(names(oldLbl[oldLbl %in% newLbl]))
-    tipToKeep <- toKeep[toKeep %in% nodeId(x, "tip")]
-    nodToKeep <- toKeep[toKeep %in% nodeId(x, "internal")]
+    wasKept <- oldLbl %in% newLbl
+    nodesToKeep <- as.numeric(names(oldLbl[wasKept]))
 
-    if(!all(dim(x@tip.data) == 0)) {
-        tipDt <- x@tip.data[match(tipToKeep, rownames(x@tip.data)) ,, drop=FALSE]
-        tipDt <- tipDt[.chnumsort(rownames(tipDt)) ,, drop=FALSE]
-        rownames(tipDt) <- 1:nTips(phytr)
-    }
-    else
-        tipDt <- data.frame(NULL)
+    ## subset original data, and update names
+    allDt <- x@data[match(nodesToKeep, rownames(x@data)), , drop=FALSE]
+    rownames(allDt) <- match(newLbl, oldLbl[wasKept])
 
-    if(!all(dim(x@node.data) == 0)) {
-        nodDt <- x@node.data[match(nodToKeep, rownames(x@node.data)) ,, drop=FALSE]
-        nodDt <- nodDt[.chnumsort(rownames(nodDt)) ,, drop=FALSE]
-        rownames(nodDt) <- 1:nNodes(phytr)
-    }
-    else
-        nodDt <- data.frame(NULL)
-
-    phytr <- phylo4d(phytr, tip.data=tipDt, node.data=nodDt, match.data=FALSE)
+    phytr <- phylo4d(phytr, all.data=allDt, match.data=TRUE)
 
     phytr
 })

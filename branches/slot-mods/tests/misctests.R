@@ -83,11 +83,11 @@ z <- as(tree.owls,"phylo4")
 example("phylo4d")
 obj1 <- obj2 <- obj3 <- phylo4d(z, data.frame(wing=1:4,color=factor(c("b","w","b","b")), tail=runif(4)*10), match.data=FALSE)
 
-obj2@tip.data <- as.data.frame(obj2@tip.data[,1])
-obj3@tip.data <- cbind(obj1@tip.data,obj2@tip.data)
+obj2@data <- as.data.frame(obj2@data[,1])
+obj3@data <- cbind(obj1@data,obj2@data)
 obj4 <- obj1
-obj4@tip.data[2,3] <- NA
-obj4@tip.data[1,1] <- NA
+obj4@data[2,3] <- NA
+obj4@data[1,1] <- NA
 
 nodeLabels(obj4) <- character(0)
 

@@ -164,24 +164,23 @@ checkPhylo4Data <- function(object) {
     ## These are just some basic tests to make sure that the user does not
     ## alter the object in a significant way
 
-    ntips <- nTips(object)
-    nnodes <- nNodes(object)
-
-    ## Check dimensions
-    if (nrow(object@tip.data) > 0 && nrow(object@tip.data) != ntips)
-        stop("The number of tip data does not match the number ",
-             "of tips in the tree")
-    if (nrow(object@node.data) > 0 && nrow(object@node.data) != nnodes)
-        stop("The number of node data does not match the number ",
-             "of internal nodes in the tree")
+# JR: I don't think this part is necessary. All that matters is that all
+# rows in the data have names corresponding to (valid) node numbers
+#    ntips <- nTips(object)
+#    nnodes <- nNodes(object)
+#
+#    ## Check dimensions
+#    if (nrow(object@tip.data) > 0 && nrow(object@tip.data) != ntips)
+#        stop("The number of tip data does not match the number ",
+#             "of tips in the tree")
+#    if (nrow(object@node.data) > 0 && nrow(object@node.data) != nnodes)
+#        stop("The number of node data does not match the number ",
+#             "of internal nodes in the tree")
 
     ## Check rownames
-    if (nrow(object@tip.data) > 0 &&
-       !all(rownames(object@tip.data) %in% nodeId(object, "tip")))
-        stop("The row names of tip data do not match the tip numbers")
-    if (nrow(object@node.data) > 0 &&
-        !all(rownames(object@node.data) %in% nodeId(object, "internal")))
-        stop("The row names of node data do not match the node numbers")
+    if (nrow(object@data) > 0 &&
+        !all(row.names(object@data) %in% nodeId(object, "all")))
+        stop("The row names of tree data do not match the node numbers")
 
     return(TRUE)
 }

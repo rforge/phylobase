@@ -163,7 +163,7 @@ setAs("phylo4", "phylo", function(from, to) {
 setAs("multiPhylo4", "multiPhylo", function(from, to) {
     y <- lapply(from@phylolist, function(x) as(x, "phylo"))
     names(y) <- from@tree.names
-    if (nrow(from@tip.data) > 0)
+    if (hasTipData(from))
         warning("discarded tip data")
     class(y) <- "multiPhylo"
     y
@@ -215,7 +215,7 @@ setAs("phylo4", "phylog", function(from, to) {
     tDf$label <- as.character(tDf$label)
 
     if (class(from) == "phylo4d") {
-        dat <- tdata(from, "allnode", label.type="column") # get data
+        dat <- tdata(from, "all", label.type="column") # get data
 
         ## reorder data to edge matrix order, drop labels (first column)
         if(nrow(dat) > 0 && ncol(dat) > 1) {
