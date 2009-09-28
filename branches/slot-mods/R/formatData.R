@@ -40,31 +40,34 @@ formatData <- function(phy, dt, type=c("tip", "internal", "all"),
     tmpDt <- data.frame(tmpDt)
 
     if(match.data) {
-        ## Replace node labels by node numbers
+        ## extract node-matching vector
         ndNames <- switch(label.type,
                           rownames = rownames(dt),
                           column = dt[,label.column])
-        ndDt <- lapply(ndNames, function(nd) {
-            if(nchar(gsub("[0-9]", "", nd)) == 0 && !rownamesAsLabels)
-                getNode(phy, as.integer(nd), missing="OK")
-            else getNode(phy, nd, missing="OK")
-        })
-        ndDt <- unlist(ndDt)
-#        ndDt <- ifelse(nchar(gsub("[0-9]", "", ndNames))==0,
-#            getNode(phy, as.integer(ndNames), missing="OK"),
-#            getNode(phy, ndNames, missing="OK"))
+        ## either force matching on labels, or match on node
+        ## numbers for any number-like elements and labels otherwise
+        if (rownamesAsLabels) {
+            ndDt <- getNode(phy, as.character(ndNames), missing="OK")
+        } else {
+            ndDt <- as.numeric(rep(NA, length(ndNames)))
+            treatAsNumber <- nchar(gsub("[0-9]", "", ndNames))==0
+            ndDt[treatAsNumber] <- getNode(phy,
+                as.integer(ndNames[treatAsNumber]), missing="OK")
+            ndDt[!treatAsNumber] <- getNode(phy,
+                as.character(ndNames[!treatAsNumber]), missing="OK")
+        }
         ## Make sure that data are matched to appropriate nodes
         if(type != "all") {
             switch(type,
                    tip = {
                      ## BMB: don't bother trying to match NAs
-                       if(any(na.omit(names(ndDt)) %in% labels(phy, "internal")))
+                       if(any(na.omit(ndDt) %in% nodeId(phy, "internal")))
                            stop("Your tip data are being matched to internal ",
                                 "nodes. Make sure that your data identifiers ",
                                 "are correct.")
                    },
                    internal = {
-                       if(any(na.omit(names(ndDt)) %in% labels(phy, "tip")))
+                       if(any(na.omit(ndDt) %in% nodeId(phy, "tip")))
                            stop("Your node data are being matched to tip ",
                                 "nodes. Make sure that your data identifiers ",
                                 "are correct.")
@@ -72,7 +75,7 @@ formatData <- function(phy, dt, type=c("tip", "internal", "all"),
         }
 
         ## Check differences
-        extra <- names(ndDt[is.na(ndDt)])
+        extra <- ndNames[is.na(ndDt)]
         mssng <- nodeId(phy, type)[! nodeId(phy, type) %in% ndDt]
 
         if(length(mssng) > 0 && missing.data != "OK") {

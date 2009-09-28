@@ -53,9 +53,9 @@
     argument is useful if the \code{phylo} object has non-unique node
     labels or node labels with informative data (e.g., posterior
     probabilities).}
-  \item{rownamesAsLabels}{(logical), in the case of number-like labels 
-    should the row names of the data provided be considered as labels 
-    (TRUE) or node numbers (FALSE and default)}
+  \item{rownamesAsLabels}{(logical), should the row names of the data
+    provided be matched only to labels (TRUE), or should any number-like
+    row names be matched to node numbers (FALSE and default)}
   \item{annote}{any additional annotation data to be passed to the new object}
   \item{metadata}{any additional metadata to be passed to the new object}
   \item{\dots}{further arguments to be passed to
@@ -71,12 +71,13 @@
   nodes are determined jointly by the \code{match.data} and
   \code{rownamesAsLabels} arguments, and these will apply the same way
   to all supplied data frames. If \code{match.data} is TRUE, data frame
-  rows will be matched against tip and node \emph{labels} if
-  \code{rownamesAsLabels} is also TRUE, and against tip and node
-  \emph{numbers} otherwise (the default). If \code{match.data} is FALSE,
-  \code{rownamesAsLabels} has no effect, and row matching is purely
-  positional with respect to the order returned by \code{nodeId(x,
-  "tip")} for tip.data, \code{nodeId(x, "internal")} for
+  rows will be matched exclusively against tip and node labels if
+  \code{rownamesAsLabels} is also TRUE, whereas any all-digit row names
+  will be matched against tip and node numbers if
+  \code{rownamesAsLabels} is FALSE (the default). If \code{match.data}
+  is FALSE, \code{rownamesAsLabels} has no effect, and row matching is
+  purely positional with respect to the order returned by
+  \code{nodeId(x, "tip")} for tip.data, \code{nodeId(x, "internal")} for
   node.data, and \code{nodeId(x, "all")} for all.data.
 
   This means that you need to be consistent with the row names of your

@@ -455,7 +455,7 @@ phyl4d> nodeLabels(p4) <- as.character(nodeId(p4, "internal"))
 phyl4d> p4d.all2 <- phylo4d(p4, all.data = rbind(dat, nod.dat, match.data=FALSE))
 Warning message:
 In switch(extra.data, warn = warning(msg), fail = stop(msg)) :
-  The following names are not found in the tree:  NA
+  The following names are not found in the tree:  match.data
 > obj1 <- obj2 <- obj3 <- phylo4d(z, data.frame(wing=1:4,color=factor(c("b","w","b","b")), tail=runif(4)*10), match.data=FALSE)
 > 
 > obj2@data <- as.data.frame(obj2@data[,1])
