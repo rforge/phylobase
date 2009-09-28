@@ -48,31 +48,31 @@ setGeneric("phylo4d", function(x, ...) { standardGeneric("phylo4d")} )
              "tip.data and node.data column names")
     }
 
-    ## identify common columns to merge if merging, or rename otherwise
-    colnamesToMerge <- intersect(names(tip.data), names(node.data))
-    if (merge.data==FALSE) {
-        names(tip.data)[names(tip.data) %in% colnamesToMerge] <-
-            paste(colnamesToMerge, "tip", sep=".")
-        names(node.data)[names(node.data) %in% colnamesToMerge] <-
-            paste(colnamesToMerge, "node", sep=".")
-        colnamesToMerge <- NULL
+    ## combine common columns and move into all.data if merging,
+    ## otherwise rename them
+    colsToMerge <- intersect(names(tip.data), names(node.data))
+    if (merge.data && length(colsToMerge)>0) {
+        ##TODO could really just index rows directly on 1:nTip and
+        ## (nTip+1):(nTip+nNode) in the next two statements for speed,
+        ## but this is more robust to changes in node numbering rules
+        tip.rows <- tip.data[match(nodeId(x, "tip"),
+            row.names(tip.data)), colsToMerge, drop=FALSE]
+        node.rows <- node.data[match(nodeId(x, "internal"),
+            row.names(tip.data)), colsToMerge, drop=FALSE]
+        merge.data <- rbind(tip.rows, node.rows)
+        all.data <- data.frame(all.data, merge.data)
+    } else {
+        names(tip.data)[names(tip.data) %in% colsToMerge] <-
+            paste(colsToMerge, "tip", sep=".")
+        names(node.data)[names(node.data) %in% colsToMerge] <-
+            paste(colsToMerge, "node", sep=".")
     }
-    ## now separate tip.only, node.only, and common columns
+    ## now separate tips-only and nodes-only data
     tip.only.data <- tip.data[setdiff(names(tip.data), names(node.data))]
     node.only.data <- node.data[setdiff(names(node.data), names(tip.data))]
-    common.data <- rbind(tip.data[colnamesToMerge], node.data[colnamesToMerge])
 
-    ## merge data common to tips and nodes
-    all.common.data <- merge(all.data, common.data, by=0, all=TRUE,
-        sort=FALSE)
-    ## merge data that apply only to tips or nodes
-    all.separate.data <- merge(tip.only.data, node.only.data, by=0,
-        all=TRUE, sort=FALSE)
-    ## merge everything together and clean up
-    complete.data <- merge(all.common.data, all.separate.data,
-        by="Row.names", all=TRUE, sort=FALSE)
-    row.names(complete.data) <- complete.data[["Row.names"]]
-    complete.data <- subset(complete.data, select=-Row.names)
+    ## combine all data
+    complete.data <- data.frame(all.data, tip.only.data, node.only.data)
 
     ## drop any rows that only contain NAs
     if (ncol(complete.data)==0) {
