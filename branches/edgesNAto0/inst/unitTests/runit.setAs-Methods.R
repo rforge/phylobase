@@ -138,7 +138,7 @@ test.phylo4d.As.phylo <- function() {
 test.phylo4.As.phylog <- function() {
 }
 
-test..phylo4ToDataFrame <- function() {
+test.phylo4ToDataFrame <- function() {
   phy.show <- phylobase:::.phylo4ToDataFrame(phy.alt, "pretty")
   checkIdentical(phy.show$label, c(lab.tip, lab.int))
   checkIdentical(phy.show$node, c(nid.tip, nid.int))

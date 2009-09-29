@@ -192,6 +192,9 @@ setAs("phylo4", "phylog", function(from, to) {
     if (edgeOrder == "pretty") {
         node <- nodeId(from, "all")
         ancestr <- ancestor(from, node)
+
+        # ancestor returns an NA, replace this w/ 0 to construct names correctly
+        ancestr[is.na(ancestr)] <- as.integer(0)
     } else {
         E <- edges(from)
         node <- E[, 2]

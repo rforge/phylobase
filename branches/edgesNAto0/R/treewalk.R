@@ -27,7 +27,7 @@ getNode <- function(phy, node, missing=c("warn","OK","fail")) {
     ## node numbers
     rval <- names(labels(phy, "all"))[irval]
 
-    rval[node == 0]   <- 0 # root ancestor gets special treatment
+    rval[node == 0]   <- NA # root ancestor gets special treatment
     rval[is.na(node)] <- NA # return NA for any NA_character_ inputs
     rval <- as.integer(rval)
 
