@@ -33,39 +33,46 @@ The phylobase package seeks to provide a set of S4 classes and methods for repre
 
 <!-- end of project description -->
 
-<h2>Package resources</h2>
-<ul>
-<li>To install the current release version (0.3, rev. 104): download one of
-the following and install as appropriate for your platform.</li>
-<li>The current version requires ape version 2.1: MacOS users will
-need to specify <tt>install.packages("ape",type="source")</tt>,
-and have development tools installed,
-to get the right version.)</li>
-</ul>
+<h2>How to install phylobase?</h2>
+
+<h3>Current release</h3>
 
 <ul>
-<li><a href="misc/phylobase_0.3.tar.gz">Source</a> (for Linux, Unix, or MacOS/Windows with development
-tools installed)</li>
-<li><a href="misc/phylobase_0.3.zip">Windows binary</a></li>
-<li><a href="misc/phylobase_0.3_R_i386-apple-darwin8.10.1.tar.gz">MacOS <strong>Intel</strong> binary</a> If you require a PowerPC binary please ask on the developer list.</li>
+<li>You can download the current release version from <a href="http://cran.r-project.org/web/packages/phylobase/index.html">R-forge</a></li>
+<li>Alternatively, you can install it directly within R: <tt>install.packages("phylobase")</tt><li>
 </ul>
 
-To install the <strong>nightly</strong> snapshot (on a good day):
+<h3>Nightly snapshot</h3>
 
 <ul>
-<li>Windows or *nix users: <tt>install.packages("phylobase", repos="http://r-forge.r-project.org")</tt></li>
-<li>MacOS users: <tt>install.packages("phylobase", repos="http://r-forge.r-project.org", type = 'source')</tt></li>
+<li>You can download the <a href="https://r-forge.r-project.org/R/?group_id=111">nighthly</a> snapshot (on a good day) from R-forge.</li>
+<li>You can also install it directly within R: <tt>install.packages("phylobase", repos="http://r-forge.r-project.org")</tt>
 </ul>
 
-Additional information:
+<h3>SVN access</h3>
+
+You can checkout the latest version of the source code using <a href="http://subversion.tigris.org/">Subversion</a>:<br/>
+<tt>svn checkout svn://svn.r-forge.r-project.org/svnroot/phylobase</tt>
+
+
+<h2>Where can I find help?</h2>
+
+<tt>phylobase</tt> comes with two vignettes that will help you to get started:
+
 <ul>
-<li>A current copy (0.3r104) of the package
-<a href="misc/phylobase.pdf"><strong>vignette</strong></a></li>
-<li>The <strong>project summary page</strong> can found <a href="http://r-forge.r-project.org/projects/phylobase/"><strong>here</strong></a>. </li>
-<li>Google Summer of Code <a href= "https://www.nescent.org/wg_phyloinformatics/PhyloSoC:Tree_and_data_plotting_in_the_phylobase_project" title = "GSOC"><strong>project description and progress</strong></a>. </li>
+<li><a href="http://cran.r-project.org/web/packages/phylobase/vignettes/phylobase.pdf">phylo4: classes and methods for phylogenetic trees and data</a>
+gives an overview of the tree manipulation and plotting functions available in phylobase</li>
+<li><a href="http://cran.r-project.org/web/packages/phylobase/vignettes/developer.pdf">A developers guide for contributing to phylobase</a>
+provides information about the organization of the package and how to use Subversion.</a>
 </ul>
 
-The phylobase email lists can be accessed and subscribed to from <a href="http://r-forge.r-project.org/mail/?group_id=111">this page.</a>
+The best way to get in touch with us is to send an email to our <a href="http://r-forge.r-project.org/mail/?group_id=111">mailing list</a>.
+If you are lucky you can also find us on the <tt>#phylobase</tt> IRC channel at freenode.
+
+<h2>Misc</h2>
+<ul>
+<li>Peter's 2008 Google Summer of Code <a href="https://www.nescent.org/wg_phyloinformatics/PhyloSoC:Tree_and_data_plotting_in_the_phylobase_project" title="GSOC">project description and progress</a>.</li>
+</ul>
 
 </body>
 </html>
