@@ -57,7 +57,10 @@ gives an overview of the tree manipulation and plotting functions available in p
 provides information about the organization of the package and how to use Subversion. Also <a href="misc/developer.pdf">here [pdf].</a>
 </ul>
 
-Additional information:
+You can contact us on our <a href="https://lists.r-forge.r-project.org/cgi-bin/mailman/listinfo/phylobase-devl">mailing list</a>.
+Alternatively, you can send an email the special interest group mailing list on phylogenetic and comparative methods and analyses: <a href="https://stat.ethz.ch/mailman/listinfo/r-sig-phylo">R-sig-phylo</a>.
+
+<h2>Additional information</h2>
 <ul>
 <li>The <strong>project summary page</strong> can found <a href="http://r-forge.r-project.org/projects/phylobase/"><strong>here</strong></a>. </li>
 
