@@ -62,9 +62,9 @@ Alternatively, you can send an email the special interest group mailing list on 
 
 <h2>Additional information</h2>
 <ul>
-<li>The <strong>project summary page</strong> can found <a href="http://r-forge.r-project.org/projects/phylobase/"><strong>here</strong></a>. </li>
+<li>The <strong>project summary page</strong> can found <a href="http://r-forge.r-project.org/projects/phylobase/"><strong>here.</strong></a></li>
 
-<li>Much of the plotting code was written as part of the 2008 Google Summer of Code <br/> <a href= "https://www.nescent.org/wg_phyloinformatics/PhyloSoC:Tree_and_data_plotting_in_the_phylobase_project" title = "GSOC"><strong>project description and progress can be found here.</strong></a>. </li>
+<li>Much of the plotting code was written as part of the 2008 Google Summer of Code <br/> <a href= "https://www.nescent.org/wg_phyloinformatics/PhyloSoC:Tree_and_data_plotting_in_the_phylobase_project" title = "GSOC"><strong>project description and progress can be found here.</strong></a></li>
 </ul>
 
 </body>
