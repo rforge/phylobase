@@ -1,0 +1,13 @@
+<map id="G" name="G">
+<area shape="rect" id="node1" href="$classNxsBlock.html" title="This is the base class from which all block classes are derived." alt="" coords="61,99,144,128"/>
+<area shape="rect" id="node3" href="$classNxsCharactersBlockAPI.html" title="Intended to specify the interface of a NxsCharactersBlock, but actually does not..." alt="" coords="249,59,428,88"/>
+<area shape="rect" id="node9" href="$classNxsDistancesBlock.html" title="This class handles reading and storage for the NEXUS block DISTANCES." alt="" coords="264,112,413,141"/>
+<area shape="rect" id="node11" href="$classNxsTaxaBlockAPI.html" title="This abstract class describes the interface that every block that wants to serve..." alt="" coords="271,5,407,35"/>
+<area shape="rect" id="node15" href="$classNxsUnalignedBlock.html" title="This class handles reading and storage for the NEXUS block UNALIGNED." alt="" coords="265,165,412,195"/>
+<area shape="rect" id="node5" href="$classNxsCharactersBlock.html" title="This class handles reading and storage for the NEXUS block CHARACTERS." alt="" coords="479,139,636,168"/>
+<area shape="rect" id="node7" href="$classNxsDataBlock.html" title="This class handles reading and storage for the NEXUS block DATA." alt="" coords="685,139,803,168"/>
+<area shape="rect" id="node13" href="$classNxsTaxaBlock.html" title="The default implementation of the NxsTaxaBlockAPI that is used to parse TAXA blocks..." alt="" coords="500,5,615,35"/>
+<area shape="rect" id="node16" href="$classNxsLabelToIndicesMapper.html" title="This is the base class for the block interfaces that correspond to blocks that hold..." alt="" coords="5,19,200,48"/>
+<area shape="rect" id="node19" href="$classNxsTaxaBlockSurrogate.html" title="This class is the base class for blocks that can (in a pinch) serve as a TAXA block..." alt="" coords="13,192,192,221"/>
+<area shape="rect" id="node23" href="$classNxsTreesBlock.html" title="This class handles reading and storage for the NEXUS block TREES." alt="" coords="279,269,399,299"/>
+</map>
