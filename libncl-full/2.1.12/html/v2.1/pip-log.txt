@@ -1,0 +1,85 @@
+Downloading/unpacking dendropy
+  Getting page http://pypi.python.org/simple/dendropy
+  URLs to search for versions for dendropy:
+  * http://pypi.python.org/simple/dendropy/
+  * http://phylo.bio.ku.edu/DendroPy-3.2.0.tar.gz
+  Found link http://phylo.bio.ku.edu/DendroPy-3.2.0.tar.gz (from -f), version: 3.2.0
+  Getting page http://pypi.python.org/simple/dendropy/
+  Skipping page http://phylo.bio.ku.edu/DendroPy-3.2.0.tar.gz because of Content-Type: 
+  Getting page http://packages.python.org/DendroPy/
+  Analyzing links from page http://pypi.python.org/simple/DendroPy/
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-2.6.2.tar.gz#md5=0e025e4b77285d3814ab9b247a0a3108 (from http://pypi.python.org/simple/DendroPy/), version: 2.6.2
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-2.6.8.tar.gz#md5=2c061ea153dae0792948208ca02205df (from http://pypi.python.org/simple/DendroPy/), version: 2.6.8
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.0.3.tar.gz#md5=b721447ec806f407e2c7d0a68067c616 (from http://pypi.python.org/simple/DendroPy/), version: 3.0.3
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.0.2.tar.gz#md5=d1e44937e5171fe864864f6cb8e629c1 (from http://pypi.python.org/simple/DendroPy/), version: 3.0.2
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-2.6.0.tar.gz#md5=9617f42554bd908a9237c243998ca0f8 (from http://pypi.python.org/simple/DendroPy/), version: 2.6.0
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.0.7.tar.gz#md5=48ac107bef7869c94f753a368588a487 (from http://pypi.python.org/simple/DendroPy/), version: 3.0.7
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-2.6.7.tar.gz#md5=56bf5c6b422aedf6db85b3584ca3cb09 (from http://pypi.python.org/simple/DendroPy/), version: 2.6.7
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.1.1.tar.gz#md5=84f6a58d582791b6fc9a0681ac713c6b (from http://pypi.python.org/simple/DendroPy/), version: 3.1.1
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.1.0.tar.gz#md5=68d5266474730d6743a85869fd66d824 (from http://pypi.python.org/simple/DendroPy/), version: 3.1.0
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-2.6.6.tar.gz#md5=398e1ec93a683042ecfd204473d3f798 (from http://pypi.python.org/simple/DendroPy/), version: 2.6.6
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.1.3.tar.gz#md5=456418c38bbd4056ed8204b9d40ef2bb (from http://pypi.python.org/simple/DendroPy/), version: 3.1.3
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.1.2.tar.gz#md5=1d007a4fd77f6e5910abeafc315dee62 (from http://pypi.python.org/simple/DendroPy/), version: 3.1.2
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-2.6.1.tar.gz#md5=35c64f7c74d3259e12eb99f6db5bd934 (from http://pypi.python.org/simple/DendroPy/), version: 2.6.1
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.2.0.tar.gz#md5=f72a4efe8890905773400560ce9f934a (from http://pypi.python.org/simple/DendroPy/), version: 3.2.0
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.0.5.tar.gz#md5=01d088b5184bdced992499fc0a6fbd12 (from http://pypi.python.org/simple/DendroPy/), version: 3.0.5
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-2.5.10.tar.gz#md5=9558a7fca7661a4219739fc91287efbb (from http://pypi.python.org/simple/DendroPy/), version: 2.5.10
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.0.1.tar.gz#md5=1bc24d8cf71a3d79c074417cfc2fe574 (from http://pypi.python.org/simple/DendroPy/), version: 3.0.1
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.0.0.tar.gz#md5=66c31d2762ce553f3a436a00501229ea (from http://pypi.python.org/simple/DendroPy/), version: 3.0.0
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.0.6.tar.gz#md5=04dd44907482520db8683184736e9ec0 (from http://pypi.python.org/simple/DendroPy/), version: 3.0.6
+    Skipping link http://packages.python.org/DendroPy/ (from http://pypi.python.org/simple/DendroPy/); not a file
+    Skipping link http://ete.cgenomics.org/ (from http://pypi.python.org/simple/DendroPy/); not a file
+    Skipping link http://github.com/jeetsukumaran/DendroPy (from http://pypi.python.org/simple/DendroPy/); not a file
+    Skipping link http://git-scm.com/ (from http://pypi.python.org/simple/DendroPy/); not a file
+    Skipping link http://packages.python.org/DendroPy/library/index.html (from http://pypi.python.org/simple/DendroPy/); unknown archive format: .html
+    Skipping link http://packages.python.org/DendroPy/tutorial/index.html (from http://pypi.python.org/simple/DendroPy/); unknown archive format: .html
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.0.7.tar.gz (from http://pypi.python.org/simple/DendroPy/), version: 3.0.7
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.1.0.tar.gz (from http://pypi.python.org/simple/DendroPy/), version: 3.1.0
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.1.1.tar.gz (from http://pypi.python.org/simple/DendroPy/), version: 3.1.1
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.1.2.tar.gz (from http://pypi.python.org/simple/DendroPy/), version: 3.1.2
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.1.3.tar.gz (from http://pypi.python.org/simple/DendroPy/), version: 3.1.3
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.2.0.tar.gz (from http://pypi.python.org/simple/DendroPy/), version: 3.2.0
+  Analyzing links from page http://packages.python.org/DendroPy/
+    Skipping link http://packages.python.org/DendroPy/_static/default.css (from http://packages.python.org/DendroPy/); unknown archive format: .css
+    Skipping link http://packages.python.org/DendroPy/_static/pygments.css (from http://packages.python.org/DendroPy/); unknown archive format: .css
+    Skipping link http://packages.python.org/DendroPy/downloading.html (from http://packages.python.org/DendroPy/); unknown archive format: .html
+    Skipping link http://packages.python.org/DendroPy/genindex.html (from http://packages.python.org/DendroPy/); unknown archive format: .html
+    Skipping link http://packages.python.org/DendroPy/modindex.html (from http://packages.python.org/DendroPy/); unknown archive format: .html
+    Skipping link http://packages.python.org/DendroPy/#dendropy-phylogenetic-computing-library (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://www.python.org/ (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://www.jeetworks.org/about (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://people.ku.edu/%7emtholder (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://packages.python.org/DendroPy/#prerequisites (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://packages.python.org/DendroPy/#installing (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://pypi.python.org/pypi/pip (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://pypi.python.org/pypi/setuptools (from http://packages.python.org/DendroPy/); not a file
+    Found link http://pypi.python.org/packages/source/D/DendroPy/DendroPy-3.2.0.tar.gz (from http://packages.python.org/DendroPy/), version: 3.2.0
+    Skipping link http://packages.python.org/DendroPy/#documentation (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://packages.python.org/DendroPy/scripts/sumtrees.html (from http://packages.python.org/DendroPy/); unknown archive format: .html
+    Skipping link http://packages.python.org/DendroPy/changes.html (from http://packages.python.org/DendroPy/); unknown archive format: .html
+    Skipping link http://packages.python.org/DendroPy/#citation (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://packages.python.org/DendroPy/#bugs-suggestions-comments-etc (from http://packages.python.org/DendroPy/); not a file
+    Skipping link mailto:jeet&#37;&#52;&#48;ku&#46;edu (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://packages.python.org/DendroPy/#copyright-license-and-warranty (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://packages.python.org/DendroPy/_static/dendropy.png (from http://packages.python.org/DendroPy/); unknown archive format: .png
+    Skipping link http://www.gnu.org/licenses/gpl.html (from http://packages.python.org/DendroPy/); unknown archive format: .html
+    Skipping link http://www.gnu.org/licenses/ (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://packages.python.org/DendroPy/#acknowledgments (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://www.phylo.org (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://www.nsf.gov/ (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://www.phylo.org/about/acknowledgements (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://pypi.python.org/pypi/DendroPy (from http://packages.python.org/DendroPy/); not a file
+    Skipping link http://sphinx.pocoo.org/ (from http://packages.python.org/DendroPy/); not a file
+  Using version 3.2.0 (newest of versions: 3.2.0, 3.2.0, 3.2.0, 3.2.0, 3.1.3, 3.1.3, 3.1.2, 3.1.2, 3.1.1, 3.1.1, 3.1.0, 3.1.0, 3.0.7, 3.0.7, 3.0.6, 3.0.5, 3.0.3, 3.0.2, 3.0.1, 3.0.0, 2.6.8, 2.6.7, 2.6.6, 2.6.2, 2.6.1, 2.6.0, 2.5.10)
+  HTTP error 404 while getting http://phylo.bio.ku.edu/DendroPy-3.2.0.tar.gz (from -f)
+  Could not install requirement dendropy because of error HTTP Error 404: Not Found
+Could not install requirement dendropy because of HTTP error HTTP Error 404: Not Found for URL http://phylo.bio.ku.edu/DendroPy-3.2.0.tar.gz (from -f)
+Exception information:
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/pip/basecommand.py", line 115, in main
+    self.run(options, args)
+  File "/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/pip/commands/install.py", line 155, in run
+    requirement_set.install_files(finder, force_root_egg_info=self.bundle, bundle=self.bundle)
+  File "/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/pip/req.py", line 836, in install_files
+    % (req_to_install, e, url))
+InstallationError: Could not install requirement dendropy because of HTTP error HTTP Error 404: Not Found for URL http://phylo.bio.ku.edu/DendroPy-3.2.0.tar.gz (from -f)

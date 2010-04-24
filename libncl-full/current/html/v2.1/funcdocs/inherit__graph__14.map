@@ -1,0 +1,7 @@
+<map id="G" name="G">
+<area shape="rect" id="node1" href="$classNxsReader.html" title="This is the class that orchestrates the reading of a NEXUS data file, and so is the..." alt="" coords="5,32,101,61"/>
+<area shape="rect" id="node3" href="$classDefaultErrorReportNxsReader.html" title="A subclass of NxsReader that is used preserves the same output style as version 2..." alt="" coords="149,5,376,35"/>
+<area shape="rect" id="node5" href="$classExceptionRaisingNxsReader.html" title="A subclass of NxsReader that is used in much of NCL v2.1." alt="" coords="157,59,368,88"/>
+<area shape="rect" id="node7" href="$classPublicNexusReader.html" title="A NxsReader that uses clone factories to read public blocks." alt="" coords="424,59,576,88"/>
+<area shape="rect" id="node9" href="$classMultiFormatReader.html" title="A special class of PublicNexusReader, that can parse." alt="" coords="625,59,777,88"/>
+</map>
