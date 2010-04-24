@@ -1,5 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$classNxsException.html" title="Exception class that conveys a message specific to the problem encountered." alt="" coords="5,5,120,35"/>
-<area shape="rect" id="node3" href="$classNxsNCLAPIException.html" title="Thrown when a programming error (a violation of one of the APIs used in NCL) is revealed..." alt="" coords="168,5,333,35"/>
-<area shape="rect" id="node5" href="$classNxsUnimplementedException.html" title="Thrown when an unimplemented method is called." alt="" coords="383,5,604,35"/>
-</map>
