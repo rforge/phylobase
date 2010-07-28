@@ -35,7 +35,7 @@ The phylobase package seeks to provide a set of S4 classes and methods for repre
 
 <h2>Package resources</h2>
 <ul>
-<li>To install the current release version (0.5, rev. 700) use CRAN</li>
+<li>To install the current release version (0.6.1, rev. 804) use CRAN</li>
 </ul>
 
 To install the <strong>nightly</strong> snapshot (on a good day, when they build properly) go to <a href="http://r-forge.r-project.org/R/?group_id=111"> the <tt>phylobase</tt> build page.</a>
@@ -66,6 +66,8 @@ Alternatively, you can send an email the special interest group mailing list on 
 
 <li>Much of the plotting code was written as part of the 2008 Google Summer of Code <br/> <a href= "https://www.nescent.org/wg_phyloinformatics/PhyloSoC:Tree_and_data_plotting_in_the_phylobase_project" title = "GSOC"><strong>project description and progress can be found here.</strong></a></li>
 </ul>
+
+<img src="geospiza.png">
 
 </body>
 </html>
