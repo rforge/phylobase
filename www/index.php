@@ -35,15 +35,10 @@ The phylobase package seeks to provide a set of S4 classes and methods for repre
 
 <h2>Package resources</h2>
 <ul>
-<li>To install the current release version (0.6.1, rev. 804) use CRAN</li>
+<li>To install the current release version use <a href="http://cran.r-project.org/web/packages/phylobase/">CRAN</a></li>
+<li>To install the <strong>nightly</strong> snapshot (on a good day, when they build properly) go to <a href="http://r-forge.r-project.org/R/?group_id=111"> the <tt>phylobase</tt> build page.</a></li>
+<li>The latest version of the source code is always available via <a href="http://subversion.tigris.org/">Subversion</a>:<br/><tt>svn checkout svn://svn.r-forge.r-project.org/svnroot/phylobase</tt></li>
 </ul>
-
-To install the <strong>nightly</strong> snapshot (on a good day, when they build properly) go to <a href="http://r-forge.r-project.org/R/?group_id=111"> the <tt>phylobase</tt> build page.</a>
-<br/>
-<br/>
-The latest version of the source code is always available via <a href="http://subversion.tigris.org/">Subversion</a>:<br/>
-<tt>svn checkout svn://svn.r-forge.r-project.org/svnroot/phylobase</tt>
-
 
 <h2>Where can I find help?</h2>
 
@@ -51,10 +46,10 @@ The latest version of the source code is always available via <a href="http://su
 
 <ul>
 <li><a href="http://cran.r-project.org/web/packages/phylobase/vignettes/phylobase.pdf">phylo4: classes and methods for phylogenetic trees and data [pdf]</a>
-gives an overview of the tree manipulation and plotting functions available in phylobase. Also <a href="misc/phylobase.pdf">here [pdf].</a><br/></li>
+gives an overview of the tree manipulation and plotting functions available in phylobase.</li>
 
 <li><a href="http://cran.r-project.org/web/packages/phylobase/vignettes/developer.pdf">A developers guide for contributing to phylobase [pdf]</a>
-provides information about the organization of the package and how to use Subversion. Also <a href="misc/developer.pdf">here [pdf].</a>
+provides information about the organization of the package and how to use Subversion.</a>
 </ul>
 
 You can contact us on our <a href="https://lists.r-forge.r-project.org/cgi-bin/mailman/listinfo/phylobase-devl">mailing list</a>.
